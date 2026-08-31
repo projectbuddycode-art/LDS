@@ -35,59 +35,43 @@ export default function IndustriesSection() {
   
   const [isMobile, setIsMobile] = useState<boolean>(false)
   const [mobileActiveIndex, setMobileActiveIndex] = useState<number>(0)
-  const [sectionVisible, setSectionVisible] = useState<boolean>(false)
-  const [activeCardIndex, setActiveCardIndex] = useState<number>(0)
 
-  // 1. Viewport proximity observer — only prepare videos when section is nearby
-  useEffect(() => {
-    const el = sectionRef.current
-    if (!el || typeof IntersectionObserver === 'undefined') {
-      setSectionVisible(true)
-      return
-    }
-    const observer = new IntersectionObserver(([entry]) => {
-      setSectionVisible(entry.isIntersecting)
-    }, { rootMargin: '300px' })
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [])
-
-  // 2. Controlled video playback helper
+  // Controlled video playback helper
   const updateVideoPlayback = useCallback((activeIdx: number) => {
     const refs = isMobile ? mobileVideoRefs.current : desktopVideoRefs.current
     refs.forEach((vid, i) => {
       if (!vid) return
       if (i === activeIdx) {
-        vid.play().catch(() => {})
+        const promise = vid.play()
+        if (promise !== undefined) {
+          promise.catch(() => {})
+        }
       } else {
         vid.pause()
       }
     })
   }, [isMobile])
 
-  // Clean unmount for videos
+  // Viewport intersection observer to play active video when section is in view
   useEffect(() => {
-    return () => {
-      [...desktopVideoRefs.current, ...mobileVideoRefs.current].forEach((vid) => {
-        if (vid) {
-          vid.pause()
-          vid.removeAttribute('src')
-          vid.load()
-        }
-      })
-    }
-  }, [])
-
-  // Start active video when section enters viewport
-  useEffect(() => {
-    if (sectionVisible) {
+    const el = sectionRef.current
+    if (!el || typeof IntersectionObserver === 'undefined') {
       updateVideoPlayback(isMobile ? mobileActiveIndex : activeIndexRef.current)
-    } else {
-      [...desktopVideoRefs.current, ...mobileVideoRefs.current].forEach((vid) => {
-        if (vid) vid.pause()
-      })
+      return
     }
-  }, [sectionVisible, isMobile, mobileActiveIndex, updateVideoPlayback])
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        updateVideoPlayback(isMobile ? mobileActiveIndex : activeIndexRef.current)
+      } else {
+        const refs = isMobile ? mobileVideoRefs.current : desktopVideoRefs.current
+        refs.forEach((vid) => { if (vid) vid.pause() })
+      }
+    }, { rootMargin: '200px' })
+
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [isMobile, mobileActiveIndex, updateVideoPlayback])
 
   // Handle responsive breakpoint
   useEffect(() => {
@@ -108,7 +92,7 @@ export default function IndustriesSection() {
     }
   }, [])
 
-  // DOM active style update helper — zero layout thrashing
+  // DOM active style update helper
   const updateCardDOMStyles = useCallback((activeIdx: number) => {
     cardRefs.current.forEach((card, i) => {
       if (!card) return
@@ -158,7 +142,6 @@ export default function IndustriesSection() {
         const distance = getDistance()
 
         if (distance > 0) {
-          // Play initial active video
           updateVideoPlayback(0)
           updateCardDOMStyles(0)
 
@@ -179,15 +162,12 @@ export default function IndustriesSection() {
                   numCards - 1
                 )
 
-                // Update active index without triggering React state re-render
                 if (cardIndex !== activeIndexRef.current) {
                   activeIndexRef.current = cardIndex
-                  setActiveCardIndex(cardIndex)
                   updateVideoPlayback(cardIndex)
                   updateCardDOMStyles(cardIndex)
                 }
 
-                // Smooth scale & opacity calculated per card via GPU transform
                 cardRefs.current.forEach((card, i) => {
                   if (!card) return
                   const cardProgress = i / (numCards - 1)
@@ -208,7 +188,6 @@ export default function IndustriesSection() {
           })
         }
 
-        // Section header reveal
         const headerEl = section.querySelector('[data-header]')
         if (headerEl) {
           gsap.fromTo(headerEl,
@@ -296,8 +275,6 @@ export default function IndustriesSection() {
               const videoSrc = MEDIA.industries[industry.mediaKey]
               const objPos = OBJECT_POSITIONS[industry.mediaKey] || 'center center'
               const isInitialActive = index === 0
-              // Smart decoder management: only mount video for active or adjacent card
-              const shouldMountVideo = sectionVisible && Math.abs(index - activeCardIndex) <= 1
 
               return (
                 <div
@@ -320,40 +297,23 @@ export default function IndustriesSection() {
                 >
                   {/* Video wrapper */}
                   <div style={{ position: 'absolute', inset: 0 }}>
-                    {shouldMountVideo && (
-                      <video
-                        ref={(el) => { desktopVideoRefs.current[index] = el }}
-                        src={videoSrc}
-                        poster={POSTER_MAP[industry.mediaKey]}
-                        autoPlay={index === activeCardIndex}
-                        muted
-                        playsInline
-                        loop
-                        preload={index === activeCardIndex ? 'auto' : 'metadata'}
-                        aria-hidden="true"
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                          objectPosition: objPos,
-                          display: 'block',
-                          transform: 'none',
-                        }}
-                      />
-                    )}
-                    {/* Poster background fallback */}
-                    <img
-                      src={POSTER_MAP[industry.mediaKey]}
-                      alt=""
+                    <video
+                      ref={(el) => { desktopVideoRefs.current[index] = el }}
+                      src={videoSrc}
+                      poster={POSTER_MAP[industry.mediaKey]}
+                      autoPlay={isInitialActive}
+                      muted
+                      playsInline
+                      loop
+                      preload="metadata"
                       aria-hidden="true"
                       style={{
-                        position: 'absolute',
-                        inset: 0,
                         width: '100%',
                         height: '100%',
                         objectFit: 'cover',
                         objectPosition: objPos,
-                        zIndex: shouldMountVideo ? -1 : 0,
+                        display: 'block',
+                        transform: 'none',
                       }}
                     />
                   </div>
@@ -444,7 +404,6 @@ export default function IndustriesSection() {
               const videoSrc = MEDIA.industries[industry.mediaKey]
               const isActive = index === mobileActiveIndex
               const objPos = OBJECT_POSITIONS[industry.id] || 'center 25%'
-              const shouldMountMobileVideo = sectionVisible && isActive
 
               return (
                 <div
@@ -466,38 +425,22 @@ export default function IndustriesSection() {
                 >
                   {/* Video / Poster */}
                   <div style={{ position: 'absolute', inset: 0 }}>
-                    {shouldMountMobileVideo && (
-                      <video
-                        ref={(el) => { mobileVideoRefs.current[index] = el }}
-                        src={videoSrc}
-                        poster={POSTER_MAP[industry.mediaKey]}
-                        autoPlay={isActive}
-                        muted
-                        playsInline
-                        loop
-                        preload="auto"
-                        aria-hidden="true"
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                          objectPosition: objPos,
-                          display: 'block',
-                        }}
-                      />
-                    )}
-                    <img
-                      src={POSTER_MAP[industry.mediaKey]}
-                      alt=""
+                    <video
+                      ref={(el) => { mobileVideoRefs.current[index] = el }}
+                      src={videoSrc}
+                      poster={POSTER_MAP[industry.mediaKey]}
+                      autoPlay={isActive}
+                      muted
+                      playsInline
+                      loop
+                      preload="metadata"
                       aria-hidden="true"
                       style={{
-                        position: 'absolute',
-                        inset: 0,
                         width: '100%',
                         height: '100%',
                         objectFit: 'cover',
                         objectPosition: objPos,
-                        zIndex: shouldMountMobileVideo ? -1 : 0,
+                        display: 'block',
                       }}
                     />
                   </div>
