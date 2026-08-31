@@ -1,0 +1,487 @@
+'use client'
+
+import { useEffect, useRef, useState, useCallback } from 'react'
+import { MEDIA } from '@/data/media'
+import { INDUSTRIES } from '@/data/content'
+
+// Per-industry object-position for optimal video framing
+const OBJECT_POSITIONS: Record<string, string> = {
+  education:      'center 25%',
+  commercial:     'center 20%',
+  residential:    'center 22%',
+  medical:        'center 20%',
+  township:       'center 28%',
+  warehousing:    'center 25%',
+  manufacturing:  'center 22%',
+}
+
+export default function IndustriesSection() {
+  const sectionRef = useRef<HTMLElement>(null)
+  const trackRef = useRef<HTMLDivElement>(null)
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([])
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([])
+  const activeIndexRef = useRef<number>(0)
+  
+  const [isMobile, setIsMobile] = useState<boolean>(false)
+  const [mobileActiveIndex, setMobileActiveIndex] = useState<number>(0)
+
+  // Handle responsive breakpoint
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth <= 768
+      setIsMobile((prev) => (prev !== mobile ? mobile : prev))
+    }
+    checkMobile()
+    let resizeTimer: ReturnType<typeof setTimeout>
+    const onResize = () => {
+      clearTimeout(resizeTimer)
+      resizeTimer = setTimeout(checkMobile, 150)
+    }
+    window.addEventListener('resize', onResize, { passive: true })
+    return () => {
+      clearTimeout(resizeTimer)
+      window.removeEventListener('resize', onResize)
+    }
+  }, [])
+
+  // Video playback helper — direct DOM control without React re-render
+  const updateVideoPlayback = useCallback((activeIdx: number) => {
+    videoRefs.current.forEach((vid, i) => {
+      if (!vid) return
+      if (i === activeIdx) {
+        vid.play().catch(() => {})
+      } else {
+        vid.pause()
+      }
+    })
+  }, [])
+
+  // DOM active style update helper — zero layout thrashing
+  const updateCardDOMStyles = useCallback((activeIdx: number) => {
+    cardRefs.current.forEach((card, i) => {
+      if (!card) return
+      const isCurrent = i === activeIdx
+      const topBar = card.querySelector('[data-active-bar]') as HTMLElement
+      const label = card.querySelector('[data-card-label]') as HTMLElement
+      const number = card.querySelector('[data-card-num]') as HTMLElement
+      const line = card.querySelector('[data-card-line]') as HTMLElement
+
+      if (topBar) topBar.style.opacity = isCurrent ? '1' : '0'
+      if (label) {
+        label.style.color = isCurrent ? '#FAF8F5' : 'rgba(250,248,245,0.70)'
+        label.style.fontWeight = isCurrent ? '600' : '500'
+      }
+      if (number) number.style.opacity = isCurrent ? '1' : '0.6'
+      if (line) {
+        line.style.width = isCurrent ? '32px' : '16px'
+        line.style.opacity = isCurrent ? '0.9' : '0.4'
+      }
+    })
+  }, [])
+
+  // Desktop GSAP Horizontal Scroll Pinning
+  useEffect(() => {
+    const section = sectionRef.current
+    const track = trackRef.current
+    if (!section || !track || isMobile) return
+
+    let cleanup: (() => void) | undefined
+
+    const init = async () => {
+      const { gsap } = await import('gsap')
+      const { ScrollTrigger } = await import('gsap/ScrollTrigger')
+      gsap.registerPlugin(ScrollTrigger)
+
+      const ctx = gsap.context(() => {
+        const numCards = INDUSTRIES.length
+
+        const getDistance = () => {
+          const trackWidth = track.scrollWidth
+          const containerWidth = section.clientWidth
+          return Math.max(0, trackWidth - containerWidth + 48)
+        }
+
+        const distance = getDistance()
+
+        if (distance > 0) {
+          // Play initial active video
+          updateVideoPlayback(0)
+          updateCardDOMStyles(0)
+
+          const tl = gsap.timeline({
+            scrollTrigger: {
+              trigger: section,
+              start: 'top top',
+              end: () => `+=${getDistance()}`,
+              scrub: 0.6,
+              pin: true,
+              pinSpacing: true,
+              anticipatePin: 1,
+              invalidateOnRefresh: true,
+              onUpdate: (self) => {
+                const progress = self.progress
+                const cardIndex = Math.min(
+                  Math.floor(progress * numCards),
+                  numCards - 1
+                )
+
+                // Update active index without triggering React state re-render
+                if (cardIndex !== activeIndexRef.current) {
+                  activeIndexRef.current = cardIndex
+                  updateVideoPlayback(cardIndex)
+                  updateCardDOMStyles(cardIndex)
+                }
+
+                // Smooth scale & opacity calculated per card via GPU transform
+                cardRefs.current.forEach((card, i) => {
+                  if (!card) return
+                  const cardProgress = i / (numCards - 1)
+                  const diff = Math.abs(progress - cardProgress) * (numCards - 1)
+                  const scale = Math.max(0.95, 1 - diff * 0.035)
+                  const opacity = Math.max(0.55, 1 - diff * 0.35)
+                  card.style.transform = `scale3d(${scale}, ${scale}, 1)`
+                  card.style.opacity = String(opacity)
+                })
+              },
+            },
+          })
+
+          tl.to(track, {
+            x: () => -getDistance(),
+            ease: 'none',
+            duration: 1,
+          })
+        }
+
+        // Section header reveal
+        const headerEl = section.querySelector('[data-header]')
+        if (headerEl) {
+          gsap.fromTo(headerEl,
+            { y: 20, opacity: 0 },
+            {
+              y: 0, opacity: 1, duration: 0.75, ease: 'power3.out',
+              scrollTrigger: { trigger: headerEl, start: 'top 88%', once: true },
+            }
+          )
+        }
+      }, section)
+
+      cleanup = () => ctx.revert()
+    }
+
+    const timer = setTimeout(init, 100)
+    return () => {
+      clearTimeout(timer)
+      cleanup?.()
+    }
+  }, [isMobile, updateVideoPlayback, updateCardDOMStyles])
+
+  // Mobile tap handler
+  const handleMobileCardTap = (index: number) => {
+    setMobileActiveIndex(index)
+    updateVideoPlayback(index)
+  }
+
+  return (
+    <section
+      ref={sectionRef}
+      id="industries"
+      style={{
+        background: 'var(--bg-secondary)',
+        borderTop: '1px solid var(--line-soft)',
+        overflow: 'hidden',
+        position: 'relative',
+      }}
+      aria-label="Industries served"
+    >
+      {/* Section header */}
+      <div
+        data-header
+        className="site-container"
+        style={{ paddingTop: 'var(--section-py)', paddingBottom: '36px' }}
+      >
+        <div className="section-label" style={{ marginBottom: '20px' }}>
+          <span className="section-label-bullet" />
+          <span className="t-label">11 — Industries</span>
+        </div>
+        <div id="industries-header" style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: 'clamp(24px, 4vw, 64px)',
+          alignItems: 'end',
+        }}>
+          <h2 className="t-headline">
+            Every sector.
+            <br />
+            <span style={{ color: 'var(--accent-gold)' }}>One standard.</span>
+          </h2>
+          <p className="t-body" style={{ maxWidth: '380px' }}>
+            From manufacturing plants and hospitals to commercial complexes, warehouses
+            and educational campuses — Lukhdatar & Sons delivers the same engineering rigour across
+            every environment.
+          </p>
+        </div>
+      </div>
+
+      {/* ── Desktop: Pinned Cinematic Horizontal Scroll ── */}
+      {!isMobile && (
+        <div style={{ overflow: 'hidden', paddingBottom: 'clamp(40px, 5vw, 64px)' }}>
+          <div
+            ref={trackRef}
+            style={{
+              display: 'flex',
+              gap: '12px',
+              paddingLeft: 'var(--container-px)',
+              paddingRight: 'var(--container-px)',
+              width: 'max-content',
+              willChange: 'transform',
+              alignItems: 'flex-end',
+            }}
+          >
+            {INDUSTRIES.map((industry, index) => {
+              const videoSrc = MEDIA.industries[industry.mediaKey]
+              const objPos = OBJECT_POSITIONS[industry.id] || 'center 25%'
+              const isInitialActive = index === 0
+
+              return (
+                <div
+                  key={industry.id}
+                  ref={(el) => { cardRefs.current[index] = el }}
+                  data-industry-card
+                  aria-label={`Industry: ${industry.label}`}
+                  style={{
+                    flexShrink: 0,
+                    width: 'clamp(280px, 26vw, 380px)',
+                    height: 'clamp(380px, 48vh, 520px)',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    background: 'var(--surface)',
+                    transformOrigin: 'bottom center',
+                    willChange: 'transform, opacity',
+                    cursor: 'default',
+                    borderBottom: '2px solid transparent',
+                  }}
+                >
+                  {/* Video wrapper */}
+                  <div style={{ position: 'absolute', inset: 0 }}>
+                    <video
+                      ref={(el) => { videoRefs.current[index] = el }}
+                      src={videoSrc}
+                      muted
+                      playsInline
+                      loop
+                      preload="metadata"
+                      aria-hidden="true"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        objectPosition: objPos,
+                        display: 'block',
+                        transform: 'none',
+                      }}
+                    />
+                  </div>
+
+                  {/* Gradient overlay */}
+                  <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: 'linear-gradient(to top, rgba(10,14,18,0.85) 0%, rgba(10,14,18,0.20) 60%, transparent 100%)',
+                    zIndex: 2,
+                  }} />
+
+                  {/* Active indicator top bar */}
+                  <div
+                    data-active-bar
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      height: '2px',
+                      background: 'var(--accent-gold)',
+                      zIndex: 4,
+                      opacity: isInitialActive ? 1 : 0,
+                      transition: 'opacity 300ms ease',
+                    }}
+                  />
+
+                  {/* Card label & metadata */}
+                  <div style={{
+                    position: 'absolute',
+                    bottom: '24px',
+                    left: '20px',
+                    right: '20px',
+                    zIndex: 3,
+                  }}>
+                    <div
+                      data-card-num
+                      style={{
+                        fontSize: '10px',
+                        fontWeight: 600,
+                        letterSpacing: '0.18em',
+                        color: 'var(--accent-gold)',
+                        marginBottom: '6px',
+                        opacity: isInitialActive ? 1 : 0.6,
+                        transition: 'opacity 300ms ease',
+                      }}
+                    >
+                      {String(index + 1).padStart(2, '0')}
+                    </div>
+                    <div
+                      data-card-label
+                      style={{
+                        fontSize: 'clamp(16px, 1.4vw, 22px)',
+                        fontWeight: isInitialActive ? 600 : 500,
+                        color: isInitialActive ? '#FAF8F5' : 'rgba(250,248,245,0.70)',
+                        letterSpacing: '-0.01em',
+                        lineHeight: 1.2,
+                        transition: 'color 300ms ease',
+                      }}
+                    >
+                      {industry.label}
+                    </div>
+                    <div
+                      data-card-line
+                      style={{
+                        width: isInitialActive ? '32px' : '16px',
+                        height: '1px',
+                        background: 'var(--accent-gold)',
+                        marginTop: '10px',
+                        opacity: isInitialActive ? 0.9 : 0.4,
+                        transition: 'width 300ms ease, opacity 300ms ease',
+                      }}
+                    />
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ── Mobile: Vertical Accordion Card Stack ── */}
+      {isMobile && (
+        <div style={{ padding: '0 var(--container-px) clamp(40px, 8vw, 60px)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            {INDUSTRIES.map((industry, index) => {
+              const videoSrc = MEDIA.industries[industry.mediaKey]
+              const isActive = index === mobileActiveIndex
+              const objPos = OBJECT_POSITIONS[industry.id] || 'center 25%'
+
+              return (
+                <div
+                  key={industry.id}
+                  onClick={() => handleMobileCardTap(index)}
+                  role="button"
+                  aria-label={`${industry.label} — ${isActive ? 'active' : 'tap to activate'}`}
+                  tabIndex={0}
+                  onKeyDown={(e) => e.key === 'Enter' && handleMobileCardTap(index)}
+                  style={{
+                    position: 'relative',
+                    height: isActive ? 'clamp(220px, 55vw, 300px)' : '72px',
+                    overflow: 'hidden',
+                    background: 'var(--surface)',
+                    cursor: 'pointer',
+                    transition: 'height 500ms cubic-bezier(0.16, 1, 0.3, 1)',
+                    borderBottom: isActive ? '2px solid var(--accent-gold)' : '2px solid transparent',
+                  }}
+                >
+                  {/* Video */}
+                  <div style={{ position: 'absolute', inset: 0 }}>
+                    <video
+                      ref={(el) => { videoRefs.current[index] = el }}
+                      src={videoSrc}
+                      muted
+                      playsInline
+                      loop
+                      preload="metadata"
+                      aria-hidden="true"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        objectPosition: objPos,
+                        display: 'block',
+                        transform: 'none',
+                      }}
+                    />
+                  </div>
+
+                  {/* Overlay */}
+                  <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: 'linear-gradient(to top, rgba(10,14,18,0.90) 0%, rgba(10,14,18,0.25) 60%, rgba(10,14,18,0.10) 100%)',
+                    zIndex: 2,
+                  }} />
+
+                  {/* Active strip */}
+                  {isActive && (
+                    <div style={{
+                      position: 'absolute', top: 0, left: 0, right: 0,
+                      height: '2px', background: 'var(--accent-gold)', zIndex: 4,
+                    }} />
+                  )}
+
+                  {/* Label */}
+                  <div style={{
+                    position: 'absolute',
+                    bottom: isActive ? '20px' : '50%',
+                    transform: isActive ? 'none' : 'translateY(50%)',
+                    left: '20px',
+                    right: '20px',
+                    zIndex: 3,
+                    transition: 'bottom 500ms cubic-bezier(0.16, 1, 0.3, 1), transform 500ms cubic-bezier(0.16, 1, 0.3, 1)',
+                    display: 'flex',
+                    alignItems: isActive ? 'flex-start' : 'center',
+                    flexDirection: isActive ? 'column' : 'row',
+                    justifyContent: 'space-between',
+                    gap: '8px',
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <span style={{
+                        fontSize: '10px', fontWeight: 600, letterSpacing: '0.18em',
+                        color: 'var(--accent-gold)',
+                      }}>
+                        {String(index + 1).padStart(2, '0')}
+                      </span>
+                      <span style={{
+                        fontSize: isActive ? '18px' : '14px',
+                        fontWeight: 600,
+                        color: '#FAF8F5',
+                        letterSpacing: '-0.01em',
+                        lineHeight: 1.2,
+                        transition: 'font-size 300ms ease',
+                      }}>
+                        {industry.label}
+                      </span>
+                    </div>
+                    {!isActive && (
+                      <span style={{
+                        fontSize: '10px', color: 'rgba(250,248,245,0.45)',
+                        letterSpacing: '0.12em', textTransform: 'uppercase',
+                      }}>
+                        Tap
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        @media (max-width: 768px) {
+          #industries-header {
+            grid-template-columns: 1fr !important;
+            gap: 16px !important;
+          }
+        }
+      `}</style>
+    </section>
+  )
+}

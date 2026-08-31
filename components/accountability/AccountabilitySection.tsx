@@ -1,0 +1,119 @@
+'use client'
+
+import { useEffect, useRef } from 'react'
+import { MEDIA } from '@/data/media'
+import { ACCOUNTABILITY_PRINCIPLES } from '@/data/content'
+
+export default function AccountabilitySection() {
+  const sectionRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    const section = sectionRef.current
+    if (!section) return
+    let cleanup: (() => void) | undefined
+
+    const init = async () => {
+      const { gsap } = await import('gsap')
+      const { ScrollTrigger } = await import('gsap/ScrollTrigger')
+      gsap.registerPlugin(ScrollTrigger)
+
+      const ctx = gsap.context(() => {
+        const visual = section.querySelector('[data-visual]')
+        if (visual) {
+          gsap.fromTo(visual,
+            { x: 32, opacity: 0 },
+            { x: 0, opacity: 1, duration: 0.9, ease: 'power3.out',
+              scrollTrigger: { trigger: section, start: 'top 80%', once: true } }
+          )
+        }
+        const textSide = section.querySelector('[data-text-side]')
+        if (textSide) {
+          gsap.fromTo(textSide,
+            { x: -32, opacity: 0 },
+            { x: 0, opacity: 1, duration: 0.9, ease: 'power3.out', delay: 0.15,
+              scrollTrigger: { trigger: section, start: 'top 80%', once: true } }
+          )
+        }
+      }, section)
+
+      cleanup = () => ctx.revert()
+    }
+    init()
+    return () => cleanup?.()
+  }, [])
+
+  return (
+    <section
+      ref={sectionRef}
+      className="section-py"
+      style={{ background: 'var(--bg-primary)', borderTop: '1px solid var(--line-soft)' }}
+      aria-label="Built with accountability"
+    >
+      <div className="site-container">
+        <div id="accountability-grid" className="two-col" style={{ alignItems: 'center' }}>
+
+          {/* LEFT — Text */}
+          <div data-text-side>
+            <div className="section-label">
+              <span className="section-label-bullet" />
+              <span className="t-label">12 — Built with Accountability</span>
+            </div>
+
+            <h2 className="t-headline" style={{ marginBottom: '20px' }}>
+              Built with
+              <br />
+              <span style={{ color: 'var(--accent-gold)' }}>accountability.</span>
+            </h2>
+
+            <p className="t-body" style={{ maxWidth: '420px', marginBottom: '40px' }}>
+              Our work is measured not only by what is commissioned, but by how it is
+              engineered, executed, documented and supported. Every project carries
+              the same standard — regardless of sector or scale.
+            </p>
+
+            <div>
+              {ACCOUNTABILITY_PRINCIPLES.map((principle) => (
+                <div key={principle.number} className="principle-item">
+                  <div className="principle-number">{principle.number}</div>
+                  <div>
+                    <div style={{ fontSize: 'clamp(15px, 1.2vw, 17px)', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '5px', letterSpacing: '-0.01em' }}>
+                      {principle.title}
+                    </div>
+                    <p className="t-body" style={{ fontSize: '14px' }}>{principle.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* RIGHT — Video */}
+          <div data-visual className="media-frame" style={{ aspectRatio: '16/9' }}>
+            <video src={MEDIA.accountability} autoPlay muted playsInline loop preload="metadata"
+              aria-label="Lukhdatar & Sons infrastructure delivery" />
+          </div>
+        </div>
+      </div>
+
+      <style>{`
+        .principle-item {
+          transition: transform 300ms ease;
+        }
+        .principle-item:hover {
+          transform: translateX(4px);
+        }
+        #accountability-grid {
+          grid-template-columns: 40fr 60fr;
+        }
+        @media (max-width: 768px) {
+          #accountability-grid {
+            grid-template-columns: 1fr !important;
+            gap: 28px !important;
+          }
+          #accountability-grid [data-visual] {
+            aspect-ratio: 16/9 !important;
+          }
+        }
+      `}</style>
+    </section>
+  )
+}
