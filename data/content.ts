@@ -139,42 +139,42 @@ export const PROJECTS = [
     id: 'skmc-medical-college',
     title: 'Shri Krishna Medical College, Muzaffarpur',
     scope: 'Complete Electrical SITC',
-    mediaKey: 'hospital' as const,
+    mediaKey: 'skmcMedical' as const,
     tag: 'Healthcare',
   },
   {
     id: 'bihar-vidhan-sabha',
     title: 'Bihar Vidhan Sabha',
     scope: 'Turnkey Infrastructure Electrification',
-    mediaKey: 'commercial' as const,
+    mediaKey: 'biharVidhanSabha' as const,
     tag: 'Government / Institutional',
   },
   {
     id: 'warehouse-projects',
     title: 'Warehouse Electrification Projects',
     scope: 'Industrial Power Distribution',
-    mediaKey: 'warehouse' as const,
+    mediaKey: 'warehouseProjects' as const,
     tag: 'Industrial / Infrastructure',
   },
   {
     id: 'kohora-substation',
     title: 'Kohora, Assam',
     scope: '2 × 3.15 MVA Substation, Control Room & VCB Panels',
-    mediaKey: 'industrial' as const,
+    mediaKey: 'kohoraSubstation' as const,
     tag: 'Substation',
   },
   {
     id: 'signature',
     title: 'Signature',
     scope: 'HT/LT Power Distribution',
-    mediaKey: 'residential' as const,
+    mediaKey: 'signature' as const,
     tag: 'Residential / Township',
   },
   {
     id: 'shristinagar',
     title: 'Shristinagar',
     scope: 'HT/LT Power Distribution',
-    mediaKey: 'township' as const,
+    mediaKey: 'shristinagar' as const,
     tag: 'Residential / Township',
   },
 ]
@@ -576,7 +576,7 @@ export const PROJECT_CASE_STUDIES: Record<string, CaseStudyDetail> = {
       'Performed vacuum circuit breaker contact resistance and timing validation tests.'
     ],
     outcome: 'Successful energisation of the complete substation in only 100 Working Days, providing reliable grid power with zero safety incidents.',
-    mediaKey: 'industrial'
+    mediaKey: 'kohoraSubstation'
   },
   'assam-hill-medical-college': {
     title: 'Assam Hill Medical College',
@@ -594,7 +594,7 @@ export const PROJECT_CASE_STUDIES: Record<string, CaseStudyDetail> = {
       'Tested low-voltage communication setups, fire alarms, and public address networks.'
     ],
     outcome: 'Delivered an integrated, high-availability electrical system providing clean, uninterrupted power for critical healthcare operations.',
-    mediaKey: 'hospital'
+    mediaKey: 'assamHill'
   },
   'sarojini-naidu-medical-hospital': {
     title: 'Sarojini Naidu Medical Hospital, Agra',
@@ -612,7 +612,7 @@ export const PROJECT_CASE_STUDIES: Record<string, CaseStudyDetail> = {
       'Tested lightning protection grids and earth pit ground resistance levels.'
     ],
     outcome: 'Successfully modernized the healthcare facility infrastructure, improving safety standards and power factor efficiency.',
-    mediaKey: 'hospital'
+    mediaKey: 'sarojiniHospital'
   },
   'shri-krishna-medical-college': {
     title: 'Shri Krishna Medical College, Muzaffarpur',
@@ -630,7 +630,7 @@ export const PROJECT_CASE_STUDIES: Record<string, CaseStudyDetail> = {
       'Validated earth grid connectivity and grounding continuity.'
     ],
     outcome: 'Completed the electrical infrastructure under strict deadlines, meeting all safety clearance standards.',
-    mediaKey: 'hospital'
+    mediaKey: 'skmcMedical'
   },
   'sonotel': {
     title: 'Sonotel',
@@ -648,7 +648,7 @@ export const PROJECT_CASE_STUDIES: Record<string, CaseStudyDetail> = {
       'Verified fire alarm integration and public address system controls.'
     ],
     outcome: 'Delivered a premium, code-compliant hospitality electrical system supporting high-end customer guest operations.',
-    mediaKey: 'tajHotel'
+    mediaKey: 'sonotel'
   }
 }
 

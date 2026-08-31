@@ -49,31 +49,29 @@ export default function ProjectPortfolio() {
   }, [])
 
   const projectMediaMap: Record<string, string> = {
-    tajHotel:         MEDIA.projects.tajHotel,
-    sonotel:          MEDIA.projects.sonotel,
-    assamHill:        MEDIA.projects.assamHill,
-    sarojiniHospital: MEDIA.projects.sarojiniHospital,
-    hospital:         MEDIA.projects.hospital,
-    campus:           MEDIA.projects.campus,
-    commercial:       MEDIA.projects.commercial,
-    township:         MEDIA.projects.township,
-    warehouse:        MEDIA.projects.warehouse,
-    residential:      MEDIA.projects.residential,
-    industrial:       MEDIA.projects.industrial,
+    tajHotel:          MEDIA.projects.tajHotel,
+    sonotel:           MEDIA.projects.sonotel,
+    assamHill:         MEDIA.projects.assamHill,
+    sarojiniHospital:  MEDIA.projects.sarojiniHospital,
+    skmcMedical:       MEDIA.projects.skmcMedical,
+    biharVidhanSabha:  MEDIA.projects.biharVidhanSabha,
+    warehouseProjects: MEDIA.projects.warehouseProjects,
+    kohoraSubstation:  MEDIA.projects.kohoraSubstation,
+    signature:         MEDIA.projects.signature,
+    shristinagar:      MEDIA.projects.shristinagar,
   }
 
   const projectPosterMap: Record<string, string> = {
-    tajHotel:         '/media/posters/taj-hotel.jpg',
-    sonotel:          '/media/posters/sonotel-project.jpg',
-    assamHill:        '/media/posters/aasam-hill-medical-college.jpg',
-    sarojiniHospital: '/media/posters/sarojini-naidu-medical-hospital.jpg',
-    hospital:         '/media/posters/hospital.jpg',
-    campus:           '/media/posters/campus.jpg',
-    commercial:       '/media/posters/commercial.jpg',
-    township:         '/media/posters/township.jpg',
-    warehouse:        '/media/posters/warehouse.jpg',
-    residential:      '/media/posters/residential.jpg',
-    industrial:       '/media/posters/industrial.jpg',
+    tajHotel:          '/media/posters/taj-hotel.jpg',
+    sonotel:           '/media/posters/sonotel-project.jpg',
+    assamHill:         '/media/posters/aasam-hill-medical-college.jpg',
+    sarojiniHospital:  '/media/posters/sarojini-naidu-medical-hospital.jpg',
+    skmcMedical:       '/media/posters/shree-krishna-medical.jpg',
+    biharVidhanSabha:  '/media/posters/bihar-vidhan-sabha.jpg',
+    warehouseProjects: '/media/posters/warehouse-projects.jpg',
+    kohoraSubstation:  '/media/posters/kohora-substation.jpg',
+    signature:         '/media/posters/signature.jpg',
+    shristinagar:      '/media/posters/shristinagar.jpg',
   }
 
   return (
