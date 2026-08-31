@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { MEDIA } from '@/data/media'
 
 interface IntroSequenceProps {
@@ -13,61 +13,64 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
 
   const [videoReady, setVideoReady] = useState(false)
   const [hasError, setHasError] = useState(false)
+  const isDoneRef = useRef(false)
+  const fallbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const finishSequence = useCallback(() => {
+    if (isDoneRef.current) return
+    isDoneRef.current = true
+    if (fallbackTimerRef.current) {
+      clearTimeout(fallbackTimerRef.current)
+    }
+
+    const container = containerRef.current
+    if (container) {
+      container.style.transition = 'opacity 850ms cubic-bezier(0.4, 0, 0.2, 1)'
+      container.style.opacity = '0'
+      container.style.pointerEvents = 'none'
+    }
+
+    setTimeout(() => {
+      onComplete()
+    }, 870)
+  }, [onComplete])
+
+  const handleEnded = useCallback(() => {
+    finishSequence()
+  }, [finishSequence])
+
+  const handleError = useCallback(() => {
+    if (isDoneRef.current) return
+    console.warn('Intro video failed to load, triggering fallback')
+    setHasError(true)
+    setTimeout(finishSequence, 1500)
+  }, [finishSequence])
 
   useEffect(() => {
     const video = videoRef.current
-    const container = containerRef.current
-    if (!video || !container) return
-
-    let isDone = false
-    let fallbackTimer: ReturnType<typeof setTimeout>
+    if (!video) return
 
     // Lock playback rate to 1.0 natural timing
     video.playbackRate = 1.0
 
-    function finishSequence() {
-      if (isDone) return
-      isDone = true
-      clearTimeout(fallbackTimer)
-
-      if (container) {
-        container.style.transition = 'opacity 850ms cubic-bezier(0.4, 0, 0.2, 1)'
-        container.style.opacity = '0'
-        container.style.pointerEvents = 'none'
-      }
-
-      setTimeout(() => {
-        onComplete()
-      }, 870)
-    }
-
     function handleVideoReady() {
-      if (isDone) return
+      if (isDoneRef.current) return
       setVideoReady(true)
-      video?.play().catch((err) => {
-        console.warn('Autoplay restricted or failed:', err)
-        // Autoplay blocked: show brand mark for a moment then transition smoothly
-        setTimeout(finishSequence, 1800)
-      })
-    }
-
-    function handleEnded() {
-      finishSequence()
-    }
-
-    function handleError() {
-      if (isDone) return
-      console.warn('Intro video failed to load, triggering fallback')
-      setHasError(true)
-      // Show brand mark fallback for 2s then transition cleanly
-      setTimeout(finishSequence, 2000)
+      const playPromise = video?.play()
+      if (playPromise !== undefined) {
+        playPromise.catch((err) => {
+          console.warn('Autoplay deferred or restricted:', err)
+          setTimeout(finishSequence, 2000)
+        })
+      }
     }
 
     // Check if video is already ready (e.g. cached)
-    if (video.readyState >= 3) {
+    if (video.readyState >= 2) {
       handleVideoReady()
     } else {
       video.addEventListener('loadeddata', handleVideoReady, { once: true })
+      video.addEventListener('canplay', handleVideoReady, { once: true })
       video.addEventListener('canplaythrough', handleVideoReady, { once: true })
     }
 
@@ -77,25 +80,24 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
     // Force explicit load attempt
     video.load()
 
-    // Robust Fallback Timeout (10 seconds) — ONLY if video network stalls completely
-    fallbackTimer = setTimeout(() => {
-      if (!isDone && video.readyState < 3) {
-        console.warn('Intro video loading timed out (10s network stall), falling back gracefully')
-        setHasError(true)
-        setTimeout(finishSequence, 1800)
+    // Fallback safety timeout
+    fallbackTimerRef.current = setTimeout(() => {
+      if (!isDoneRef.current) {
+        finishSequence()
       }
-    }, 10000)
+    }, 8000)
 
     return () => {
-      clearTimeout(fallbackTimer)
-      if (video) {
-        video.removeEventListener('loadeddata', handleVideoReady)
-        video.removeEventListener('canplaythrough', handleVideoReady)
-        video.removeEventListener('ended', handleEnded)
-        video.removeEventListener('error', handleError)
+      if (fallbackTimerRef.current) {
+        clearTimeout(fallbackTimerRef.current)
       }
+      video.removeEventListener('loadeddata', handleVideoReady)
+      video.removeEventListener('canplay', handleVideoReady)
+      video.removeEventListener('canplaythrough', handleVideoReady)
+      video.removeEventListener('ended', handleEnded)
+      video.removeEventListener('error', handleError)
     }
-  }, [onComplete])
+  }, [finishSequence, handleEnded, handleError])
 
   return (
     <div
@@ -117,14 +119,32 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
       }}
       aria-label="Intro Sequence"
     >
-      {/* Intro Video — Single instance, responsive fit */}
+      {/* Intro Video — Autoplays immediately with poster fallback */}
       <video
         ref={videoRef}
         src={MEDIA.introVideo}
         poster="/media/posters/intro-video-v2.jpg"
+        autoPlay
         muted
         playsInline
         preload="auto"
+        onPlay={() => setVideoReady(true)}
+        onPlaying={() => setVideoReady(true)}
+        onTimeUpdate={(e) => {
+          setVideoReady(true)
+          const target = e.currentTarget
+          if (target.duration > 0 && target.currentTime >= target.duration - 0.25) {
+            // Near end of video — trigger smooth transition
+            const container = containerRef.current
+            if (container) {
+              container.style.transition = 'opacity 800ms cubic-bezier(0.4, 0, 0.2, 1)'
+              container.style.opacity = '0'
+              container.style.pointerEvents = 'none'
+            }
+          }
+        }}
+        onEnded={handleEnded}
+        onError={handleError}
         aria-hidden="true"
         className="intro-video-element"
         style={{
@@ -132,8 +152,8 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
           inset: 0,
           width: '100%',
           height: '100%',
-          opacity: videoReady && !hasError ? 1 : 0,
-          transition: 'opacity 600ms cubic-bezier(0.4, 0, 0.2, 1)',
+          opacity: 1,
+          transition: 'opacity 400ms ease',
         }}
       />
 

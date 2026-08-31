@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 
 interface LazyVideoProps extends React.VideoHTMLAttributes<HTMLVideoElement> {
   src: string
@@ -17,8 +17,8 @@ export default function LazyVideo({
   poster,
   aspectRatio,
   containerStyle,
-  rootMargin = '1200px',
-  autoplayMargin = '600px',
+  rootMargin = '1800px',
+  autoplayMargin = '900px',
   preloadImmediate = false,
   className,
   style,
@@ -70,6 +70,11 @@ export default function LazyVideo({
     return () => playObserver.disconnect()
   }, [shouldLoad, preloadImmediate, autoplayMargin])
 
+  // Mark video as active and playing
+  const markActive = useCallback(() => {
+    setVideoActive(true)
+  }, [])
+
   // 3. Keep video play/pause synced with proximity state
   useEffect(() => {
     const video = videoRef.current
@@ -78,21 +83,22 @@ export default function LazyVideo({
     if (shouldPlay) {
       video.muted = true
       video.playsInline = true
-      video.play().catch((err) => {
-        // Autoplay could be blocked by browser policy on initial load
-        console.warn('LazyVideo autoplay blocked/failed:', err)
-      })
+      const playPromise = video.play()
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            markActive()
+          })
+          .catch(() => {
+            // Autoplay policy or power-save deferral
+          })
+      }
     } else {
       video.pause()
     }
-  }, [shouldPlay, shouldLoad])
+  }, [shouldPlay, shouldLoad, markActive])
 
-  // Triggered when video starts rendering frames
-  const handlePlaying = () => {
-    setVideoActive(true)
-  }
-
-  // Reset opacity state when source changes
+  // Reset state when source changes
   useEffect(() => {
     setVideoActive(false)
   }, [src])
@@ -111,12 +117,48 @@ export default function LazyVideo({
       }}
       className={className}
     >
-      {/* Poster Image Layer */}
+      {/* Video Stream Layer — underneath poster */}
+      {shouldLoad && (
+        <video
+          ref={videoRef}
+          src={src}
+          autoPlay={shouldPlay}
+          muted
+          playsInline
+          loop
+          preload={shouldLoad ? 'auto' : 'metadata'}
+          onPlay={markActive}
+          onPlaying={markActive}
+          onTimeUpdate={(e) => {
+            if (e.currentTarget.currentTime > 0) {
+              markActive()
+            }
+          }}
+          onLoadedData={() => {
+            if (shouldPlay) markActive()
+          }}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            zIndex: 0,
+            transform: 'none',
+            ...style,
+          }}
+          {...props}
+        />
+      )}
+
+      {/* Poster Image Layer — covers video until first frame renders */}
       {poster && (
         <img
           src={poster}
           alt=""
           aria-hidden="true"
+          loading={preloadImmediate ? 'eager' : 'lazy'}
+          decoding="async"
           style={{
             position: 'absolute',
             inset: 0,
@@ -125,34 +167,9 @@ export default function LazyVideo({
             objectFit: 'cover',
             zIndex: 1,
             opacity: videoActive ? 0 : 1,
-            transition: 'opacity 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+            transition: 'opacity 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
             pointerEvents: 'none',
           }}
-        />
-      )}
-
-      {/* Video Stream Layer */}
-      {shouldLoad && (
-        <video
-          ref={videoRef}
-          src={src}
-          onPlaying={handlePlaying}
-          muted
-          playsInline
-          loop
-          style={{
-            position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            zIndex: 0,
-            opacity: videoActive ? 1 : 0,
-            transition: 'opacity 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-            transform: 'none', // Critical: prevents layout shake/jitter during rendering
-            ...style,
-          }}
-          {...props}
         />
       )}
     </div>

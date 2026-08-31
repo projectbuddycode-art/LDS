@@ -36,7 +36,7 @@ export default function IndustriesSection() {
   const [mobileActiveIndex, setMobileActiveIndex] = useState<number>(0)
   const [sectionIntersected, setSectionIntersected] = useState<boolean>(false)
 
-  // Lazy-load all video files 1200px before the section is scrolled into viewport
+  // Lazy-load all video files 1800px before the section is scrolled into viewport
   useEffect(() => {
     const el = sectionRef.current
     if (!el) return
@@ -45,10 +45,29 @@ export default function IndustriesSection() {
         setSectionIntersected(true)
         observer.disconnect()
       }
-    }, { rootMargin: '1200px' })
+    }, { rootMargin: '1800px' })
     observer.observe(el)
     return () => observer.disconnect()
   }, [])
+
+  // Video playback helper — direct DOM control without React re-render
+  const updateVideoPlayback = useCallback((activeIdx: number) => {
+    videoRefs.current.forEach((vid, i) => {
+      if (!vid) return
+      if (i === activeIdx) {
+        vid.play().catch(() => {})
+      } else {
+        vid.pause()
+      }
+    })
+  }, [])
+
+  // Start active video immediately once section is intersected
+  useEffect(() => {
+    if (sectionIntersected) {
+      updateVideoPlayback(isMobile ? mobileActiveIndex : activeIndexRef.current)
+    }
+  }, [sectionIntersected, isMobile, mobileActiveIndex, updateVideoPlayback])
 
   // Handle responsive breakpoint
   useEffect(() => {
@@ -67,18 +86,6 @@ export default function IndustriesSection() {
       clearTimeout(resizeTimer)
       window.removeEventListener('resize', onResize)
     }
-  }, [])
-
-  // Video playback helper — direct DOM control without React re-render
-  const updateVideoPlayback = useCallback((activeIdx: number) => {
-    videoRefs.current.forEach((vid, i) => {
-      if (!vid) return
-      if (i === activeIdx) {
-        vid.play().catch(() => {})
-      } else {
-        vid.pause()
-      }
-    })
   }, [])
 
   // DOM active style update helper — zero layout thrashing
@@ -294,10 +301,11 @@ export default function IndustriesSection() {
                       ref={(el) => { videoRefs.current[index] = el }}
                       src={sectionIntersected ? videoSrc : undefined}
                       poster={POSTER_MAP[industry.mediaKey]}
+                      autoPlay={index === 0}
                       muted
                       playsInline
                       loop
-                      preload="metadata"
+                      preload="auto"
                       aria-hidden="true"
                       style={{
                         width: '100%',
@@ -421,10 +429,11 @@ export default function IndustriesSection() {
                       ref={(el) => { videoRefs.current[index] = el }}
                       src={sectionIntersected ? videoSrc : undefined}
                       poster={POSTER_MAP[industry.mediaKey]}
+                      autoPlay={isActive}
                       muted
                       playsInline
                       loop
-                      preload="metadata"
+                      preload="auto"
                       aria-hidden="true"
                       style={{
                         width: '100%',
