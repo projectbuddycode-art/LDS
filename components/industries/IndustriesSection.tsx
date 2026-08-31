@@ -35,23 +35,24 @@ export default function IndustriesSection() {
   
   const [isMobile, setIsMobile] = useState<boolean>(false)
   const [mobileActiveIndex, setMobileActiveIndex] = useState<number>(0)
-  const [sectionIntersected, setSectionIntersected] = useState<boolean>(false)
+  const [sectionVisible, setSectionVisible] = useState<boolean>(false)
+  const [activeCardIndex, setActiveCardIndex] = useState<number>(0)
 
-  // Lazy-load all video files 1200px before the section is scrolled into viewport
+  // 1. Viewport proximity observer — only prepare videos when section is nearby
   useEffect(() => {
     const el = sectionRef.current
-    if (!el) return
+    if (!el || typeof IntersectionObserver === 'undefined') {
+      setSectionVisible(true)
+      return
+    }
     const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        setSectionIntersected(true)
-        observer.disconnect()
-      }
-    }, { rootMargin: '1200px' })
+      setSectionVisible(entry.isIntersecting)
+    }, { rootMargin: '300px' })
     observer.observe(el)
     return () => observer.disconnect()
   }, [])
 
-  // Video playback helper — direct DOM control without React re-render
+  // 2. Controlled video playback helper
   const updateVideoPlayback = useCallback((activeIdx: number) => {
     const refs = isMobile ? mobileVideoRefs.current : desktopVideoRefs.current
     refs.forEach((vid, i) => {
@@ -71,17 +72,22 @@ export default function IndustriesSection() {
         if (vid) {
           vid.pause()
           vid.removeAttribute('src')
+          vid.load()
         }
       })
     }
   }, [])
 
-  // Start active video immediately once section is intersected
+  // Start active video when section enters viewport
   useEffect(() => {
-    if (sectionIntersected) {
+    if (sectionVisible) {
       updateVideoPlayback(isMobile ? mobileActiveIndex : activeIndexRef.current)
+    } else {
+      [...desktopVideoRefs.current, ...mobileVideoRefs.current].forEach((vid) => {
+        if (vid) vid.pause()
+      })
     }
-  }, [sectionIntersected, isMobile, mobileActiveIndex, updateVideoPlayback])
+  }, [sectionVisible, isMobile, mobileActiveIndex, updateVideoPlayback])
 
   // Handle responsive breakpoint
   useEffect(() => {
@@ -176,6 +182,7 @@ export default function IndustriesSection() {
                 // Update active index without triggering React state re-render
                 if (cardIndex !== activeIndexRef.current) {
                   activeIndexRef.current = cardIndex
+                  setActiveCardIndex(cardIndex)
                   updateVideoPlayback(cardIndex)
                   updateCardDOMStyles(cardIndex)
                 }
@@ -289,6 +296,8 @@ export default function IndustriesSection() {
               const videoSrc = MEDIA.industries[industry.mediaKey]
               const objPos = OBJECT_POSITIONS[industry.mediaKey] || 'center center'
               const isInitialActive = index === 0
+              // Smart decoder management: only mount video for active or adjacent card
+              const shouldMountVideo = sectionVisible && Math.abs(index - activeCardIndex) <= 1
 
               return (
                 <div
@@ -311,23 +320,40 @@ export default function IndustriesSection() {
                 >
                   {/* Video wrapper */}
                   <div style={{ position: 'absolute', inset: 0 }}>
-                    <video
-                      ref={(el) => { desktopVideoRefs.current[index] = el }}
-                      src={sectionIntersected ? videoSrc : undefined}
-                      poster={POSTER_MAP[industry.mediaKey]}
-                      autoPlay={index === 0}
-                      muted
-                      playsInline
-                      loop
-                      preload={index === 0 ? 'auto' : 'metadata'}
+                    {shouldMountVideo && (
+                      <video
+                        ref={(el) => { desktopVideoRefs.current[index] = el }}
+                        src={videoSrc}
+                        poster={POSTER_MAP[industry.mediaKey]}
+                        autoPlay={index === activeCardIndex}
+                        muted
+                        playsInline
+                        loop
+                        preload={index === activeCardIndex ? 'auto' : 'metadata'}
+                        aria-hidden="true"
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          objectPosition: objPos,
+                          display: 'block',
+                          transform: 'none',
+                        }}
+                      />
+                    )}
+                    {/* Poster background fallback */}
+                    <img
+                      src={POSTER_MAP[industry.mediaKey]}
+                      alt=""
                       aria-hidden="true"
                       style={{
+                        position: 'absolute',
+                        inset: 0,
                         width: '100%',
                         height: '100%',
                         objectFit: 'cover',
                         objectPosition: objPos,
-                        display: 'block',
-                        transform: 'none',
+                        zIndex: shouldMountVideo ? -1 : 0,
                       }}
                     />
                   </div>
@@ -418,6 +444,7 @@ export default function IndustriesSection() {
               const videoSrc = MEDIA.industries[industry.mediaKey]
               const isActive = index === mobileActiveIndex
               const objPos = OBJECT_POSITIONS[industry.id] || 'center 25%'
+              const shouldMountMobileVideo = sectionVisible && isActive
 
               return (
                 <div
@@ -437,85 +464,107 @@ export default function IndustriesSection() {
                     borderBottom: isActive ? '2px solid var(--accent-gold)' : '2px solid transparent',
                   }}
                 >
-                  {/* Video */}
+                  {/* Video / Poster */}
                   <div style={{ position: 'absolute', inset: 0 }}>
-                    <video
-                      ref={(el) => { mobileVideoRefs.current[index] = el }}
-                      src={sectionIntersected ? videoSrc : undefined}
-                      poster={POSTER_MAP[industry.mediaKey]}
-                      autoPlay={isActive}
-                      muted
-                      playsInline
-                      loop
-                      preload={isActive ? 'auto' : 'metadata'}
+                    {shouldMountMobileVideo && (
+                      <video
+                        ref={(el) => { mobileVideoRefs.current[index] = el }}
+                        src={videoSrc}
+                        poster={POSTER_MAP[industry.mediaKey]}
+                        autoPlay={isActive}
+                        muted
+                        playsInline
+                        loop
+                        preload="auto"
+                        aria-hidden="true"
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          objectPosition: objPos,
+                          display: 'block',
+                        }}
+                      />
+                    )}
+                    <img
+                      src={POSTER_MAP[industry.mediaKey]}
+                      alt=""
                       aria-hidden="true"
                       style={{
+                        position: 'absolute',
+                        inset: 0,
                         width: '100%',
                         height: '100%',
                         objectFit: 'cover',
                         objectPosition: objPos,
-                        display: 'block',
-                        transform: 'none',
+                        zIndex: shouldMountMobileVideo ? -1 : 0,
                       }}
                     />
                   </div>
 
-                  {/* Overlay */}
+                  {/* Gradient */}
                   <div style={{
                     position: 'absolute',
                     inset: 0,
-                    background: 'linear-gradient(to top, rgba(10,14,18,0.90) 0%, rgba(10,14,18,0.25) 60%, rgba(10,14,18,0.10) 100%)',
+                    background: isActive
+                      ? 'linear-gradient(to top, rgba(10,14,18,0.85) 0%, rgba(10,14,18,0.20) 60%, transparent 100%)'
+                      : 'linear-gradient(to right, rgba(10,14,18,0.85) 0%, rgba(10,14,18,0.60) 100%)',
                     zIndex: 2,
+                    transition: 'background 400ms ease',
                   }} />
 
-                  {/* Active strip */}
-                  {isActive && (
-                    <div style={{
-                      position: 'absolute', top: 0, left: 0, right: 0,
-                      height: '2px', background: 'var(--accent-gold)', zIndex: 4,
-                    }} />
-                  )}
-
-                  {/* Label */}
+                  {/* Content */}
                   <div style={{
                     position: 'absolute',
-                    bottom: isActive ? '20px' : '50%',
-                    transform: isActive ? 'none' : 'translateY(50%)',
+                    bottom: isActive ? '20px' : '0',
+                    top: isActive ? 'auto' : '0',
                     left: '20px',
                     right: '20px',
                     zIndex: 3,
-                    transition: 'bottom 500ms cubic-bezier(0.16, 1, 0.3, 1), transform 500ms cubic-bezier(0.16, 1, 0.3, 1)',
                     display: 'flex',
-                    alignItems: isActive ? 'flex-start' : 'center',
                     flexDirection: isActive ? 'column' : 'row',
-                    justifyContent: 'space-between',
-                    gap: '8px',
+                    alignItems: isActive ? 'flex-start' : 'center',
+                    justifyContent: isActive ? 'flex-end' : 'space-between',
+                    transition: 'all 400ms ease',
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <span style={{
-                        fontSize: '10px', fontWeight: 600, letterSpacing: '0.18em',
+                        fontSize: '10px',
+                        fontWeight: 600,
+                        letterSpacing: '0.18em',
                         color: 'var(--accent-gold)',
                       }}>
                         {String(index + 1).padStart(2, '0')}
                       </span>
                       <span style={{
-                        fontSize: isActive ? '18px' : '14px',
-                        fontWeight: 600,
+                        fontSize: isActive ? '18px' : '15px',
+                        fontWeight: isActive ? 600 : 500,
                         color: '#FAF8F5',
                         letterSpacing: '-0.01em',
-                        lineHeight: 1.2,
                         transition: 'font-size 300ms ease',
                       }}>
                         {industry.label}
                       </span>
                     </div>
+
                     {!isActive && (
                       <span style={{
-                        fontSize: '10px', color: 'rgba(250,248,245,0.45)',
-                        letterSpacing: '0.12em', textTransform: 'uppercase',
+                        fontSize: '11px',
+                        color: 'rgba(250,248,245,0.40)',
+                        letterSpacing: '0.10em',
+                        textTransform: 'uppercase',
                       }}>
-                        Tap
+                        Expand +
                       </span>
+                    )}
+
+                    {isActive && (
+                      <div style={{
+                        width: '32px',
+                        height: '1px',
+                        background: 'var(--accent-gold)',
+                        marginTop: '8px',
+                      }} />
                     )}
                   </div>
                 </div>

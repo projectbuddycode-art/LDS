@@ -93,14 +93,30 @@ function BrandTrack({ brands, reverse = false, activeIdx }: {
 export default function EcosystemSection() {
   const sectionRef = useRef<HTMLElement>(null)
   const [activeIdx, setActiveIdx] = useState(0)
+  const [isVisible, setIsVisible] = useState(false)
 
-  // Cycle spotlight slowly
+  // Track section visibility
   useEffect(() => {
+    const el = sectionRef.current
+    if (!el || typeof IntersectionObserver === 'undefined') {
+      setIsVisible(true)
+      return
+    }
+    const observer = new IntersectionObserver(([entry]) => {
+      setIsVisible(entry.isIntersecting)
+    }, { rootMargin: '100px' })
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  // Cycle spotlight only when section is in viewport
+  useEffect(() => {
+    if (!isVisible) return
     const id = setInterval(() => {
       setActiveIdx(prev => (prev + 1) % TRACK_A.length)
-    }, 2400)
+    }, 2600)
     return () => clearInterval(id)
-  }, [])
+  }, [isVisible])
 
   useEffect(() => {
     let isUnmounted = false

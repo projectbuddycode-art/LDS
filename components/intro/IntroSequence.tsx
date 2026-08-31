@@ -96,6 +96,9 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
       video.removeEventListener('canplaythrough', handleVideoReady)
       video.removeEventListener('ended', handleEnded)
       video.removeEventListener('error', handleError)
+      video.pause()
+      video.removeAttribute('src')
+      video.load()
     }
   }, [finishSequence, handleEnded, handleError])
 
