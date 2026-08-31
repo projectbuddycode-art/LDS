@@ -23,18 +23,23 @@ export function useLenis() {
 
     lenisInstance = lenis
 
-    // Integrate with GSAP ScrollTrigger — critical for pinned sections
+    let isDestroyed = false
     let tickerCleanup: (() => void) | undefined
+    let rafId: number = 0
 
     const syncWithScrollTrigger = async () => {
       try {
         const { gsap } = await import('gsap')
         const { ScrollTrigger } = await import('gsap/ScrollTrigger')
         
+        if (isDestroyed) return
+        
         lenis.on('scroll', ScrollTrigger.update)
         
         const tick = (time: number) => {
-          lenis.raf(time * 1000)
+          if (!isDestroyed) {
+            lenis.raf(time * 1000)
+          }
         }
         
         gsap.ticker.add(tick)
@@ -44,22 +49,24 @@ export function useLenis() {
           gsap.ticker.remove(tick)
         }
       } catch {
-        // Fallback RAF if GSAP not loaded
+        // Fallback if GSAP is not loaded
       }
     }
     syncWithScrollTrigger()
 
     function raf(time: number) {
+      if (isDestroyed) return
       if (!tickerCleanup) {
         lenis.raf(time)
+        rafId = requestAnimationFrame(raf)
       }
-      requestAnimationFrame(raf)
     }
 
-    const rafId = requestAnimationFrame(raf)
+    rafId = requestAnimationFrame(raf)
 
     return () => {
-      cancelAnimationFrame(rafId)
+      isDestroyed = true
+      if (rafId) cancelAnimationFrame(rafId)
       if (tickerCleanup) tickerCleanup()
       lenis.destroy()
       lenisInstance = null

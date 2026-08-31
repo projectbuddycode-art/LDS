@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { MEDIA } from '@/data/media'
+import LazyVideo from '@/components/LazyVideo'
 
 const VOLTAGES = ['11KV', '33KV', '66KV', '132KV', '220KV', '400KV']
 
@@ -9,16 +10,19 @@ export default function TransmissionSection() {
   const sectionRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
+    let isUnmounted = false
+    let ctx: any
     const section = sectionRef.current
     if (!section) return
-    let cleanup: (() => void) | undefined
 
     const init = async () => {
       const { gsap } = await import('gsap')
       const { ScrollTrigger } = await import('gsap/ScrollTrigger')
       gsap.registerPlugin(ScrollTrigger)
 
-      const ctx = gsap.context(() => {
+      if (isUnmounted) return
+
+      ctx = gsap.context(() => {
         section.querySelectorAll('[data-reveal]').forEach((el, i) => {
           gsap.fromTo(el,
             { y: 20, opacity: 0 },
@@ -36,10 +40,12 @@ export default function TransmissionSection() {
         }
       }, section)
 
-      cleanup = () => ctx.revert()
     }
     init()
-    return () => cleanup?.()
+    return () => {
+      isUnmounted = true
+      if (ctx) ctx.revert()
+    }
   }, [])
 
   return (
@@ -69,7 +75,7 @@ export default function TransmissionSection() {
 
         {/* Primary video */}
         <div data-visual className="media-frame" style={{ aspectRatio: '16/9', clipPath: 'inset(0% 0 0 0)', marginBottom: 'clamp(32px, 4vw, 52px)' }}>
-          <video src={MEDIA.transmission} autoPlay muted playsInline loop preload="metadata"
+          <LazyVideo src={MEDIA.transmission} poster="/media/posters/substation.jpg"
             aria-label="Electrical transmission substation infrastructure" />
           <div style={{
             position: 'absolute', bottom: 0, left: 0, right: 0, height: '40%',

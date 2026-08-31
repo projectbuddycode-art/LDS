@@ -1,34 +1,24 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { MEDIA } from '@/data/media'
+import LazyVideo from '@/components/LazyVideo'
 
 export default function Hero() {
-  const videoRef = useRef<HTMLVideoElement>(null)
   const sectionRef = useRef<HTMLElement>(null)
-  const [videoLoaded, setVideoLoaded] = useState(false)
-
-  // ── Video load ────────────────────────────────────────────────────────────
-  useEffect(() => {
-    const video = videoRef.current
-    if (!video) return
-    const onCanPlay = () => setVideoLoaded(true)
-    video.addEventListener('canplay', onCanPlay)
-    video.load()
-    video.play().catch(() => {})
-    return () => video.removeEventListener('canplay', onCanPlay)
-  }, [])
 
   // ── Premium cinematic text reveal ─────────────────────────────────────────
   useEffect(() => {
+    let isUnmounted = false
+    let ctx: any
     const section = sectionRef.current
     if (!section) return
-    let cleanup: (() => void) | undefined
 
     const init = async () => {
       const { gsap } = await import('gsap')
+      if (isUnmounted) return
 
-      const ctx = gsap.context(() => {
+      ctx = gsap.context(() => {
         const tl = gsap.timeline({ delay: 0.25 })
 
         // 1. Eyebrow / section label
@@ -86,11 +76,12 @@ export default function Hero() {
           )
         })
       }, section)
-
-      cleanup = () => ctx.revert()
     }
     init()
-    return () => cleanup?.()
+    return () => {
+      isUnmounted = true
+      if (ctx) ctx.revert()
+    }
   }, [])
 
   return (
@@ -102,20 +93,14 @@ export default function Hero() {
     >
       {/* ── Full-bleed video background ─────────────────── */}
       <div className="hero-video-wrapper" aria-hidden="true">
-        <video
-          ref={videoRef}
+        <LazyVideo
           src={MEDIA.heroVideo}
+          poster="/media/posters/hero-bg.jpg"
+          preloadImmediate={true}
           autoPlay
           muted
           playsInline
           loop
-          preload="auto"
-          style={{
-            // NEVER transform video — animate wrapper only
-            transform: 'none',
-            opacity: videoLoaded ? 1 : 0,
-            transition: 'opacity 700ms ease',
-          }}
           aria-hidden="true"
         />
       </div>

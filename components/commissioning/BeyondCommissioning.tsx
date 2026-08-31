@@ -3,21 +3,25 @@
 import { useEffect, useRef } from 'react'
 import { MEDIA } from '@/data/media'
 import { LIFECYCLE_STAGES } from '@/data/content'
+import LazyVideo from '@/components/LazyVideo'
 
 export default function BeyondCommissioning() {
   const sectionRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
+    let isUnmounted = false
+    let ctx: any
     const section = sectionRef.current
     if (!section) return
-    let cleanup: (() => void) | undefined
 
     const init = async () => {
       const { gsap } = await import('gsap')
       const { ScrollTrigger } = await import('gsap/ScrollTrigger')
       gsap.registerPlugin(ScrollTrigger)
 
-      const ctx = gsap.context(() => {
+      if (isUnmounted) return
+
+      ctx = gsap.context(() => {
         // Left video enters from left
         const visual = section.querySelector('[data-visual]')
         if (visual) {
@@ -38,10 +42,12 @@ export default function BeyondCommissioning() {
         }
       }, section)
 
-      cleanup = () => ctx.revert()
     }
     init()
-    return () => cleanup?.()
+    return () => {
+      isUnmounted = true
+      if (ctx) ctx.revert()
+    }
   }, [])
 
   return (
@@ -56,7 +62,7 @@ export default function BeyondCommissioning() {
 
           {/* LEFT — Video */}
           <div data-visual className="media-frame" style={{ aspectRatio: '16/9' }}>
-            <video src={MEDIA.beyondCommissioning} autoPlay muted playsInline loop preload="metadata"
+            <LazyVideo src={MEDIA.beyondCommissioning} poster="/media/posters/beyond-commissioning.jpg"
               aria-label="Infrastructure maintenance and lifecycle support" />
           </div>
 

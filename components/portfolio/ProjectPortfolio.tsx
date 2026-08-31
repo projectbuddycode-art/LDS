@@ -4,21 +4,25 @@ import { useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { MEDIA } from '@/data/media'
 import { PROJECTS } from '@/data/content'
+import LazyVideo from '@/components/LazyVideo'
 
 export default function ProjectPortfolio() {
   const sectionRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
+    let isUnmounted = false
+    let ctx: any
     const section = sectionRef.current
     if (!section) return
-    let cleanup: (() => void) | undefined
 
     const init = async () => {
       const { gsap } = await import('gsap')
       const { ScrollTrigger } = await import('gsap/ScrollTrigger')
       gsap.registerPlugin(ScrollTrigger)
 
-      const ctx = gsap.context(() => {
+      if (isUnmounted) return
+
+      ctx = gsap.context(() => {
         section.querySelectorAll('[data-reveal]').forEach((el, i) => {
           gsap.fromTo(el,
             { y: 20, opacity: 0 },
@@ -36,10 +40,12 @@ export default function ProjectPortfolio() {
         })
       }, section)
 
-      cleanup = () => ctx.revert()
     }
     init()
-    return () => cleanup?.()
+    return () => {
+      isUnmounted = true
+      if (ctx) ctx.revert()
+    }
   }, [])
 
   const projectMediaMap: Record<string, string> = {
@@ -51,6 +57,17 @@ export default function ProjectPortfolio() {
     warehouse: MEDIA.projects.warehouse,
     residential: MEDIA.projects.residential,
     industrial: MEDIA.projects.industrial,
+  }
+
+  const projectPosterMap: Record<string, string> = {
+    tajHotel:    '/media/posters/taj-hotel.jpg',
+    hospital:    '/media/posters/hospital.jpg',
+    campus:      '/media/posters/campus.jpg',
+    commercial:  '/media/posters/commercial.jpg',
+    township:    '/media/posters/township.jpg',
+    warehouse:   '/media/posters/warehouse.jpg',
+    residential: '/media/posters/residential.jpg',
+    industrial:  '/media/posters/industrial.jpg',
   }
 
   return (
@@ -96,11 +113,10 @@ export default function ProjectPortfolio() {
               style={{ display: 'block', textDecoration: 'none' }}
             >
               <div className="project-card-media">
-                <video
+                <LazyVideo
                   src={projectMediaMap[project.mediaKey]}
-                  autoPlay muted playsInline loop preload="metadata"
+                  poster={projectPosterMap[project.mediaKey]}
                   aria-hidden="true"
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                 />
               </div>
               <div className="project-card-overlay" />

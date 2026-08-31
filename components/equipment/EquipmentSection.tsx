@@ -3,21 +3,25 @@
 import { useEffect, useRef } from 'react'
 import { MEDIA } from '@/data/media'
 import { EQUIPMENT_RANGE, EQUIPMENT_CATEGORIES } from '@/data/content'
+import LazyVideo from '@/components/LazyVideo'
 
 export default function EquipmentSection() {
   const sectionRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
+    let isUnmounted = false
+    let ctx: any
     const section = sectionRef.current
     if (!section) return
-    let cleanup: (() => void) | undefined
 
     const init = async () => {
       const { gsap } = await import('gsap')
       const { ScrollTrigger } = await import('gsap/ScrollTrigger')
       gsap.registerPlugin(ScrollTrigger)
 
-      const ctx = gsap.context(() => {
+      if (isUnmounted) return
+
+      ctx = gsap.context(() => {
         section.querySelectorAll('[data-reveal]').forEach((el, i) => {
           gsap.fromTo(el,
             { y: 20, opacity: 0 },
@@ -36,16 +40,24 @@ export default function EquipmentSection() {
         })
       }, section)
 
-      cleanup = () => ctx.revert()
     }
     init()
-    return () => cleanup?.()
+    return () => {
+      isUnmounted = true
+      if (ctx) ctx.revert()
+    }
   }, [])
 
   const mediaMap: Record<string, string> = {
     busduct: MEDIA.equipment.busduct,
     capacitorBank: MEDIA.equipment.capacitorBank,
     powerControlCenter: MEDIA.equipment.powerControlCenter,
+  }
+
+  const posterMap: Record<string, string> = {
+    busduct: '/media/posters/busduct.jpg',
+    capacitorBank: '/media/posters/capacitor-bank.jpg',
+    powerControlCenter: '/media/posters/power-control-center.jpg',
   }
 
   return (
@@ -62,17 +74,15 @@ export default function EquipmentSection() {
             <span className="section-label-bullet" />
             <span className="t-label">07 — Equipment Range</span>
           </div>
-          <div id="equipment-header" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'clamp(24px, 4vw, 64px)', alignItems: 'end' }}>
-            <h2 data-reveal className="t-headline">
-              Engineered
-              <br />
-              <span style={{ color: 'var(--accent-gold)' }}>to specification.</span>
-            </h2>
-            <p data-reveal className="t-body" style={{ maxWidth: '380px' }}>
-              Lukhdatar & Sons supplies and installs a complete range of HT/LT electrical equipment —
-              from bus ducts and capacitor banks to MCC/PCC panels, transformers and distribution boards.
-            </p>
-          </div>
+          <h2 data-reveal className="t-headline" style={{ marginBottom: '16px' }}>
+            Delivered &
+            <br />
+            <span style={{ color: 'var(--accent-gold)' }}>installed.</span>
+          </h2>
+          <p data-reveal className="t-body" style={{ maxWidth: '380px' }}>
+            Lukhdatar & Sons supplies and installs a complete range of HT/LT electrical equipment —
+            from bus ducts and capacitor banks to MCC/PCC panels, transformers and distribution boards.
+          </p>
         </div>
 
         {/* Equipment video cards */}
@@ -83,10 +93,9 @@ export default function EquipmentSection() {
               overflow: 'hidden', background: 'var(--surface)',
             }}>
               <div className="equipment-card-media" style={{ position: 'absolute', inset: 0, transition: 'transform 500ms cubic-bezier(0.16, 1, 0.3, 1)' }}>
-                <video
+                <LazyVideo
                   src={mediaMap[item.mediaKey]}
-                  autoPlay muted playsInline loop preload="metadata"
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  poster={posterMap[item.mediaKey]}
                   aria-label={item.title}
                 />
               </div>

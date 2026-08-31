@@ -15,6 +15,16 @@ const OBJECT_POSITIONS: Record<string, string> = {
   manufacturing:  'center 22%',
 }
 
+const POSTER_MAP: Record<string, string> = {
+  education:      '/media/posters/campus.jpg',
+  commercial:     '/media/posters/commercial.jpg',
+  residential:    '/media/posters/residential.jpg',
+  medical:        '/media/posters/hospital.jpg',
+  township:       '/media/posters/township.jpg',
+  warehousing:    '/media/posters/warehouse.jpg',
+  manufacturing:  '/media/posters/industrial.jpg',
+}
+
 export default function IndustriesSection() {
   const sectionRef = useRef<HTMLElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
@@ -24,6 +34,21 @@ export default function IndustriesSection() {
   
   const [isMobile, setIsMobile] = useState<boolean>(false)
   const [mobileActiveIndex, setMobileActiveIndex] = useState<number>(0)
+  const [sectionIntersected, setSectionIntersected] = useState<boolean>(false)
+
+  // Lazy-load all video files 1200px before the section is scrolled into viewport
+  useEffect(() => {
+    const el = sectionRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setSectionIntersected(true)
+        observer.disconnect()
+      }
+    }, { rootMargin: '1200px' })
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
 
   // Handle responsive breakpoint
   useEffect(() => {
@@ -81,18 +106,20 @@ export default function IndustriesSection() {
 
   // Desktop GSAP Horizontal Scroll Pinning
   useEffect(() => {
+    let isUnmounted = false
+    let ctx: any
     const section = sectionRef.current
     const track = trackRef.current
     if (!section || !track || isMobile) return
-
-    let cleanup: (() => void) | undefined
 
     const init = async () => {
       const { gsap } = await import('gsap')
       const { ScrollTrigger } = await import('gsap/ScrollTrigger')
       gsap.registerPlugin(ScrollTrigger)
 
-      const ctx = gsap.context(() => {
+      if (isUnmounted) return
+
+      ctx = gsap.context(() => {
         const numCards = INDUSTRIES.length
 
         const getDistance = () => {
@@ -165,14 +192,13 @@ export default function IndustriesSection() {
           )
         }
       }, section)
-
-      cleanup = () => ctx.revert()
     }
 
     const timer = setTimeout(init, 100)
     return () => {
+      isUnmounted = true
       clearTimeout(timer)
-      cleanup?.()
+      if (ctx) ctx.revert()
     }
   }, [isMobile, updateVideoPlayback, updateCardDOMStyles])
 
@@ -240,7 +266,7 @@ export default function IndustriesSection() {
           >
             {INDUSTRIES.map((industry, index) => {
               const videoSrc = MEDIA.industries[industry.mediaKey]
-              const objPos = OBJECT_POSITIONS[industry.id] || 'center 25%'
+              const objPos = OBJECT_POSITIONS[industry.mediaKey] || 'center center'
               const isInitialActive = index === 0
 
               return (
@@ -266,7 +292,8 @@ export default function IndustriesSection() {
                   <div style={{ position: 'absolute', inset: 0 }}>
                     <video
                       ref={(el) => { videoRefs.current[index] = el }}
-                      src={videoSrc}
+                      src={sectionIntersected ? videoSrc : undefined}
+                      poster={POSTER_MAP[industry.mediaKey]}
                       muted
                       playsInline
                       loop
@@ -392,7 +419,8 @@ export default function IndustriesSection() {
                   <div style={{ position: 'absolute', inset: 0 }}>
                     <video
                       ref={(el) => { videoRefs.current[index] = el }}
-                      src={videoSrc}
+                      src={sectionIntersected ? videoSrc : undefined}
+                      poster={POSTER_MAP[industry.mediaKey]}
                       muted
                       playsInline
                       loop

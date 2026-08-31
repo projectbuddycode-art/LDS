@@ -43,16 +43,19 @@ export default function LeadershipSection() {
   const sectionRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
+    let isUnmounted = false
+    let ctx: any
     const section = sectionRef.current
     if (!section) return
-    let cleanup: (() => void) | undefined
 
     const init = async () => {
       const { gsap } = await import('gsap')
       const { ScrollTrigger } = await import('gsap/ScrollTrigger')
       gsap.registerPlugin(ScrollTrigger)
 
-      const ctx = gsap.context(() => {
+      if (isUnmounted) return
+
+      ctx = gsap.context(() => {
         // Portrait clip-path reveals — bottom to top
         section.querySelectorAll('[data-portrait-reveal]').forEach((el, i) => {
           gsap.fromTo(el,
@@ -82,12 +85,13 @@ export default function LeadershipSection() {
           )
         })
       }, section)
-
-      cleanup = () => ctx.revert()
     }
 
     init()
-    return () => cleanup?.()
+    return () => {
+      isUnmounted = true
+      if (ctx) ctx.revert()
+    }
   }, [])
 
   return (

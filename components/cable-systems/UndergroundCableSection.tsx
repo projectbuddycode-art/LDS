@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { MEDIA } from '@/data/media'
+import LazyVideo from '@/components/LazyVideo'
 
 const SERVICES = ['Supply', 'Laying', 'Repair', 'Maintenance', 'Replacement']
 
@@ -9,16 +10,19 @@ export default function UndergroundCableSection() {
   const sectionRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
+    let isUnmounted = false
+    let ctx: any
     const section = sectionRef.current
     if (!section) return
-    let cleanup: (() => void) | undefined
 
     const init = async () => {
       const { gsap } = await import('gsap')
       const { ScrollTrigger } = await import('gsap/ScrollTrigger')
       gsap.registerPlugin(ScrollTrigger)
 
-      const ctx = gsap.context(() => {
+      if (isUnmounted) return
+
+      ctx = gsap.context(() => {
         section.querySelectorAll('[data-reveal]').forEach((el, i) => {
           gsap.fromTo(el,
             { y: 20, opacity: 0 },
@@ -36,10 +40,12 @@ export default function UndergroundCableSection() {
         }
       }, section)
 
-      cleanup = () => ctx.revert()
     }
     init()
-    return () => cleanup?.()
+    return () => {
+      isUnmounted = true
+      if (ctx) ctx.revert()
+    }
   }, [])
 
   return (
@@ -109,7 +115,7 @@ export default function UndergroundCableSection() {
 
           {/* RIGHT — Visual */}
           <div data-visual className="media-frame" style={{ aspectRatio: '9/12', clipPath: 'inset(0 0% 0 0)' }}>
-            <video src={MEDIA.cableSystems} autoPlay muted playsInline loop preload="metadata"
+            <LazyVideo src={MEDIA.cableSystems} poster="/media/posters/substation.jpg"
               aria-label="Electrical substation construction" />
           </div>
         </div>

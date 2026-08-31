@@ -3,21 +3,25 @@
 import { useEffect, useRef } from 'react'
 import { MEDIA } from '@/data/media'
 import { ACCOUNTABILITY_PRINCIPLES } from '@/data/content'
+import LazyVideo from '@/components/LazyVideo'
 
 export default function AccountabilitySection() {
   const sectionRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
+    let isUnmounted = false
+    let ctx: any
     const section = sectionRef.current
     if (!section) return
-    let cleanup: (() => void) | undefined
 
     const init = async () => {
       const { gsap } = await import('gsap')
       const { ScrollTrigger } = await import('gsap/ScrollTrigger')
       gsap.registerPlugin(ScrollTrigger)
 
-      const ctx = gsap.context(() => {
+      if (isUnmounted) return
+
+      ctx = gsap.context(() => {
         const visual = section.querySelector('[data-visual]')
         if (visual) {
           gsap.fromTo(visual,
@@ -36,10 +40,12 @@ export default function AccountabilitySection() {
         }
       }, section)
 
-      cleanup = () => ctx.revert()
     }
     init()
-    return () => cleanup?.()
+    return () => {
+      isUnmounted = true
+      if (ctx) ctx.revert()
+    }
   }, [])
 
   return (
@@ -88,7 +94,7 @@ export default function AccountabilitySection() {
 
           {/* RIGHT — Video */}
           <div data-visual className="media-frame" style={{ aspectRatio: '16/9' }}>
-            <video src={MEDIA.accountability} autoPlay muted playsInline loop preload="metadata"
+            <LazyVideo src={MEDIA.accountability} poster="/media/posters/accountability.jpg"
               aria-label="Lukhdatar & Sons infrastructure delivery" />
           </div>
         </div>
