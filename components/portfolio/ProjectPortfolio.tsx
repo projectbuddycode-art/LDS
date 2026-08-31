@@ -50,6 +50,7 @@ export default function ProjectPortfolio() {
 
   const projectMediaMap: Record<string, string> = {
     tajHotel: MEDIA.projects.tajHotel,
+    sonotel: MEDIA.projects.sonotel,
     hospital: MEDIA.projects.hospital,
     campus: MEDIA.projects.campus,
     commercial: MEDIA.projects.commercial,
@@ -61,6 +62,7 @@ export default function ProjectPortfolio() {
 
   const projectPosterMap: Record<string, string> = {
     tajHotel:    '/media/posters/taj-hotel.jpg',
+    sonotel:     '/media/posters/sonotel-project.jpg',
     hospital:    '/media/posters/hospital.jpg',
     campus:      '/media/posters/campus.jpg',
     commercial:  '/media/posters/commercial.jpg',

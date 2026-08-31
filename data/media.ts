@@ -14,7 +14,7 @@ export const MEDIA = {
   },
 
   // ── Infrastructure / Cable Systems ───────────────────────
-  cableSystems: '/media/substation.mp4',
+  cableSystems: '/media/underground-cabling-system.mp4',
 
   // ── Transmission ─────────────────────────────────────────
   transmission: '/media/substation.mp4',
@@ -32,6 +32,7 @@ export const MEDIA = {
   // ── Project Portfolio ────────────────────────────────────
   projects: {
     tajHotel:    '/media/taj-hotel.mp4',
+    sonotel:     '/media/sonotel-project.mp4',
     hospital:    '/media/hospital.mp4',
     campus:      '/media/campus.mp4',
     commercial:  '/media/commercial.mp4',

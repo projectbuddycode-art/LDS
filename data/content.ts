@@ -118,7 +118,7 @@ export const PROJECTS = [
     id: 'sonotel',
     title: 'Sonotel',
     scope: 'Complete SITC & Electrical Infrastructure',
-    mediaKey: 'tajHotel' as const,
+    mediaKey: 'sonotel' as const,
     tag: 'Hospitality',
   },
   {
