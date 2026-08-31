@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, memo } from 'react'
+import { useEffect, useRef, memo } from 'react'
 
 interface LazyVideoProps extends React.VideoHTMLAttributes<HTMLVideoElement> {
   src: string
@@ -22,54 +22,90 @@ function LazyVideo({
 }: LazyVideoProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
-  const [isPlaying, setIsPlaying] = useState(false)
+  const posterRef = useRef<HTMLImageElement>(null)
+  const playTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const isPlayingRef = useRef<boolean>(false)
 
   useEffect(() => {
     const video = videoRef.current
     const container = containerRef.current
+    const posterEl = posterRef.current
     if (!video) return
 
-    // Ensure native autoplay attributes are active
     video.muted = true
     video.playsInline = true
 
-    // Initial play attempt
-    const startPlay = () => {
-      const promise = video.play()
-      if (promise !== undefined) {
-        promise
-          .then(() => setIsPlaying(true))
-          .catch(() => {
-            // Autoplay deferred by browser policy
-          })
+    const handlePlaying = () => {
+      isPlayingRef.current = true
+      if (posterEl) {
+        posterEl.style.opacity = '0'
       }
     }
 
+    video.addEventListener('playing', handlePlaying)
+    video.addEventListener('play', handlePlaying)
+
+    // Above-the-fold hero video plays immediately
     if (preloadImmediate) {
-      startPlay()
+      const promise = video.play()
+      if (promise !== undefined) {
+        promise.catch(() => {})
+      }
+      return () => {
+        video.removeEventListener('playing', handlePlaying)
+        video.removeEventListener('play', handlePlaying)
+      }
     }
 
     if (typeof IntersectionObserver === 'undefined' || !container) {
-      startPlay()
-      return
+      const promise = video.play()
+      if (promise !== undefined) {
+        promise.catch(() => {})
+      }
+      return () => {
+        video.removeEventListener('playing', handlePlaying)
+        video.removeEventListener('play', handlePlaying)
+      }
     }
 
-    // Viewport intersection observer: play when visible/near, pause when offscreen
+    // Viewport IntersectionObserver with tight margins & debounce for rapid scrolling
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          startPlay()
+          // Debounce play by 80ms: if user flings past in <80ms, we don't stress the hardware decoder
+          if (playTimerRef.current) clearTimeout(playTimerRef.current)
+          playTimerRef.current = setTimeout(() => {
+            if (video && entry.isIntersecting) {
+              const promise = video.play()
+              if (promise !== undefined) {
+                promise.catch(() => {})
+              }
+            }
+          }, 80)
         } else {
-          video.pause()
+          // Immediately cancel any pending play and pause offscreen video
+          if (playTimerRef.current) {
+            clearTimeout(playTimerRef.current)
+            playTimerRef.current = null
+          }
+          if (video && !video.paused) {
+            video.pause()
+          }
         }
       },
-      { rootMargin: '300px' }
+      { rootMargin: '60px 0px 60px 0px', threshold: 0.05 }
     )
 
     observer.observe(container)
 
     return () => {
+      if (playTimerRef.current) {
+        clearTimeout(playTimerRef.current)
+        playTimerRef.current = null
+      }
       observer.disconnect()
+      video.removeEventListener('playing', handlePlaying)
+      video.removeEventListener('play', handlePlaying)
     }
   }, [src, preloadImmediate])
 
@@ -83,6 +119,7 @@ function LazyVideo({
         aspectRatio,
         overflow: 'hidden',
         background: 'var(--surface)',
+        contain: 'layout paint',
         ...containerStyle,
       }}
       className={className}
@@ -91,16 +128,11 @@ function LazyVideo({
       <video
         ref={videoRef}
         src={src}
-        autoPlay
+        autoPlay={preloadImmediate}
         muted
         playsInline
         loop
         preload={preloadImmediate ? 'auto' : 'metadata'}
-        onPlay={() => setIsPlaying(true)}
-        onPlaying={() => setIsPlaying(true)}
-        onTimeUpdate={() => {
-          if (!isPlaying) setIsPlaying(true)
-        }}
         aria-hidden="true"
         style={{
           position: 'absolute',
@@ -116,9 +148,10 @@ function LazyVideo({
         {...props}
       />
 
-      {/* ── Seamless Poster Layer (fades out as video plays) ── */}
+      {/* ── Seamless Poster Layer (fades out directly in DOM on play) ── */}
       {poster && (
         <img
+          ref={posterRef}
           src={poster}
           alt=""
           aria-hidden="true"
@@ -131,8 +164,8 @@ function LazyVideo({
             objectFit: style?.objectFit || 'cover',
             objectPosition: style?.objectPosition || 'center center',
             zIndex: 2,
-            opacity: isPlaying ? 0 : 1,
-            transition: 'opacity 400ms ease-out',
+            opacity: 1,
+            transition: 'opacity 350ms ease-out',
             pointerEvents: 'none',
           }}
         />

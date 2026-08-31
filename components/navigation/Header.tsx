@@ -11,11 +11,25 @@ export default function Header() {
   const headerRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
+    let rafId: number = 0
+    let lastScrolled = false
     function onScroll() {
-      setScrolled(window.scrollY > 60)
+      if (!rafId) {
+        rafId = window.requestAnimationFrame(() => {
+          const isScrolled = window.scrollY > 60
+          if (isScrolled !== lastScrolled) {
+            lastScrolled = isScrolled
+            setScrolled(isScrolled)
+          }
+          rafId = 0
+        })
+      }
     }
     window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+    return () => {
+      if (rafId) window.cancelAnimationFrame(rafId)
+      window.removeEventListener('scroll', onScroll)
+    }
   }, [])
 
   useEffect(() => {
