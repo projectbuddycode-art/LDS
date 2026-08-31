@@ -14,7 +14,7 @@ export const MEDIA = {
   },
 
   // ── Infrastructure / Cable Systems ───────────────────────
-  cableSystems: '/media/underground-cabling-system-portrait.mp4',
+  cableSystems: '/media/underground-cabling-system.mp4',
 
   // ── Transmission ─────────────────────────────────────────
   transmission: '/media/substation.mp4',

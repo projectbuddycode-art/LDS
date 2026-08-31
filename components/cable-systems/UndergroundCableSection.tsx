@@ -57,7 +57,7 @@ export default function UndergroundCableSection() {
       aria-label="Underground cable systems"
     >
       <div className="site-container">
-        <div className="two-col-55-45" style={{ alignItems: 'center' }}>
+        <div className="two-col-45-55" style={{ alignItems: 'center' }}>
 
           {/* LEFT — Text */}
           <div>
@@ -114,10 +114,10 @@ export default function UndergroundCableSection() {
           </div>
 
           {/* RIGHT — Visual */}
-          <div data-visual className="media-frame" style={{ aspectRatio: '9/12', clipPath: 'inset(0 0% 0 0)' }}>
+          <div data-visual className="media-frame" style={{ aspectRatio: '4/3', clipPath: 'inset(0 0% 0 0)' }}>
             <LazyVideo
               src={MEDIA.cableSystems}
-              poster="/media/posters/underground-cabling-system-portrait.jpg"
+              poster="/media/posters/underground-cabling-system.jpg"
               aria-label="Underground cable works and installations"
             />
           </div>
