@@ -49,27 +49,31 @@ export default function ProjectPortfolio() {
   }, [])
 
   const projectMediaMap: Record<string, string> = {
-    tajHotel: MEDIA.projects.tajHotel,
-    sonotel: MEDIA.projects.sonotel,
-    hospital: MEDIA.projects.hospital,
-    campus: MEDIA.projects.campus,
-    commercial: MEDIA.projects.commercial,
-    township: MEDIA.projects.township,
-    warehouse: MEDIA.projects.warehouse,
-    residential: MEDIA.projects.residential,
-    industrial: MEDIA.projects.industrial,
+    tajHotel:         MEDIA.projects.tajHotel,
+    sonotel:          MEDIA.projects.sonotel,
+    assamHill:        MEDIA.projects.assamHill,
+    sarojiniHospital: MEDIA.projects.sarojiniHospital,
+    hospital:         MEDIA.projects.hospital,
+    campus:           MEDIA.projects.campus,
+    commercial:       MEDIA.projects.commercial,
+    township:         MEDIA.projects.township,
+    warehouse:        MEDIA.projects.warehouse,
+    residential:      MEDIA.projects.residential,
+    industrial:       MEDIA.projects.industrial,
   }
 
   const projectPosterMap: Record<string, string> = {
-    tajHotel:    '/media/posters/taj-hotel.jpg',
-    sonotel:     '/media/posters/sonotel-project.jpg',
-    hospital:    '/media/posters/hospital.jpg',
-    campus:      '/media/posters/campus.jpg',
-    commercial:  '/media/posters/commercial.jpg',
-    township:    '/media/posters/township.jpg',
-    warehouse:   '/media/posters/warehouse.jpg',
-    residential: '/media/posters/residential.jpg',
-    industrial:  '/media/posters/industrial.jpg',
+    tajHotel:         '/media/posters/taj-hotel.jpg',
+    sonotel:          '/media/posters/sonotel-project.jpg',
+    assamHill:        '/media/posters/aasam-hill-medical-college.jpg',
+    sarojiniHospital: '/media/posters/sarojini-naidu-medical-hospital.jpg',
+    hospital:         '/media/posters/hospital.jpg',
+    campus:           '/media/posters/campus.jpg',
+    commercial:       '/media/posters/commercial.jpg',
+    township:         '/media/posters/township.jpg',
+    warehouse:        '/media/posters/warehouse.jpg',
+    residential:      '/media/posters/residential.jpg',
+    industrial:       '/media/posters/industrial.jpg',
   }
 
   return (

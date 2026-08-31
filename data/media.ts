@@ -31,15 +31,17 @@ export const MEDIA = {
 
   // ── Project Portfolio ────────────────────────────────────
   projects: {
-    tajHotel:    '/media/taj-hotel.mp4',
-    sonotel:     '/media/sonotel-project.mp4',
-    hospital:    '/media/hospital.mp4',
-    campus:      '/media/campus.mp4',
-    commercial:  '/media/commercial.mp4',
-    township:    '/media/township.mp4',
-    warehouse:   '/media/warehouse.mp4',
-    residential: '/media/residential.mp4',
-    industrial:  '/media/industrial.mp4',
+    tajHotel:         '/media/taj-hotel.mp4',
+    sonotel:          '/media/sonotel-project.mp4',
+    assamHill:        '/media/aasam-hill-medical-college.mp4',
+    sarojiniHospital: '/media/sarojini-naidu-medical-hospital.mp4',
+    hospital:         '/media/hospital.mp4',
+    campus:           '/media/campus.mp4',
+    commercial:       '/media/commercial.mp4',
+    township:         '/media/township.mp4',
+    warehouse:        '/media/warehouse.mp4',
+    residential:      '/media/residential.mp4',
+    industrial:       '/media/industrial.mp4',
   },
 
   // ── Industries Section ───────────────────────────────────

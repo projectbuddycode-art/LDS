@@ -125,14 +125,14 @@ export const PROJECTS = [
     id: 'assam-medical-college',
     title: 'Assam Hill Medical College & Research Institute',
     scope: 'Complete Electrical SITC',
-    mediaKey: 'hospital' as const,
+    mediaKey: 'assamHill' as const,
     tag: 'Healthcare',
   },
   {
     id: 'sarojini-naidu-hospital',
     title: 'Sarojini Naidu Medical Hospital, Agra',
     scope: 'SITC of Electrical Installations',
-    mediaKey: 'hospital' as const,
+    mediaKey: 'sarojiniHospital' as const,
     tag: 'Healthcare',
   },
   {
