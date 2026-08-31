@@ -62,10 +62,8 @@ export default function FinalCTA() {
           <span style={{ color: 'var(--accent-gold)' }}>requirement?</span>
         </h2>
 
-        <p data-reveal className="t-body-lg" style={{ maxWidth: '520px', marginBottom: 'clamp(36px, 4vw, 56px)' }}>
-          From equipment requirements to complete electrical infrastructure, Lukhdatar & Sons brings
-          engineering, supply, installation, testing and commissioning into one accountable
-          delivery framework.
+        <p data-reveal className="t-body-lg" style={{ maxWidth: '560px', marginBottom: 'clamp(36px, 4vw, 56px)' }}>
+          Looking for an established contractor for complete electrical SITC, HT/LT power distribution, substation erection, or cable infrastructure? Discuss your project scope and execution timeline directly with our team.
         </p>
 
         <div data-reveal style={{ width: '100%', height: '1px', background: 'var(--line-soft)', marginBottom: 'clamp(32px, 4vw, 48px)' }} />

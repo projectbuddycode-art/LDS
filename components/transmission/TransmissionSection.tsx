@@ -67,9 +67,8 @@ export default function TransmissionSection() {
             <br />
             <span style={{ color: 'var(--accent-gold)' }}>Up to 400KV.</span>
           </h2>
-          <p data-reveal className="t-body" style={{ maxWidth: '480px', margin: '0 auto 32px' }}>
-            Lukhdatar & Sons executes overhead transmission line works across voltage levels from 11KV to 400KV —
-            towers, stringing, substation integration and complete commissioning.
+          <p data-reveal className="t-body" style={{ maxWidth: '520px', margin: '0 auto 32px' }}>
+            Lukhdatar & Sons executes overhead transmission line projects across voltage levels from 11KV to 400KV, covering structural foundations, tower erection, conductor tension stringing, and substation grid synchronization.
           </p>
         </div>
 

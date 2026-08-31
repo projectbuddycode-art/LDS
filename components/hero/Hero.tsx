@@ -154,8 +154,7 @@ export default function Hero() {
               data-hero-para
               className="hero-para"
             >
-              Complete electrical infrastructure — engineering, supply, installation,
-              testing and commissioning delivered as one accountable scope.
+              Turnkey electrical contracting and high-voltage infrastructure across Government and Private sectors. We deliver complete engineering coordination, supply, installation, testing, and commissioning under single-point project accountability.
             </p>
 
             {/* 4. CTA row */}

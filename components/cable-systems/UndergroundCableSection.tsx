@@ -72,10 +72,8 @@ export default function UndergroundCableSection() {
               <span style={{ color: 'var(--accent-gold)' }}>the surface.</span>
             </h2>
 
-            <p data-reveal className="t-body" style={{ maxWidth: '420px', marginBottom: '36px' }}>
-              Engineered underground cable infrastructure — from supply and laying through
-              testing, maintenance and full lifecycle support. Built for long-term reliability
-              in commercial, industrial and public environments.
+            <p data-reveal className="t-body" style={{ maxWidth: '440px', marginBottom: '36px' }}>
+              Lukhdatar & Sons engineers, supplies, lays, tests, and maintains high-voltage underground cable networks up to 66KV. Our teams manage route surveying, trench excavation, bedding, duct installation, certified jointing, and routine maintenance across commercial, housing, industrial, and public sector developments.
             </p>
 
             <div data-reveal style={{

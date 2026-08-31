@@ -106,9 +106,8 @@ export default function CapabilitySection() {
               <br />
               <span style={{ color: 'var(--accent-gold)' }}>every voltage.</span>
             </h2>
-            <p data-reveal className="t-body" style={{ maxWidth: '380px' }}>
-              From the first engineering drawing to final commissioning, Lukhdatar & Sons delivers complete
-              electrical infrastructure across voltage levels from 11KV to 400KV.
+            <p data-reveal className="t-body" style={{ maxWidth: '400px' }}>
+              Lukhdatar & Sons delivers complete electrical infrastructure across Government and Private sectors, managing low, medium, and high-voltage projects up to 400KV transmission and 220KV substations.
             </p>
           </div>
         </div>

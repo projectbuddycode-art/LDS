@@ -166,10 +166,8 @@ export default function TurnkeySection() {
               <br />
               delivery.
             </h2>
-            <p data-reveal className="t-body" style={{ maxWidth: '380px' }}>
-              Lukhdatar & Sons integrates engineering, supply, installation, testing and commissioning
-              into a single delivery framework — eliminating interface risk and
-              multi-vendor accountability gaps.
+            <p data-reveal className="t-body" style={{ maxWidth: '400px' }}>
+              Lukhdatar & Sons manages complete electrical SITC under single-point project accountability. We coordinate engineering layout reviews, spec-compliant procurement, field installation, pre-commissioning testing, and utility grid energisation across Government and Private sector projects.
             </p>
           </div>
         </div>

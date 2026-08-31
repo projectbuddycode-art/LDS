@@ -10,24 +10,40 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'Lukhdatar & Sons | Electrical Engineering & Turnkey Contracting',
+  title: 'Lukhdatar & Sons | Turnkey Electrical Infrastructure & Contracting',
   description:
-    'Lukhdatar & Sons delivers complete electrical infrastructure solutions: turnkey contracting, underground cable works up to 66KV, substations up to 220KV, and transmission up to 400KV across commercial, industrial, residential and public sectors.',
+    'Lukhdatar & Sons delivers complete electrical infrastructure solutions: turnkey electrical SITC contracting, underground cable systems up to 66KV, substations up to 220KV, and overhead transmission lines up to 400KV across Government and Private sectors.',
   keywords: [
-    'electrical infrastructure',
-    'turnkey contracting',
-    'underground cable laying',
-    'substation works',
-    'transmission lines',
-    'electrical engineering',
+    'Lukhdatar & Sons',
+    'electrical infrastructure contractor',
+    'turnkey electrical contractor',
+    'turnkey electrification',
+    'electrical SITC',
+    'complete electrical SITC',
+    'electrical installation contractor',
+    'HT/LT power distribution',
+    'substation electrical work',
+    'underground cable systems',
+    'overhead transmission lines',
+    'electrical testing and commissioning',
+    'routine electrical maintenance',
+    'lifecycle support',
+    'industrial electrical infrastructure',
+    'government electrical projects',
+    'healthcare electrical infrastructure',
+    'commercial electrical projects',
+    'residential township electrification',
+    'earthing and bonding',
+    'lightning protection',
+    'LV/MV/HV electrical systems',
     'Kolkata',
     'West Bengal',
-    'Lukhdatar & Sons',
-    'Lukhdatar and Sons',
+    'India',
   ],
   openGraph: {
-    title: 'Lukhdatar & Sons',
-    description: 'Power. Engineered to Endure.',
+    title: 'Lukhdatar & Sons | Turnkey Electrical Infrastructure',
+    description:
+      'Turnkey electrical SITC, high-voltage substations up to 220KV, transmission lines up to 400KV, and underground cable networks up to 66KV.',
     siteName: 'Lukhdatar & Sons',
     locale: 'en_IN',
     type: 'website',
@@ -36,6 +52,57 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+}
+
+const orgSchema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': 'https://ldsinfrastructure.com/#organization',
+      'name': 'Lukhdatar & Sons',
+      'legalName': 'Lukhdatar & Sons',
+      'foundingDate': '1997',
+      'founder': {
+        '@type': 'Person',
+        'name': 'Mr. Lalit Kumar Sureka',
+      },
+      'employee': [
+        {
+          '@type': 'Person',
+          'name': 'Mr. Shree Mangalam Sureka',
+          'jobTitle': 'Managing Director',
+        },
+      ],
+      'address': {
+        '@type': 'PostalAddress',
+        'addressLocality': 'Kolkata',
+        'addressRegion': 'West Bengal',
+        'addressCountry': 'IN',
+      },
+      'email': 'info@ldsinfrastructure.com',
+      'description':
+        'Lukhdatar & Sons is a turnkey electrical infrastructure contractor established in 1997 in Kolkata. Delivering complete SITC projects across Government and Private sectors.',
+      'knowsAbout': [
+        'Turnkey Electrical Contracting',
+        'Substations & Switchyards up to 220KV',
+        'Transmission Lines up to 400KV',
+        'Underground Cable Systems up to 66KV',
+        'HT and LT Power Distribution',
+        'Electrical Testing and Commissioning',
+        'Routine Maintenance and Lifecycle Support',
+      ],
+    },
+    {
+      '@type': 'WebSite',
+      '@id': 'https://ldsinfrastructure.com/#website',
+      'url': 'https://ldsinfrastructure.com',
+      'name': 'Lukhdatar & Sons',
+      'publisher': {
+        '@id': 'https://ldsinfrastructure.com/#organization',
+      },
+    },
+  ],
 }
 
 export default function RootLayout({
@@ -49,6 +116,10 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
+        />
       </head>
       <body className={inter.className}>{children}</body>
     </html>

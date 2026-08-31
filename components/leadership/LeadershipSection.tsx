@@ -7,29 +7,29 @@ import { MEDIA } from '@/data/media'
 const FOUNDER_STORY = [
   {
     year: '1997',
-    label: 'The Beginning',
-    body: 'Lukhdatar & Sons was established by Mr. Lalit Kumar Sureka in Kolkata as an electrical goods supply business. Operating in the field gave Mr. Sureka direct exposure to equipment requirements, installation practices and the practical gaps that existed between supply and reliable delivery.',
+    label: 'Company Foundation',
+    body: 'Lukhdatar & Sons was established by Mr. Lalit Kumar Sureka in Kolkata as an electrical goods and equipment supply enterprise. Operating directly in the field provided Mr. Sureka with practical insight into component specifications, installation requirements, and the coordination needed for reliable electrical execution.',
   },
   {
     year: '2007',
-    label: 'From Supply to Execution',
-    body: 'After a decade of building supplier relationships and technical knowledge, Lukhdatar & Sons made a decisive strategic move — transitioning from electrical goods supply into full turnkey electrical contracting. This shift meant owning the complete engineering cycle: design, supply, installation, testing, commissioning and ongoing maintenance as a single integrated scope.',
+    label: 'Turnkey Contracting Expansion',
+    body: 'Building on a decade of supplier relationships and technical knowledge, the company expanded into complete turnkey electrical contracting. This transition established single-point accountability for engineering coordination, equipment procurement, site installation, testing, commissioning, and post-handover maintenance across Government and Private sector projects.',
   },
   {
-    year: 'Today',
-    label: 'Infrastructure at Scale',
-    body: 'Today, Lukhdatar & Sons undertakes electrical infrastructure projects across commercial, residential, industrial, public and substation environments — with technical capability spanning underground cable works up to 66KV, substations and switchyards up to 220KV, and overhead transmission lines up to 400KV.',
+    year: 'Present',
+    label: 'Multi-Sector Infrastructure',
+    body: 'Today, Lukhdatar & Sons delivers comprehensive electrical infrastructure across commercial, healthcare, residential township, industrial, public, and substation developments, with high-voltage capabilities spanning underground cable systems up to 66KV, substations up to 220KV, and overhead transmission lines up to 400KV.',
   },
 ]
 
 const MD_STORY = [
   {
-    label: 'The Next Generation',
-    body: 'Mr. Shree Mangalam Sureka joined Lukhdatar & Sons as it entered its contracting phase, bringing structured management discipline to complement the technical foundation his father had built. As Managing Director, he oversees project delivery, client relationships and the company\'s long-term strategic direction.',
+    label: 'Executive Leadership & Execution',
+    body: 'Mr. Shree Mangalam Sureka joined Lukhdatar & Sons in 2007 to spearhead its turnkey contracting division, introducing structured project management practices to complement the company\'s technical foundation. As Managing Director, he oversees project delivery teams, client relationships, engineering quality, and safety standards.',
   },
   {
-    label: 'Continuity of Standards',
-    body: 'Under his leadership, Lukhdatar & Sons has maintained the engineering discipline and delivery accountability that defined its early years — while expanding the scope and complexity of projects it undertakes. The company\'s commitment to testing, documentation and post-commissioning support reflects a management philosophy built on long-term relationships.',
+    label: 'Delivery Standards & Lifecycle Support',
+    body: 'Under his leadership, Lukhdatar & Sons has maintained consistent engineering standards and timeline adherence across diverse contract sizes. The company prioritizes pre-commissioning testing rigour, clear technical documentation, and post-commissioning routine maintenance to support long-term client relationships and repeat engagements.',
   },
 ]
 

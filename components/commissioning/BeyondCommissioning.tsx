@@ -79,10 +79,8 @@ export default function BeyondCommissioning() {
               <span style={{ color: 'var(--accent-gold)' }}>commissioning.</span>
             </h2>
 
-            <p className="t-body" style={{ maxWidth: '420px', marginBottom: '40px' }}>
-              Electrical infrastructure is not finished when it is energised. Lukhdatar & Sons supports
-              the full operational lifecycle — routine maintenance, repair and replacement of
-              existing installations and completed projects.
+            <p className="t-body" style={{ maxWidth: '440px', marginBottom: '40px' }}>
+              Electrical assets require continuous operational oversight after energisation. Lukhdatar & Sons provides routine maintenance, transformer oil filtration, breaker servicing, and lifecycle repair support for completed projects and existing client installations.
             </p>
 
             <div className="lifecycle-flow">

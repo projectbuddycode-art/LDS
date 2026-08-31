@@ -71,10 +71,8 @@ export default function AccountabilitySection() {
               <span style={{ color: 'var(--accent-gold)' }}>accountability.</span>
             </h2>
 
-            <p className="t-body" style={{ maxWidth: '420px', marginBottom: '40px' }}>
-              Our work is measured not only by what is commissioned, but by how it is
-              engineered, executed, documented and supported. Every project carries
-              the same standard — regardless of sector or scale.
+            <p className="t-body" style={{ maxWidth: '440px', marginBottom: '40px' }}>
+              Our engineering delivery is measured by single-point accountability, rigorous adherence to safety standards, clear documentation, and dependable lifecycle support across both Government and Private sector projects.
             </p>
 
             <div>

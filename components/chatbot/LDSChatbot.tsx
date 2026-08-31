@@ -13,11 +13,11 @@ const LDS_KB = {
     location: 'Kolkata, West Bengal, India',
     founded: '1997',
     turnkeySince: '2007',
-    tagline: 'Power. Engineered to Endure.',
-    pillars: 'Engineering • Equipment • Execution',
+    tagline: 'Turnkey Electrical Infrastructure & Contracting',
+    pillars: 'Engineering Coordination • Spec-Compliant Supply • Site Execution',
     email: 'info@ldsinfrastructure.com',
-    about: `Lukhdatar & Sons (LDS) is a premier engineering-led electrical infrastructure company founded in 1997 in Kolkata. Originating as an electrical equipment and goods supplier, LDS expanded into full-scale Turnkey Electrical Contracting in 2007. Today, LDS delivers complete end-to-end electrical infrastructure across healthcare, government, commercial, residential, industrial, and utility substation environments.`,
-    whyChoose: `Clients choose Lukhdatar & Sons because:\n\n1. **Engineering Precision**: Load design validation, single-line diagrams, and strict technical specification compliance.\n2. **Single Accountability**: Integrated SITC (Supply, Installation, Testing & Commissioning) with zero multi-vendor coordination bottlenecks.\n3. **High-Voltage Track Record**: Proven execution in substations up to 220KV, transmission lines up to 400KV, and underground cable networks up to 66KV.\n4. **Rapid Execution**: Demonstrated milestone speed, including energising the 2 × 3.15 MVA Kohora Substation in only 100 working days.\n5. **Beyond Commissioning**: 7-stage lifecycle support with scheduled preventative maintenance and emergency operational assistance.`,
+    about: `Lukhdatar & Sons was established in 1997 in Kolkata by Mr. Lalit Kumar Sureka as an electrical goods and equipment supplier. In 2007, under the leadership of Managing Director Mr. Shree Mangalam Sureka, the company transitioned into full-scale turnkey electrical contracting. Today, Lukhdatar & Sons delivers complete electrical Supply, Installation, Testing & Commissioning (SITC) across Government and Private sectors for commercial, housing, industrial, public, and high-voltage substation projects.`,
+    whyChoose: `Clients choose Lukhdatar & Sons for several key reasons:\n\n1. **Single-Point Accountability**: Integrated SITC managing engineering coordination, spec-compliant procurement, field installation, testing, and commissioning without multi-vendor interface friction.\n2. **In-House Technical Breadth**: Extensive capabilities spanning LV, MV, and HV wiring and cabling, switchboards, HT and LT power panels, lighting grids, earthing, lightning protection, and substation equipment.\n3. **High-Voltage Execution**: Proven delivery of underground cable systems up to 66KV, substations up to 220KV, and transmission lines up to 400KV.\n4. **Public & Private Track Record**: Dependable project execution across landmark healthcare campuses, government complexes (such as Bihar Vidhan Sabha), industrial warehouses, and utility substations.\n5. **Post-Commissioning Continuity**: Long-term operational support including scheduled preventative maintenance, transformer oil filtration, and switchgear servicing.`,
   },
 
   leadership: {
@@ -25,24 +25,24 @@ const LDS_KB = {
       name: 'Mr. Lalit Kumar Sureka',
       role: 'Founder',
       since: '1997',
-      story: 'Mr. Lalit Kumar Sureka founded Lukhdatar & Sons in Kolkata in 1997. His initial decade of direct equipment supply and technical distribution laid the bedrock of procurement acumen and engineering standards that enabled LDS to evolve into a full-scale turnkey electrical contractor.',
+      story: 'Mr. Lalit Kumar Sureka founded Lukhdatar & Sons in Kolkata in 1997 as an electrical goods supplier. His initial decade of on-ground commercial experience and deep supplier relationships established the technical standards that enabled the company to transition into turnkey electrical contracting.',
     },
     md: {
       name: 'Mr. Shree Mangalam Sureka',
       role: 'Managing Director',
       since: '2007',
-      story: 'Mr. Shree Mangalam Sureka joined Lukhdatar & Sons as it transitioned into turnkey contracting in 2007. As Managing Director, he spearheads on-ground project execution, client relationships, engineering standards, and the company\'s long-term infrastructure expansion.',
+      story: 'Mr. Shree Mangalam Sureka joined Lukhdatar & Sons in 2007 to lead its expansion into turnkey contracting. As Managing Director, he oversees on-ground project execution teams, client relationships, engineering quality, and safety standards across Government and Private sector developments.',
     },
   },
 
   capabilities: {
-    summary: `Lukhdatar & Sons provides complete turnkey electrical infrastructure across a 7-stage project lifecycle:\n\n• **Turnkey Electrification (SITC)**: Complete design, procurement, physical installation, and energisation.\n• **Substations & Switchyards**: High-voltage substations up to 220KV.\n• **Transmission Lines**: Overhead transmission tower lines up to 400KV.\n• **Underground Cable Systems**: Specialized trenching, laying, and jointing up to 66KV.\n• **HT / LT Distribution**: Main switchboards, PCC panels, MCCs, bus ducts, capacitor banks, and rising mains.\n• **Testing & Commissioning**: Relay calibrations, insulation resistance, hipot tests, and statutory grid clearances.\n• **Beyond Commissioning**: Preventative maintenance, transformer oil filtration, and operational lifecycle support.`,
-    turnkey: `LDS delivers turnkey electrical infrastructure covering Engineering, Supply, Installation, Testing, and Commissioning (SITC) as a single accountable contract. We manage design approvals, equipment procurement, on-site physical erection, pre-commissioning safety audits, and grid synchronization.`,
-    underground: `LDS specializes in high-voltage underground cable systems up to 66KV. Our capabilities include precision trenching, bedding, cable laying, cross-bonded jointing, heat-shrink terminations, and fault testing across challenging urban, industrial, and rocky terrains.`,
-    substations: `LDS executes substations and switchyards up to 220KV capacity. Our scope includes transformer yards, vacuum circuit breaker (VCB) panels, control room SCADA interfaces, capacitor banks, and earthing grids. A prime example is our turnkey delivery of the 2 × 3.15 MVA Substation at Kohora, Assam in just 100 working days.`,
-    transmission: `LDS delivers overhead high-voltage transmission line infrastructure up to 400KV, encompassing foundation erection, steel tower assembly, hardware fittings, conductor stringing, and statutory safety energisation clearances.`,
+    summary: `Lukhdatar & Sons provides complete turnkey electrical infrastructure across the project lifecycle:\n\n• **Turnkey Electrification (SITC)**: End-to-end engineering, spec-compliant procurement, on-site erection, pre-commissioning testing, and grid energisation.\n• **Substations & Switchyards**: High-voltage utility substations and industrial switchyards up to 220KV.\n• **Overhead Transmission Lines**: Lattice steel tower assembly and conductor stringing up to 400KV.\n• **Underground Cable Systems**: Specialized trenching, bedding, ducting, and certified jointing up to 66KV.\n• **HT / LT Power Distribution**: Switchboards, Power Control Centres (PCC), Motor Control Centres (MCC), bus ducts, capacitor banks, and rising mains.\n• **Testing & Pre-Commissioning**: Protection relay calibration, high-voltage insulation audits, and statutory utility clearances.\n• **Beyond Commissioning**: Routine maintenance, transformer oil filtration, planned shutdown servicing, and lifecycle support.`,
+    turnkey: `Lukhdatar & Sons delivers turnkey electrical infrastructure covering Engineering Coordination, Procurement & Supply, Site Installation, Pre-Commissioning Testing, and Utility Commissioning (SITC) under single-point project accountability.`,
+    underground: `LDS specializes in high-voltage underground cable networks up to 66KV. Our capabilities include route surveying, mechanical trench excavation, bedding, protective ducting, cross-bonded jointing, heat-shrink terminations, and hipot testing.`,
+    substations: `LDS engineers and erects substations and switchyards up to 220KV. Our scope covers civil foundations, gantry structural erection, transformer installation, vacuum circuit breaker (VCB) panels, and protection relay calibration. A key example is our turnkey delivery of the 2 × 3.15 MVA Substation at Kohora, Assam in 100 working days.`,
+    transmission: `LDS delivers overhead high-voltage transmission line infrastructure up to 400KV, encompassing foundation casting, lattice tower erection, hardware fitting, and conductor tension stringing.`,
     htLt: `Our HT/LT power distribution capabilities include transformer installation, LT feeder pillars, power control centres (PCC), motor control centres (MCC), bus duct trunking, automatic power factor correction (APFC) capacitor banks, and internal/external cabling.`,
-    lifecycle: `Beyond commissioning, LDS completes the 7-stage project lifecycle with Maintenance & Operational Support: scheduled preventative maintenance, transformer oil dielectric filtration, relay recalibrations, thermal imaging of panel busbars, and emergency technical troubleshooting.`,
+    lifecycle: `Beyond commissioning, LDS supports clients with routine maintenance, scheduled preventative shutdowns, transformer oil dielectric filtration, relay recalibrations, thermal imaging inspections, and switchboard modernizations.`,
   },
 
   equipment: {
