@@ -123,7 +123,7 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
       <video
         ref={videoRef}
         src={MEDIA.introVideo}
-        poster="/media/posters/intro-video-v2.jpg"
+        poster="/media/posters/intro-video.jpg"
         autoPlay
         muted
         playsInline
