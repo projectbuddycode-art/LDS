@@ -117,8 +117,7 @@ export default function UndergroundCableSection() {
           <div data-visual className="media-frame" style={{ aspectRatio: '9/12', clipPath: 'inset(0 0% 0 0)' }}>
             <LazyVideo
               src={MEDIA.cableSystems}
-              poster="/media/posters/underground-cabling-system.jpg"
-              style={{ objectPosition: '48% center' }}
+              poster="/media/posters/underground-cabling-system-portrait.jpg"
               aria-label="Underground cable works and installations"
             />
           </div>
