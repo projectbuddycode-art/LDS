@@ -4,7 +4,7 @@
 
 export const MEDIA = {
   // ── Intro + Hero ─────────────────────────────────────────
-  introVideo: '/media/intro-video.mp4',
+  introVideo: '/media/white-logo-intro.mp4',
   heroVideo: '/media/hero-bg.mp4',
 
   // ── Leadership ───────────────────────────────────────────
