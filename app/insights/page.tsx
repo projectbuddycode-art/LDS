@@ -1,6 +1,7 @@
 'use client'
 
 import PageLayout from '@/components/layout/PageLayout'
+import BackNav from '@/components/navigation/BackNav'
 
 const FAQS = [
   {
@@ -54,6 +55,7 @@ export default function InsightsPage() {
       {/* Hero section */}
       <section className="section-py" style={{ background: 'var(--bg-primary)', borderBottom: '1px solid var(--line-soft)', marginTop: '72px' }}>
         <div className="site-container">
+          <BackNav fallbackHref="/" label="Home" />
           <div className="section-label">
             <span className="section-label-bullet" />
             <span className="t-label">Technical Resources</span>

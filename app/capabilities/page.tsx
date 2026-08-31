@@ -2,6 +2,7 @@
 
 import PageLayout from '@/components/layout/PageLayout'
 import Link from 'next/link'
+import BackNav from '@/components/navigation/BackNav'
 
 const CAPABILITIES_LIST = [
   { id: 'turnkey-electrification', title: 'Turnkey Electrification', desc: 'Complete end-to-end electrical design, engineering, procurement, installation, and commissioning.' },
@@ -21,6 +22,7 @@ export default function CapabilitiesPage() {
       {/* Hero section */}
       <section className="section-py" style={{ background: 'var(--bg-primary)', borderBottom: '1px solid var(--line-soft)', marginTop: '72px' }}>
         <div className="site-container">
+          <BackNav fallbackHref="/#capabilities" label="Home" />
           <div className="section-label">
             <span className="section-label-bullet" />
             <span className="t-label">Technical Hub</span>

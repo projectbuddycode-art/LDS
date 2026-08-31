@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import PageLayout from '@/components/layout/PageLayout'
+import BackNav from '@/components/navigation/BackNav'
 import { CAPABILITIES_DATA } from '@/data/content'
 
 // static generation parameters for Next.js build optimization
@@ -47,18 +48,7 @@ export default async function CapabilityDetailPage({ params }: PageProps) {
       {/* Header section */}
       <section className="section-py" style={{ background: 'var(--bg-primary)', borderBottom: '1px solid var(--line-soft)', marginTop: '72px' }}>
         <div className="site-container">
-          <Link href="/capabilities" style={{
-            fontSize: '11px',
-            fontWeight: 600,
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
-            color: 'var(--accent-gold)',
-            textDecoration: 'none',
-            display: 'inline-block',
-            marginBottom: '24px'
-          }}>
-            ← Capabilities Hub
-          </Link>
+          <BackNav fallbackHref="/capabilities" label="Capabilities Hub" />
           <div className="section-label">
             <span className="section-label-bullet" />
             <span className="t-label">Technical Details</span>

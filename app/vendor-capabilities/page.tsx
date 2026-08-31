@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import PageLayout from '@/components/layout/PageLayout'
+import BackNav from '@/components/navigation/BackNav'
 import { COMPANY } from '@/data/content'
 
 export default function VendorPage() {
@@ -28,6 +29,7 @@ export default function VendorPage() {
       {/* Hero section */}
       <section className="section-py" style={{ background: 'var(--bg-primary)', borderBottom: '1px solid var(--line-soft)', marginTop: '72px' }}>
         <div className="site-container">
+          <BackNav fallbackHref="/" label="Home" />
           <div className="section-label">
             <span className="section-label-bullet" />
             <span className="t-label">Procurement & Evaluation</span>

@@ -865,6 +865,11 @@ video {
 /* ─────────────────────────────────────────────────────────
    UTILITIES
 ───────────────────────────────────────────────────────── */
+.back-nav-link:hover {
+  transform: translateX(-4px);
+  color: var(--accent-gold-light);
+}
+
 .text-balance {
   text-wrap: balance;
 }

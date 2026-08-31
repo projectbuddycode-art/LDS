@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import PageLayout from '@/components/layout/PageLayout'
+import BackNav from '@/components/navigation/BackNav'
 import { PROJECT_CASE_STUDIES } from '@/data/content'
 
 // static generation parameters for Next.js build optimization
@@ -43,18 +44,7 @@ export default async function ProjectCaseStudyPage({ params }: PageProps) {
       {/* Header section */}
       <section className="section-py" style={{ background: 'var(--bg-primary)', borderBottom: '1px solid var(--line-soft)', marginTop: '72px' }}>
         <div className="site-container">
-          <Link href="/#projects" style={{
-            fontSize: '11px',
-            fontWeight: 600,
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
-            color: 'var(--accent-gold)',
-            textDecoration: 'none',
-            display: 'inline-block',
-            marginBottom: '24px'
-          }}>
-            ← Portfolio
-          </Link>
+          <BackNav fallbackHref="/#projects" label="Project Portfolio" />
           <div className="section-label">
             <span className="section-label-bullet" />
             <span className="t-label">Case Study 0{Object.keys(PROJECT_CASE_STUDIES).indexOf(id) + 1}</span>

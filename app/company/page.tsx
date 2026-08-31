@@ -1,6 +1,7 @@
 'use client'
 
 import PageLayout from '@/components/layout/PageLayout'
+import BackNav from '@/components/navigation/BackNav'
 import { COMPANY, TIMELINE, LEADERSHIP } from '@/data/content'
 import Image from 'next/image'
 
@@ -10,6 +11,7 @@ export default function CompanyPage() {
       {/* Hero section */}
       <section className="section-py" style={{ background: 'var(--bg-primary)', borderBottom: '1px solid var(--line-soft)', marginTop: '72px' }}>
         <div className="site-container">
+          <BackNav fallbackHref="/#about" label="Home" />
           <div className="section-label">
             <span className="section-label-bullet" />
             <span className="t-label">Enterprise Profile</span>
