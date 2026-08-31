@@ -11,6 +11,10 @@ export function getLenis() {
 
 export function useLenis() {
   useEffect(() => {
+    // Only initialize smooth wheel interpolation for precision pointers
+    const isTouch = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
+    if (isTouch) return
+
     const lenis = new Lenis({
       duration: 1.1,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -18,36 +22,19 @@ export function useLenis() {
       gestureOrientation: 'vertical',
       smoothWheel: true,
       wheelMultiplier: 0.95,
-      touchMultiplier: 2,
+      touchMultiplier: 1.5,
     })
 
     lenisInstance = lenis
 
     let isDestroyed = false
-    let tickerCleanup: (() => void) | undefined
     let rafId: number = 0
 
     const syncWithScrollTrigger = async () => {
       try {
-        const { gsap } = await import('gsap')
         const { ScrollTrigger } = await import('gsap/ScrollTrigger')
-        
         if (isDestroyed) return
-        
         lenis.on('scroll', ScrollTrigger.update)
-        
-        const tick = (time: number) => {
-          if (!isDestroyed) {
-            lenis.raf(time * 1000)
-          }
-        }
-        
-        gsap.ticker.add(tick)
-        gsap.ticker.lagSmoothing(0)
-        
-        tickerCleanup = () => {
-          gsap.ticker.remove(tick)
-        }
       } catch {
         // Fallback if GSAP is not loaded
       }
@@ -56,10 +43,8 @@ export function useLenis() {
 
     function raf(time: number) {
       if (isDestroyed) return
-      if (!tickerCleanup) {
-        lenis.raf(time)
-        rafId = requestAnimationFrame(raf)
-      }
+      lenis.raf(time)
+      rafId = requestAnimationFrame(raf)
     }
 
     rafId = requestAnimationFrame(raf)
@@ -67,7 +52,6 @@ export function useLenis() {
     return () => {
       isDestroyed = true
       if (rafId) cancelAnimationFrame(rafId)
-      if (tickerCleanup) tickerCleanup()
       lenis.destroy()
       lenisInstance = null
     }

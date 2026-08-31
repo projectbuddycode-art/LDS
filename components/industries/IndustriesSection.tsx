@@ -28,7 +28,8 @@ const POSTER_MAP: Record<string, string> = {
 export default function IndustriesSection() {
   const sectionRef = useRef<HTMLElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
-  const videoRefs = useRef<(HTMLVideoElement | null)[]>([])
+  const desktopVideoRefs = useRef<(HTMLVideoElement | null)[]>([])
+  const mobileVideoRefs = useRef<(HTMLVideoElement | null)[]>([])
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
   const activeIndexRef = useRef<number>(0)
   
@@ -36,7 +37,7 @@ export default function IndustriesSection() {
   const [mobileActiveIndex, setMobileActiveIndex] = useState<number>(0)
   const [sectionIntersected, setSectionIntersected] = useState<boolean>(false)
 
-  // Lazy-load all video files 1800px before the section is scrolled into viewport
+  // Lazy-load all video files 1200px before the section is scrolled into viewport
   useEffect(() => {
     const el = sectionRef.current
     if (!el) return
@@ -45,14 +46,15 @@ export default function IndustriesSection() {
         setSectionIntersected(true)
         observer.disconnect()
       }
-    }, { rootMargin: '1800px' })
+    }, { rootMargin: '1200px' })
     observer.observe(el)
     return () => observer.disconnect()
   }, [])
 
   // Video playback helper — direct DOM control without React re-render
   const updateVideoPlayback = useCallback((activeIdx: number) => {
-    videoRefs.current.forEach((vid, i) => {
+    const refs = isMobile ? mobileVideoRefs.current : desktopVideoRefs.current
+    refs.forEach((vid, i) => {
       if (!vid) return
       if (i === activeIdx) {
         vid.play().catch(() => {})
@@ -60,6 +62,18 @@ export default function IndustriesSection() {
         vid.pause()
       }
     })
+  }, [isMobile])
+
+  // Clean unmount for videos
+  useEffect(() => {
+    return () => {
+      [...desktopVideoRefs.current, ...mobileVideoRefs.current].forEach((vid) => {
+        if (vid) {
+          vid.pause()
+          vid.removeAttribute('src')
+        }
+      })
+    }
   }, [])
 
   // Start active video immediately once section is intersected
@@ -298,14 +312,14 @@ export default function IndustriesSection() {
                   {/* Video wrapper */}
                   <div style={{ position: 'absolute', inset: 0 }}>
                     <video
-                      ref={(el) => { videoRefs.current[index] = el }}
+                      ref={(el) => { desktopVideoRefs.current[index] = el }}
                       src={sectionIntersected ? videoSrc : undefined}
                       poster={POSTER_MAP[industry.mediaKey]}
                       autoPlay={index === 0}
                       muted
                       playsInline
                       loop
-                      preload="auto"
+                      preload={index === 0 ? 'auto' : 'metadata'}
                       aria-hidden="true"
                       style={{
                         width: '100%',
@@ -426,14 +440,14 @@ export default function IndustriesSection() {
                   {/* Video */}
                   <div style={{ position: 'absolute', inset: 0 }}>
                     <video
-                      ref={(el) => { videoRefs.current[index] = el }}
+                      ref={(el) => { mobileVideoRefs.current[index] = el }}
                       src={sectionIntersected ? videoSrc : undefined}
                       poster={POSTER_MAP[industry.mediaKey]}
                       autoPlay={isActive}
                       muted
                       playsInline
                       loop
-                      preload="auto"
+                      preload={isActive ? 'auto' : 'metadata'}
                       aria-hidden="true"
                       style={{
                         width: '100%',

@@ -1,24 +1,24 @@
 'use client'
 
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState, useCallback, memo } from 'react'
 
 interface LazyVideoProps extends React.VideoHTMLAttributes<HTMLVideoElement> {
   src: string
   poster: string
   aspectRatio?: string
   containerStyle?: React.CSSProperties
-  rootMargin?: string      // Margin to start loading/buffering the video file
-  autoplayMargin?: string  // Margin to start playing the video
-  preloadImmediate?: boolean // True for above-the-fold content
+  rootMargin?: string      // Margin to start loading/buffering the video stream
+  autoplayMargin?: string  // Margin to activate video playback
+  preloadImmediate?: boolean // True for hero/above-the-fold content
 }
 
-export default function LazyVideo({
+function LazyVideo({
   src,
   poster,
   aspectRatio,
   containerStyle,
-  rootMargin = '1800px',
-  autoplayMargin = '900px',
+  rootMargin = '1200px',
+  autoplayMargin = '600px',
   preloadImmediate = false,
   className,
   style,
@@ -31,13 +31,23 @@ export default function LazyVideo({
   const [shouldPlay, setShouldPlay] = useState(preloadImmediate)
   const [videoActive, setVideoActive] = useState(false)
 
-  // 1. IntersectionObserver for preloading (buffering) the video
+  // Mark video as active and playing (cross-fading poster away)
+  const handlePlaySuccess = useCallback(() => {
+    setVideoActive(true)
+  }, [])
+
+  // 1. Unified Proximity & Preload Observer
   useEffect(() => {
-    if (preloadImmediate || shouldLoad) return
+    if (preloadImmediate) return
 
     const container = containerRef.current
-    if (!container) return
+    if (!container || typeof IntersectionObserver === 'undefined') {
+      setShouldLoad(true)
+      setShouldPlay(true)
+      return
+    }
 
+    // Buffer observer — triggers video element mount & stream buffering
     const loadObserver = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -47,35 +57,24 @@ export default function LazyVideo({
       },
       { rootMargin }
     )
-
     loadObserver.observe(container)
-    return () => loadObserver.disconnect()
-  }, [shouldLoad, preloadImmediate, rootMargin])
 
-  // 2. IntersectionObserver for playing/pausing based on proximity
-  useEffect(() => {
-    if (preloadImmediate || !shouldLoad) return
-
-    const container = containerRef.current
-    if (!container) return
-
+    // Play/Pause viewport proximity observer — pauses offscreen videos to save GPU/CPU
     const playObserver = new IntersectionObserver(
       ([entry]) => {
         setShouldPlay(entry.isIntersecting)
       },
       { rootMargin: autoplayMargin }
     )
-
     playObserver.observe(container)
-    return () => playObserver.disconnect()
-  }, [shouldLoad, preloadImmediate, autoplayMargin])
 
-  // Mark video as active and playing
-  const markActive = useCallback(() => {
-    setVideoActive(true)
-  }, [])
+    return () => {
+      loadObserver.disconnect()
+      playObserver.disconnect()
+    }
+  }, [preloadImmediate, rootMargin, autoplayMargin])
 
-  // 3. Keep video play/pause synced with proximity state
+  // 2. Manage Play / Pause lifecycle without continuous React state updates
   useEffect(() => {
     const video = videoRef.current
     if (!video || !shouldLoad) return
@@ -83,25 +82,35 @@ export default function LazyVideo({
     if (shouldPlay) {
       video.muted = true
       video.playsInline = true
-      const playPromise = video.play()
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            markActive()
-          })
+      const promise = video.play()
+      if (promise !== undefined) {
+        promise
+          .then(handlePlaySuccess)
           .catch(() => {
-            // Autoplay policy or power-save deferral
+            // Autoplay policy or low power mode deferral
           })
       }
     } else {
       video.pause()
     }
-  }, [shouldPlay, shouldLoad, markActive])
+  }, [shouldPlay, shouldLoad, handlePlaySuccess])
 
-  // Reset state when source changes
+  // 3. Reset poster state when video source changes
   useEffect(() => {
     setVideoActive(false)
   }, [src])
+
+  // 4. Memory cleanup on component unmount
+  useEffect(() => {
+    const video = videoRef.current
+    return () => {
+      if (video) {
+        video.pause()
+        video.removeAttribute('src')
+        video.load()
+      }
+    }
+  }, [])
 
   return (
     <div
@@ -113,11 +122,12 @@ export default function LazyVideo({
         aspectRatio,
         overflow: 'hidden',
         background: 'var(--surface)',
+        contain: 'paint layout',
         ...containerStyle,
       }}
       className={className}
     >
-      {/* Video Stream Layer — underneath poster */}
+      {/* Video Stream Layer */}
       {shouldLoad && (
         <video
           ref={videoRef}
@@ -126,23 +136,18 @@ export default function LazyVideo({
           muted
           playsInline
           loop
-          preload={shouldLoad ? 'auto' : 'metadata'}
-          onPlay={markActive}
-          onPlaying={markActive}
-          onTimeUpdate={(e) => {
-            if (e.currentTarget.currentTime > 0) {
-              markActive()
-            }
-          }}
+          preload={shouldPlay ? 'auto' : 'metadata'}
+          onPlaying={handlePlaySuccess}
           onLoadedData={() => {
-            if (shouldPlay) markActive()
+            if (shouldPlay) handlePlaySuccess()
           }}
           style={{
             position: 'absolute',
             inset: 0,
             width: '100%',
             height: '100%',
-            objectFit: 'cover',
+            objectFit: style?.objectFit || 'cover',
+            objectPosition: style?.objectPosition || 'center center',
             zIndex: 0,
             transform: 'none',
             ...style,
@@ -151,7 +156,7 @@ export default function LazyVideo({
         />
       )}
 
-      {/* Poster Image Layer — covers video until first frame renders */}
+      {/* Synchronized Seamless Poster Image Layer */}
       {poster && (
         <img
           src={poster}
@@ -168,7 +173,7 @@ export default function LazyVideo({
             objectPosition: style?.objectPosition || 'center center',
             zIndex: 1,
             opacity: videoActive ? 0 : 1,
-            transition: 'opacity 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+            transition: 'opacity 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
             pointerEvents: 'none',
           }}
         />
@@ -176,3 +181,5 @@ export default function LazyVideo({
     </div>
   )
 }
+
+export default memo(LazyVideo)
