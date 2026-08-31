@@ -17,7 +17,7 @@ export default function Footer() {
             {/* Actual LDS Logo — inverted/filtered for dark footer */}
             <Link href="/" aria-label="Lukhdatar & Sons — Home" style={{ display: 'inline-block', textDecoration: 'none', marginBottom: '28px' }}>
               <Image
-                src="/media/lds-logo.png"
+                src="/media/lds-logo-v2.png"
                 alt="Lukhdatar & Sons"
                 width={160}
                 height={68}

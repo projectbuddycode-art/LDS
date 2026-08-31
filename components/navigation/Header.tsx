@@ -41,7 +41,7 @@ export default function Header() {
               On scrolled (light ivory bg): the white bg merges with the header bg naturally.
             */}
             <Image
-              src="/media/lds-logo.png"
+              src="/media/lds-logo-v2.png"
               alt="Lukhdatar & Sons"
               width={120}
               height={52}
