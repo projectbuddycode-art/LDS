@@ -103,6 +103,7 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
     <div
       ref={containerRef}
       className="intro-overlay-container"
+      onClick={finishSequence}
       style={{
         position: 'fixed',
         inset: 0,
@@ -115,9 +116,10 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
         opacity: 1,
         willChange: 'opacity',
         height: '100svh',
+        cursor: 'pointer',
         padding: 'env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)',
       }}
-      aria-label="Intro Sequence"
+      aria-label="Intro Sequence (Click or tap to enter site)"
     >
       {/* Intro Video — Autoplays immediately with poster fallback */}
       <video
@@ -156,6 +158,43 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
           transition: 'opacity 400ms ease',
         }}
       />
+
+      {/* Top right Skip indicator */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation()
+          finishSequence()
+        }}
+        aria-label="Skip Introduction"
+        style={{
+          position: 'absolute',
+          top: '24px',
+          right: '24px',
+          zIndex: 10,
+          background: 'rgba(14, 19, 26, 0.65)',
+          backdropFilter: 'blur(8px)',
+          border: '1px solid rgba(250, 248, 245, 0.20)',
+          color: 'rgba(250, 248, 245, 0.85)',
+          padding: '8px 14px',
+          fontSize: '10px',
+          fontWeight: 600,
+          letterSpacing: '0.14em',
+          textTransform: 'uppercase',
+          cursor: 'pointer',
+          borderRadius: '2px',
+          transition: 'all 200ms ease',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.borderColor = 'var(--accent-gold)'
+          e.currentTarget.style.color = '#FFFFFF'
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.borderColor = 'rgba(250, 248, 245, 0.20)'
+          e.currentTarget.style.color = 'rgba(250, 248, 245, 0.85)'
+        }}
+      >
+        Skip Intro ↗
+      </button>
 
       {/* Thin gold rule overlay — communicates brand */}
       <div
@@ -229,4 +268,5 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
     </div>
   )
 }
+
 
