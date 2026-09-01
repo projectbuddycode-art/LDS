@@ -49,11 +49,24 @@ export function useLenis() {
 
     rafId = requestAnimationFrame(raf)
 
+    // Pause RAF when document is hidden to conserve GPU/CPU cycles
+    const handleVisibility = () => {
+      if (document.hidden) {
+        if (rafId) cancelAnimationFrame(rafId)
+        rafId = 0
+      } else if (!isDestroyed && !rafId) {
+        rafId = requestAnimationFrame(raf)
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibility)
+
     return () => {
       isDestroyed = true
+      document.removeEventListener('visibilitychange', handleVisibility)
       if (rafId) cancelAnimationFrame(rafId)
       lenis.destroy()
       lenisInstance = null
     }
   }, [])
 }
+
