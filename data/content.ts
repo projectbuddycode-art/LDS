@@ -219,14 +219,40 @@ export const ACCOUNTABILITY_PRINCIPLES = [
   },
 ]
 
-export const ECOSYSTEM_BRANDS = [
-  'Larsen & Toubro', 'ABB', 'HPL', 'Havells', 'Polycab', 'KEI',
-  'Legrand', 'Crompton Greaves', 'Schneider Electric', 'Anchor',
-  'Bajaj Electricals', 'Philips', 'Wipro', '3M', 'Eaton',
-  'Raychem RPG', 'Voltamp', 'Kotsons', 'Huphen Electromech',
-  'Lucy Electric', "Dowell's", 'Lamco', 'AKG', 'Utkarsh',
-  'HEX', 'MESCAB', 'Powerstar', 'Daga Power Group',
+export interface EcosystemBrandItem {
+  name: string
+  logo: string
+  alt: string
+}
+
+export const ECOSYSTEM_LOGOS: EcosystemBrandItem[] = [
+  { name: 'Larsen & Toubro', logo: '/media/ecosystem/lt.jpg', alt: 'Larsen & Toubro electrical engineering' },
+  { name: 'ABB', logo: '/media/ecosystem/abb.svg', alt: 'ABB electrical technology' },
+  { name: 'Schneider Electric', logo: '/media/ecosystem/schneider-electric.png', alt: 'Schneider Electric power management' },
+  { name: 'Legrand', logo: '/media/ecosystem/legrand.png', alt: 'Legrand electrical solutions' },
+  { name: 'L&T EBG', logo: '/media/ecosystem/lt-ebg.png', alt: 'L&T Electronic Products & Systems' },
+  { name: 'Lucy Electric', logo: '/media/ecosystem/lucy-electric.png', alt: 'Lucy Electric secondary distribution' },
+  { name: 'HPL Electric & Power Ltd', logo: '/media/ecosystem/hpl-electric-power.webp', alt: 'HPL Electric & Power Ltd' },
+  { name: 'Huphen Electromech Pvt', logo: '/media/ecosystem/huphen-electromech.png', alt: 'Huphen Electromech Pvt Ltd' },
+  { name: 'Crompton Greaves', logo: '/media/ecosystem/cg-crompton-greaves.jpg', alt: 'Crompton Greaves CG Power and Industrial Solutions' },
+  { name: 'Crompton', logo: '/media/ecosystem/crompton.png', alt: 'Crompton electrical products' },
+  { name: 'Havells', logo: '/media/ecosystem/havells.png', alt: 'Havells India electrical equipment' },
+  { name: 'KEI Wires and Cables', logo: '/media/ecosystem/kei-wires-cables.png', alt: 'KEI Wires and Cables' },
+  { name: 'Finolex', logo: '/media/ecosystem/finolex.jpg', alt: 'Finolex Cables Limited' },
+  { name: 'Raychem RPG', logo: '/media/ecosystem/raychem-rpg.png', alt: 'Raychem RPG energy products' },
+  { name: 'Anchor by Panasonic', logo: '/media/ecosystem/anchor-by-panasonic.png', alt: 'Anchor by Panasonic electrical devices' },
+  { name: 'Bajaj Electricals', logo: '/media/ecosystem/bajaj-electricals.jpg', alt: 'Bajaj Electricals illumination & power' },
+  { name: 'Philips', logo: '/media/ecosystem/philips.jpg', alt: 'Philips Lighting and electrical systems' },
+  { name: 'Wipro', logo: '/media/ecosystem/wipro.jpg', alt: 'Wipro lighting and power solutions' },
+  { name: '3M', logo: '/media/ecosystem/3m.png', alt: '3M electrical insulation and termination' },
+  { name: 'Utkarsh India', logo: '/media/ecosystem/utkarsh-india.png', alt: 'Utkarsh India transmission and high-mast poles' },
+  { name: 'Volamp', logo: '/media/ecosystem/volamp.jpg', alt: 'Volamp transformers and power solutions' },
+  { name: 'AKG', logo: '/media/ecosystem/akg.jpg', alt: 'AKG pipes and electrical conduits' },
+  { name: 'Daga Power Group', logo: '/media/ecosystem/daga-power-group.jpg', alt: 'Daga Power Group electrical equipment' },
+  { name: 'Mescab', logo: '/media/ecosystem/mescab.jpg', alt: 'Mescab Smart Living cables and wires' },
 ]
+
+export const ECOSYSTEM_BRANDS = ECOSYSTEM_LOGOS.map(b => b.name)
 
 export const CAPABILITIES_LIST = [
   'Turnkey Electrical Contracting (SITC)',

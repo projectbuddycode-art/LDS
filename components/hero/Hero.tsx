@@ -161,43 +161,29 @@ export default function Hero() {
             <div data-hero-cta className="hero-cta-row">
               <a
                 href="#capabilities"
-                className="cta-btn"
-                style={{ color: '#FAF8F5', borderColor: 'rgba(250,248,245,0.32)' }}
+                className="hero-btn hero-btn-primary"
               >
                 Explore Capabilities <span className="cta-arrow">↗</span>
               </a>
               <a
                 href="#projects"
-                className="cta-btn"
-                style={{ color: 'rgba(250,248,245,0.60)', borderColor: 'rgba(250,248,245,0.15)' }}
+                className="hero-btn hero-btn-secondary"
               >
                 View Projects <span className="cta-arrow">↗</span>
               </a>
             </div>
-          </div>
 
-          {/* Est. 1997 detail — bottom left, outside text col */}
-          <div
-            data-hero-detail
-            style={{
-              position: 'absolute',
-              left: 0,
-              bottom: 0,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-            }}
-          >
-            <div style={{ width: '20px', height: '1px', background: 'var(--line-gold)', opacity: 0.6 }} />
-            <span style={{
-              fontSize: '9px',
-              fontWeight: 500,
-              letterSpacing: '0.18em',
-              textTransform: 'uppercase',
-              color: 'rgba(250,248,245,0.35)',
-            }}>
-              Est. 1997 · Kolkata
-            </span>
+            {/* 5. Establishment Line — Premium Engineering Heritage Marker (38–48px separation below CTA row) */}
+            <div
+              data-hero-detail
+              className="hero-est-badge"
+            >
+              <div className="hero-est-line hero-est-line-left" />
+              <span className="hero-est-text">
+                EST. 1997 · KOLKATA
+              </span>
+              <div className="hero-est-line hero-est-line-right" />
+            </div>
           </div>
 
           {/* Scroll indicator — bottom right */}
@@ -274,6 +260,89 @@ export default function Hero() {
           display: flex;
           gap: 10px;
           flex-wrap: wrap;
+        }
+
+        /* ── Hero CTA buttons (reusing approved footer interaction system) ── */
+        .hero-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          font-size: 13px;
+          font-weight: 600;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          text-decoration: none;
+          padding: 16px 28px;
+          cursor: pointer;
+          transition: all 300ms ease;
+        }
+
+        .hero-btn-primary {
+          color: #FAF8F5;
+          border: 1px solid rgba(250, 248, 245, 0.32);
+          background: transparent;
+        }
+
+        .hero-btn-primary:hover {
+          border-color: var(--accent-gold);
+          color: #FFFFFF;
+          background: rgba(201, 160, 82, 0.08);
+          box-shadow: 0 0 20px rgba(201, 160, 82, 0.15);
+        }
+
+        .hero-btn-secondary {
+          color: rgba(250, 248, 245, 0.65);
+          border: 1px solid rgba(250, 248, 245, 0.18);
+          background: transparent;
+        }
+
+        .hero-btn-secondary:hover {
+          border-color: var(--accent-gold);
+          color: #FAF8F5;
+          background: rgba(201, 160, 82, 0.08);
+          box-shadow: 0 0 16px rgba(201, 160, 82, 0.10);
+        }
+
+        .hero-btn .cta-arrow {
+          display: inline-block;
+          color: var(--accent-gold);
+          transition: transform 250ms ease;
+        }
+
+        .hero-btn:hover .cta-arrow {
+          transform: translate(2px, -2px);
+        }
+
+        /* ── Establishment Line (Heritage Marker) ── */
+        .hero-est-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 14px;
+          margin-top: clamp(38px, 4.5vw, 48px);
+        }
+
+        .hero-est-line {
+          height: 1px;
+          width: 32px;
+          flex-shrink: 0;
+        }
+
+        .hero-est-line-left {
+          background: linear-gradient(90deg, transparent 0%, rgba(226, 202, 158, 0.75) 100%);
+        }
+
+        .hero-est-line-right {
+          background: linear-gradient(90deg, rgba(226, 202, 158, 0.75) 0%, transparent 100%);
+        }
+
+        .hero-est-text {
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.22em;
+          text-transform: uppercase;
+          color: #E2CA9E;
+          text-shadow: 0 0 16px rgba(226, 202, 158, 0.40);
+          white-space: nowrap;
         }
 
         /* ── Tablet: widen text column slightly ── */
