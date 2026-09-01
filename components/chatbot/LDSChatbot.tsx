@@ -554,46 +554,12 @@ export default function LDSChatbot() {
           onClick={() => setIsOpen(!isOpen)}
           aria-label={isOpen ? 'Close Lukhdatar & Sons Assistant' : 'Open Lukhdatar & Sons Engineering Assistant'}
           aria-expanded={isOpen}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            padding: '13px 20px',
-            background: 'var(--text-primary)',
-            border: '1px solid rgba(201,160,82,0.35)',
-            cursor: 'pointer',
-            fontSize: '11px',
-            fontWeight: 600,
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
-            color: '#FAF8F5',
-            transition: 'all 300ms cubic-bezier(0.16, 1, 0.3, 1)',
-            boxShadow: '0 8px 24px rgba(17,24,32,0.25)',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = '#1a2330'
-            e.currentTarget.style.borderColor = 'var(--accent-gold)'
-            e.currentTarget.style.paddingRight = '24px'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'var(--text-primary)'
-            e.currentTarget.style.borderColor = 'rgba(201,160,82,0.35)'
-            e.currentTarget.style.paddingRight = '20px'
-          }}
+          className="ask-lds-trigger-btn"
         >
-          <span
-            style={{
-              width: '7px',
-              height: '7px',
-              borderRadius: '50%',
-              background: 'var(--accent-gold)',
-              flexShrink: 0,
-              boxShadow: '0 0 8px rgba(201,160,82,0.8)',
-            }}
-          />
-          {isOpen ? '✕ Close' : 'Ask LDS AI'}
+          <span className="ask-lds-dot" />
+          <span>{isOpen ? '✕ Close' : 'Ask LDS AI'}</span>
           {!isOpen && (
-            <span style={{ color: 'var(--accent-gold)', marginLeft: '2px' }}>→</span>
+            <span className="cta-arrow">↗</span>
           )}
         </button>
       </div>
@@ -865,6 +831,62 @@ export default function LDSChatbot() {
           </form>
         </div>
       )}
+
+      {/* ── Scoped Styles for Ask LDS Trigger Button matching Explore Capabilities button ── */}
+      <style>{`
+        .ask-lds-trigger-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          padding: 14px 22px;
+          background: rgba(17, 24, 32, 0.94);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border: 1px solid rgba(250, 248, 245, 0.32);
+          cursor: pointer;
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: #FAF8F5;
+          transition: all 300ms ease;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+          user-select: none;
+        }
+
+        .ask-lds-trigger-btn:hover {
+          border-color: var(--accent-gold);
+          color: #FFFFFF;
+          background: rgba(201, 160, 82, 0.10);
+          box-shadow: 0 0 20px rgba(201, 160, 82, 0.20), 0 8px 24px rgba(0, 0, 0, 0.45);
+        }
+
+        .ask-lds-dot {
+          width: 7px;
+          height: 7px;
+          border-radius: 50%;
+          background: var(--accent-gold);
+          flex-shrink: 0;
+          box-shadow: 0 0 8px rgba(201, 160, 82, 0.8);
+          transition: transform 250ms ease;
+        }
+
+        .ask-lds-trigger-btn:hover .ask-lds-dot {
+          transform: scale(1.2);
+          box-shadow: 0 0 12px rgba(201, 160, 82, 1);
+        }
+
+        .ask-lds-trigger-btn .cta-arrow {
+          display: inline-block;
+          color: var(--accent-gold);
+          font-size: 13px;
+          transition: transform 250ms ease;
+        }
+
+        .ask-lds-trigger-btn:hover .cta-arrow {
+          transform: translate(2px, -2px);
+        }
+      `}</style>
     </>
   )
 }
