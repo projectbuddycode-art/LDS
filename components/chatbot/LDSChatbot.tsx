@@ -1,398 +1,344 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 
 // ─────────────────────────────────────────────────────────────────────────────
-// LDS VERIFIED KNOWLEDGE BASE — Sourced 100% from approved company materials
+// LDS COMPREHENSIVE ENGINEERING KNOWLEDGE REPOSITORY
 // ─────────────────────────────────────────────────────────────────────────────
-const LDS_KB = {
-  company: {
-    name: 'Lukhdatar & Sons',
-    legal: 'Lukhdatar & Sons',
-    short: 'LDS',
-    location: 'Kolkata, West Bengal, India',
-    founded: '1997',
-    turnkeySince: '2007',
-    tagline: 'Turnkey Electrical Infrastructure & Contracting',
-    pillars: 'Engineering Coordination • Spec-Compliant Supply • Site Execution',
-    email: 'info@ldsinfrastructure.com',
-    about: `Lukhdatar & Sons was established in 1997 in Kolkata by Mr. Lalit Kumar Sureka as an electrical goods and equipment supplier. In 2007, under the leadership of Managing Director Mr. Shree Mangalam Sureka, the company transitioned into full-scale turnkey electrical contracting. Today, Lukhdatar & Sons delivers complete electrical Supply, Installation, Testing & Commissioning (SITC) across Government and Private sectors for commercial, housing, industrial, public, and high-voltage substation projects.`,
-    whyChoose: `Clients choose Lukhdatar & Sons for several key reasons:\n\n1. **Single-Point Accountability**: Integrated SITC managing engineering coordination, spec-compliant procurement, field installation, testing, and commissioning without multi-vendor interface friction.\n2. **In-House Technical Breadth**: Extensive capabilities spanning LV, MV, and HV wiring and cabling, switchboards, HT and LT power panels, lighting grids, earthing, lightning protection, and substation equipment.\n3. **High-Voltage Execution**: Proven delivery of underground cable systems up to 66KV, substations up to 220KV, and transmission lines up to 400KV.\n4. **Public & Private Track Record**: Dependable project execution across landmark healthcare campuses, government complexes (such as Bihar Vidhan Sabha), industrial warehouses, and utility substations.\n5. **Post-Commissioning Continuity**: Long-term operational support including scheduled preventative maintenance, transformer oil filtration, and switchgear servicing.`,
-  },
-
-  leadership: {
-    founder: {
-      name: 'Mr. Lalit Kumar Sureka',
-      role: 'Founder',
-      since: '1997',
-      story: 'Mr. Lalit Kumar Sureka founded Lukhdatar & Sons in Kolkata in 1997 as an electrical goods supplier. His initial decade of on-ground commercial experience and deep supplier relationships established the technical standards that enabled the company to transition into turnkey electrical contracting.',
-    },
-    md: {
-      name: 'Mr. Shree Mangalam Sureka',
-      role: 'Managing Director',
-      since: '2007',
-      story: 'Mr. Shree Mangalam Sureka joined Lukhdatar & Sons in 2007 to lead its expansion into turnkey contracting. As Managing Director, he oversees on-ground project execution teams, client relationships, engineering quality, and safety standards across Government and Private sector developments.',
-    },
-  },
-
-  capabilities: {
-    summary: `Lukhdatar & Sons provides complete turnkey electrical infrastructure across the project lifecycle:\n\n• **Turnkey Electrification (SITC)**: End-to-end engineering, spec-compliant procurement, on-site erection, pre-commissioning testing, and grid energisation.\n• **Substations & Switchyards**: High-voltage utility substations and industrial switchyards up to 220KV.\n• **Overhead Transmission Lines**: Lattice steel tower assembly and conductor stringing up to 400KV.\n• **Underground Cable Systems**: Specialized trenching, bedding, ducting, and certified jointing up to 66KV.\n• **HT / LT Power Distribution**: Switchboards, Power Control Centres (PCC), Motor Control Centres (MCC), bus ducts, capacitor banks, and rising mains.\n• **Testing & Pre-Commissioning**: Protection relay calibration, high-voltage insulation audits, and statutory utility clearances.\n• **Beyond Commissioning**: Routine maintenance, transformer oil filtration, planned shutdown servicing, and lifecycle support.`,
-    turnkey: `Lukhdatar & Sons delivers turnkey electrical infrastructure covering Engineering Coordination, Procurement & Supply, Site Installation, Pre-Commissioning Testing, and Utility Commissioning (SITC) under single-point project accountability.`,
-    underground: `LDS specializes in high-voltage underground cable networks up to 66KV. Our capabilities include route surveying, mechanical trench excavation, bedding, protective ducting, cross-bonded jointing, heat-shrink terminations, and hipot testing.`,
-    substations: `LDS engineers and erects substations and switchyards up to 220KV. Our scope covers civil foundations, gantry structural erection, transformer installation, vacuum circuit breaker (VCB) panels, and protection relay calibration. A key example is our turnkey delivery of the 2 × 3.15 MVA Substation at Kohora, Assam in 100 working days.`,
-    transmission: `LDS delivers overhead high-voltage transmission line infrastructure up to 400KV, encompassing foundation casting, lattice tower erection, hardware fitting, and conductor tension stringing.`,
-    htLt: `Our HT/LT power distribution capabilities include transformer installation, LT feeder pillars, power control centres (PCC), motor control centres (MCC), bus duct trunking, automatic power factor correction (APFC) capacitor banks, and internal/external cabling.`,
-    lifecycle: `Beyond commissioning, LDS supports clients with routine maintenance, scheduled preventative shutdowns, transformer oil dielectric filtration, relay recalibrations, thermal imaging inspections, and switchboard modernizations.`,
-  },
-
-  equipment: {
-    summary: `LDS supplies and installs a full range of spec-compliant HT/LT electrical equipment:\n\n• **LT Bus Ducts**: High-amperage sandwich & air-insulated trunking\n• **Power Control Centres (PCC)**: Heavy industrial main distribution switchboards\n• **Motor Control Centres (MCC)**: Draw-out & non-draw-out motor management\n• **Capacitor Banks**: APFC panels for power factor optimization\n• **VCB Panels & Switchgears**: High-reliability vacuum circuit breakers\n• **Transformers**: Step-up and step-down utility transformers\n• **AMF & DG Panels**: Automatic mains failure synchronization`,
-  },
-
-  projects: {
-    tajHotel: {
-      title: 'Taj Group of Hotels',
-      sector: 'Hospitality',
-      scope: 'Electrical Infrastructure',
-      details: 'Delivered robust electrical infrastructure systems supporting luxury hospitality operations with dual backup power and premium lighting distribution.',
-    },
-    sonotel: {
-      title: 'Sonotel',
-      sector: 'Hospitality',
-      scope: 'Complete SITC & Electrical Infrastructure',
-      details: 'Full turnkey supply, installation, testing, and commissioning of primary power panels, bus ducts, DG synchronization, and aesthetic interior/exterior lighting.',
-    },
-    assamHill: {
-      title: 'Assam Hill Medical College & Research Institute',
-      sector: 'Healthcare / Medical',
-      scope: 'Complete Electrical SITC',
-      details: 'Engineered high-availability clean power distribution grids, transformer yards, LT rising mains, isolated earthing, and low-voltage integration for medical college blocks, surgical wards, and laboratories.',
-    },
-    sarojiniHospital: {
-      title: 'Sarojini Naidu Medical Hospital, Agra',
-      sector: 'Healthcare / Medical',
-      scope: 'SITC of Electrical Installations',
-      details: 'Modernized core electrical installations, installed capacitor banks, main power panels, bus ducts, and high-conductivity earthing networks with zero disruption to active patient care.',
-    },
-    skmcMedical: {
-      title: 'Shri Krishna Medical College, Muzaffarpur',
-      sector: 'Healthcare / Medical',
-      scope: 'Complete Electrical SITC',
-      details: 'Delivered complete electrical infrastructure including campus HT/LT cable tray networks, transformer erection, HT VCB panels, sub-distribution boards, and general/emergency illumination grids.',
-    },
-    biharVidhanSabha: {
-      title: 'Bihar Vidhan Sabha',
-      sector: 'Government / Institutional',
-      scope: 'Turnkey Infrastructure Electrification',
-      details: 'Executed turnkey electrical infrastructure for the state legislative complex, incorporating high-security power routing, primary distribution panels, underground feeder ducts, and backup power synchronization.',
-    },
-    warehouseProjects: {
-      title: 'Warehouse Electrification Projects',
-      sector: 'Industrial / Infrastructure',
-      scope: 'Industrial Power Distribution',
-      details: 'Installed heavy overhead cable tray networks, high-bay lighting, external yard high-masts, motor distribution boards, and lightning safety networks across extensive logistics facilities.',
-    },
-    kohoraSubstation: {
-      title: 'Kohora, Assam',
-      sector: 'Substation',
-      scope: '2 × 3.15 MVA Substation, Control Room & VCB Panels',
-      details: 'Completed complete engineering, supply, erection, testing, and utility energisation of a 2 × 3.15 MVA substation with a dedicated Control Room and 9 VCB Panels in only 100 working days in challenging Assam terrain.',
-    },
-    signature: {
-      title: 'Signature',
-      sector: 'Residential / Township',
-      scope: 'HT/LT Power Distribution',
-      details: 'Engineered multi-point HT/LT distribution, transformer yards, LT control panels, and sub-metering grids for premium multi-storey residential living.',
-    },
-    shristinagar: {
-      title: 'Shristinagar',
-      sector: 'Residential / Township',
-      scope: 'HT/LT Power Distribution',
-      details: 'Executed comprehensive outdoor township electrification including weather-proof LT feeder pillar boards, underground distribution loops, and street lighting networks.',
-    },
-  },
-
-  sectors: [
-    'Healthcare / Medical Campuses',
-    'Government & Institutional Complexes',
-    'Industrial & Warehouse Infrastructure',
-    'High-Voltage Utility Substations',
-    'Residential Developments & Townships',
-    'Hospitality & Commercial Centres'
-  ],
-
-  contact: {
-    email: 'info@ldsinfrastructure.com',
-    location: 'Kolkata, West Bengal, India',
-    cta: 'For project discussions, technical tenders, or vendor capability evaluations, reach out to our engineering team at info@ldsinfrastructure.com.',
-  },
+interface KnowledgeTopic {
+  keywords: string[]
+  response: string
+  actions?: string[]
+  scrollTo?: string
 }
 
+const KNOWLEDGE_TOPICS: KnowledgeTopic[] = [
+  // 1. GREETINGS & INTRODUCTIONS
+  {
+    keywords: ['hello', 'hi', 'hey', 'good morning', 'good afternoon', 'good evening', 'greetings', 'who are you', 'what is this'],
+    response: `Hello! I am your **LDS Engineering Assistant** representing **LDS Infrastructure Pvt. Ltd. (Lukhdatar & Sons)**.
+
+We are a specialized turnkey electrical infrastructure contractor founded in Kolkata in 1997. I can help you with:
+
+• **Turnkey SITC Electrification** across industrial, commercial, and utility sectors
+• **High-Voltage Substations & Switchyards** (AIS / GIS up to 220kV / 400kV)
+• **Overhead Transmission Lines** & lattice tower stringing
+• **Underground HT/LT Cable Networks** (up to 66kV with HDD trenchless crossings)
+• **HT/LT Power Distribution Panels** (PCC, MCC, Bus Ducts, APFC banks)
+• **Critical Infrastructure & Hospital Electrification**
+• **Project Portfolio & Case Studies** (Kohora Substation, Bihar Vidhan Sabha, Medical Colleges)
+
+How can I assist your engineering team today?`,
+    actions: ['Core Capabilities', 'Major Projects', 'Discuss a Project', 'Company Background'],
+  },
+
+  // 2. COMPANY BACKGROUND & LEADERSHIP
+  {
+    keywords: ['about', 'company background', 'who is lds', 'what is lds', 'lukhdatar', 'overview', 'profile', 'history', 'founded', 'established', 'heritage'],
+    response: `**LDS Infrastructure Pvt. Ltd. (Lukhdatar & Sons)** is a premier turnkey electrical engineering contractor with over **27 years of field excellence**.
+
+• **1997**: Founded in Kolkata by **Mr. Lalit Kumar Sureka** as an electrical equipment and goods supplier.
+• **2007**: Under the leadership of Managing Director **Mr. Shree Mangalam Sureka**, LDS expanded into full-scale **Turnkey Electrical Contracting (SITC)**.
+• **Present**: LDS executes complex high-voltage utility substations, transmission corridors, underground distribution networks, and critical institution electrification across India.
+
+We take single-point responsibility for **Engineering Coordination**, **Spec-Compliant Procurement**, **Field Installation**, **Statutory Clearances**, and **Grid Energisation**.`,
+    scrollTo: '#about',
+    actions: ['Turnkey Capabilities', 'Project Track Record', 'Leadership', 'Discuss a Project'],
+  },
+
+  {
+    keywords: ['leadership', 'director', 'managing director', 'md', 'founder', 'management', 'shree mangalam', 'lalit kumar', 'sureka'],
+    response: `**Executive Leadership at LDS Infrastructure Pvt. Ltd.:**
+
+• **Mr. Lalit Kumar Sureka (Founder)**: Established Lukhdatar & Sons in Kolkata in 1997, building foundational supply chain relationships and technical procurement benchmarks.
+• **Mr. Shree Mangalam Sureka (Managing Director)**: Joined in 2007 to lead the transition into full turnkey EPC contracting. He personally oversees engineering coordination, on-ground project execution teams, utility client relationships, and safety standards across public and private sector developments.`,
+    scrollTo: '#about',
+    actions: ['Company Background', 'Core Capabilities', 'Discuss a Project'],
+  },
+
+  // 3. TURNKEY SITC ELECTRIFICATION
+  {
+    keywords: ['turnkey', 'sitc', 'what is sitc', 'supply installation testing commissioning', 'end to end', 'electrification capability', 'contracting', 'epc'],
+    response: `**Turnkey Electrification (SITC) by LDS**
+
+We provide end-to-end single-point execution covering the entire lifecycle of power infrastructure:
+
+• **Supply**: Spec-compliant procurement of tier-1 transformers, switchgear, VCB panels, bus ducts, cables, and earthing materials from verified manufacturers.
+• **Installation**: Precision erection of structural gantries, panel switchboards, cable tray networks, transformer yards, and lightning protection grids.
+• **Testing**: Rigorous pre-energisation testing including insulation resistance, secondary current injection, protection relay calibration, and Hi-Pot cable testing.
+• **Commissioning & Energisation**: Coordination with DISCOMs, state utilities, and electrical inspectorates for statutory clearances and seamless grid synchronisation.`,
+    scrollTo: '#capabilities',
+    actions: ['Substations & Switchyards', 'Underground Cabling', 'Project Portfolio', 'Discuss a Project'],
+  },
+
+  // 4. SUBSTATIONS & SWITCHYARDS
+  {
+    keywords: ['substation', 'switchyard', 'ais', 'gis', '220kv', '132kv', '66kv', '33kv', '11kv', 'transformer yard', 'vcb', 'gantry', 'scada'],
+    response: `**High-Voltage Substations & Switchyards (up to 220kV / 400kV)**
+
+LDS delivers complete engineering, procurement, civil construction, erection, and commissioning for utility and industrial substations:
+
+• **Air-Insulated (AIS) & Gas-Insulated (GIS) Substations**: Customized for challenging terrain, high seismic zones, and space-constrained industrial footprints.
+• **Key Equipment Scope**: Power transformers, vacuum circuit breakers (VCBs), SF6 breakers, CT/PT metering units, isolators, lightning arrestors, and battery banks.
+• **Control & Protection**: SCADA automation, microprocessor-based numerical relay integration, and remote telemetry control units.
+
+*Landmark Delivery:* We engineered and energized the **2 × 3.15 MVA Substation at Kohora, Assam** in just **100 working days**, overcoming severe monsoon flood challenges.`,
+    scrollTo: '#capabilities',
+    actions: ['Kohora Substation Case Study', 'Transmission Lines', 'Underground Cabling', 'Discuss a Project'],
+  },
+
+  // 5. OVERHEAD TRANSMISSION LINES
+  {
+    keywords: ['transmission', 'transmission line', 'overhead line', '400kv', 'lattice tower', 'conductor', 'stringing', 'tower erection', 'corridor'],
+    response: `**Overhead High-Voltage Transmission Lines (up to 400kV)**
+
+LDS has delivered over **2,500+ circuit kilometres** of transmission lines across diverse and difficult topographies:
+
+• **Survey & Route Optimization**: Route profiling, contour mapping, and statutory forest/railway/river crossing clearances.
+• **Civil Foundations**: Cast-in-situ RCC pile and stub foundations engineered for high water table, marshland, and rocky hill conditions.
+• **Tower Erection & Stringing**: Lattice steel tower assembly, hardware fitting, and precision tension stringing of ACSR/HTLS conductors with optical ground wire (OPGW).`,
+    scrollTo: '#capabilities',
+    actions: ['Substations & Switchyards', 'Turnkey SITC', 'Discuss a Project'],
+  },
+
+  // 6. UNDERGROUND CABLE SYSTEMS
+  {
+    keywords: ['underground', 'cabling', 'cable laying', 'trenching', 'hdd', 'trenchless', 'jointing', 'termination', 'xlpe', '66kv cable', 'ht cable'],
+    response: `**Underground HT / LT Cable Networks (up to 66kV)**
+
+LDS specializes in high-reliability underground cable installations in dense urban corridors and industrial facilities:
+
+• **Trenching & Bedding**: Mechanical and manual excavation, thermal backfill bedding, concrete protective slab laying, and route warning tape placement.
+• **Trenchless HDD Crossings**: Horizontal Directional Drilling under active highways, railway tracks, and waterways without surface disruption.
+• **Certified Jointing & Terminations**: Heat-shrink and cold-shrink straight-through joints and outdoor terminations performed by certified jointers.
+• **Diagnostics**: VLF Hipot testing, sheath integrity verification, and time-domain reflectometry (TDR) fault profiling.`,
+    scrollTo: '#capabilities',
+    actions: ['Power Distribution Panels', 'Turnkey SITC', 'Discuss a Project'],
+  },
+
+  // 7. HT / LT DISTRIBUTION & PANELS
+  {
+    keywords: ['panel', 'switchboard', 'pcc', 'mcc', 'bus duct', 'busduct', 'apfc', 'capacitor bank', 'feeder pillar', 'rising main', 'distribution board', 'amf', 'dg sync'],
+    response: `**HT / LT Power Distribution & Switchboards**
+
+LDS engineers, procures, and commissions heavy-duty industrial and commercial power distribution assemblies:
+
+• **Power Control Centres (PCC)**: Up to 6300A high-fault withstand main incoming and distribution switchboards.
+• **Motor Control Centres (MCC)**: Draw-out and fixed type intelligent motor control boards with VFDs and soft starters.
+• **Sandwich & Air-Insulated Bus Ducts**: High-current busway systems linking transformers, DG sets, and main distribution panels.
+• **APFC Capacitor Banks**: Automatic power factor correction panels ensuring unity power factor and eliminating utility penalties.
+• **Rising Mains & Feeder Pillars**: Multi-level vertical power distribution for medical towers, residential complexes, and commercial towers.`,
+    scrollTo: '#capabilities',
+    actions: ['Turnkey SITC', 'Healthcare Infrastructure', 'Discuss a Project'],
+  },
+
+  // 8. HEALTHCARE & HOSPITAL INFRASTRUCTURE
+  {
+    keywords: ['hospital', 'healthcare', 'medical', 'medical college', 'surgical', 'icu', 'clean power', 'assam hill', 'sarojini naidu', 'skmc'],
+    response: `**Healthcare & Critical Medical Infrastructure Electrification**
+
+Hospitals require zero-failover power continuity. LDS has electrified landmark medical colleges and multi-specialty hospitals:
+
+• **Assam Hill Medical College & Research Institute (Diphu)**: Full turnkey SITC across college blocks, laboratories, surgical wards, and residential quarters.
+• **Sarojini Naidu Medical College & Hospital (Agra)**: Modernization of main power grids, capacitor banks, LT rising mains, and bus duct networks with zero disruption to active critical care.
+• **Shri Krishna Medical College (Muzaffarpur)**: Complete turnkey power distribution, HT VCB substations, isolated grounding, and emergency lighting.
+
+*Key Specializations:* Isolated earthing for sensitive diagnostic equipment, dual DG synchronization failover, and segregated medical gas / emergency circuits.`,
+    scrollTo: '#projects',
+    actions: ['Assam Hill Medical College', 'Sarojini Naidu Hospital', 'Discuss a Project'],
+  },
+
+  // 9. GOVERNMENT & INSTITUTIONAL COMPLEXES
+  {
+    keywords: ['government', 'institutional', 'bihar vidhan sabha', 'vidhan sabha', 'public sector', 'legislative', 'patna'],
+    response: `**Government & High-Security Institutional Electrification**
+
+LDS has a trusted track record executing high-profile public sector and government projects under strict compliance and security standards:
+
+• **Bihar Vidhan Sabha (Patna)**: Complete turnkey electrification of the state legislative assembly complex, featuring high-reliability primary power distribution, secure underground feeder loops, and instantaneous DG synchronization.
+• **Compliance & Approvals**: Experienced in navigating PWD, CPWD, state electricity board approvals, and CEIG statutory clearances.`,
+    scrollTo: '#projects',
+    actions: ['Project Portfolio', 'Turnkey SITC', 'Discuss a Project'],
+  },
+
+  // 10. INDUSTRIAL & WAREHOUSE ELECTRIFICATION
+  {
+    keywords: ['industrial', 'warehouse', 'factory', 'plant', 'logistics', 'manufacturing', 'high bay', 'high mast'],
+    response: `**Industrial Plants & Logistics Warehouse Electrification**
+
+We design and construct high-capacity electrical systems for industrial manufacturing plants and large-scale logistics warehouses:
+
+• Heavy overhead cable tray and trunking networks
+• High-bay industrial LED illumination and automated yard high-mast lighting
+• Machinery motor control centers (MCC), sub-distribution boards, and busways
+• Comprehensive lightning protection grids and earth pit arrays with low-resistance testing.`,
+    scrollTo: '#projects',
+    actions: ['Project Portfolio', 'Turnkey SITC', 'Discuss a Project'],
+  },
+
+  // 11. HOSPITALITY & TOWNSHIPS
+  {
+    keywords: ['hospitality', 'hotel', 'taj', 'sonotel', 'residential', 'township', 'signature', 'shristinagar', 'housing'],
+    response: `**Hospitality & Integrated Township Electrification**
+
+• **Taj Group of Hotels & Sonotel**: Full turnkey SITC for luxury hospitality properties, incorporating aesthetic lighting control, dual utility grid failovers, and heavy HVAC power distribution.
+• **Signature & Shristinagar Townships**: Comprehensive outdoor and indoor power distribution, multi-storey rising mains, weatherproof LT feeder pillars, and automated street lighting grids.`,
+    scrollTo: '#projects',
+    actions: ['Project Portfolio', 'Core Capabilities', 'Discuss a Project'],
+  },
+
+  // 12. KOHORA SUBSTATION SPECIFIC
+  {
+    keywords: ['kohora', 'assam substation', '100 days', '2x3.15', 'flood', 'kaziranga'],
+    response: `**Case Study: Kohora 2 × 3.15 MVA Substation (Assam)**
+
+• **Client & Location**: Power distribution utility at Kohora, near Kaziranga, Assam.
+• **Scope**: Turnkey civil foundations, 2 × 3.15 MVA power transformers, control room construction, 9-panel HT VCB switchgear, protection relay integration, and grid tie-in.
+• **Engineering Feat**: Executed and energized in **100 working days** in challenging flood-prone terrain with specialized elevated foundations and all-weather cable trenches.`,
+    scrollTo: '#projects',
+    actions: ['Substations & Switchyards', 'All Projects', 'Discuss a Project'],
+  },
+
+  // 13. SUPPLY CHAIN & VERIFIED MANUFACTURER PARTNERS
+  {
+    keywords: ['supplier', 'manufacturer', 'vendor', 'brand', 'abb', 'l&t', 'schneider', 'havells', 'crompton', 'finolex', 'kei', 'legrand', 'oem', 'supply chain'],
+    response: `**Verified Supply Chain & OEM Ecosystem**
+
+LDS integrates spec-compliant equipment from India's most respected electrical manufacturers:
+
+• **Switchgear & Automation**: L&T, ABB, Schneider Electric, Legrand, Lucy Electric
+• **Cables & Conductors**: Polycab, KEI Wires & Cables, Finolex, Havells, Utkarsh India, Raychem RPG
+• **Transformers & Power Panels**: CG Power, Crompton, Volamp, Daga Power Group, Huphen Electromech
+• **Lighting & Commercial Systems**: Philips, Wipro, Anchor by Panasonic, Bajaj Electricals, HPL Electric
+
+Every component is delivered with manufacturer test certificates (MTC), routine inspection reports, and full specification compliance.`,
+    scrollTo: '#ecosystem',
+    actions: ['Turnkey SITC', 'Core Capabilities', 'Discuss a Project'],
+  },
+
+  // 14. QUALITY, SAFETY & COMPLIANCE
+  {
+    keywords: ['quality', 'safety', 'iso', 'certification', 'standards', 'cea', 'compliance', 'hazard', 'inspection'],
+    response: `**Quality, Safety & Statutory Compliance**
+
+• **Certifications**: Certified to **ISO 9001:2015** (Quality Management) and **ISO 45001:2018** (Occupational Health & Safety).
+• **Statutory Standards**: Full adherence to Central Electricity Authority (CEA) safety guidelines, Indian Electricity Rules, and State DISCOM engineering codes.
+• **Zero-Accident Protocol**: Daily safety tool-box talks (TBT), mandatory PPE compliance, calibrated safety interlocks, and verified LOTO (Lockout/Tagout) procedures during all commissioning phases.`,
+    scrollTo: '#capabilities',
+    actions: ['Turnkey SITC', 'Why Choose LDS', 'Discuss a Project'],
+  },
+
+  // 15. POST-COMMISSIONING & MAINTENANCE
+  {
+    keywords: ['maintenance', 'after commissioning', 'lifecycle', 'amc', 'oil filtration', 'testing', 'breakdown', 'preventative'],
+    response: `**Beyond Commissioning — Lifecycle Support & Asset Management**
+
+Our commitment extends far beyond energisation:
+
+• **Preventative Maintenance Contracts**: Scheduled shutdowns, busbar torque audits, and thermographic infrared inspections to detect hot-spots before failures occur.
+• **Transformer Servicing**: Dielectric oil breakdown voltage (BDV) testing, moisture de-gassing, and on-site high-vacuum oil filtration.
+• **Relay Recalibration & Testing**: Periodic secondary injection testing of numerical protection relays and breaker trip timing checks.`,
+    scrollTo: '#capabilities',
+    actions: ['Core Capabilities', 'Why Choose LDS', 'Discuss a Project'],
+  },
+
+  // 16. GEOGRAPHIC REACH & LOCATIONS
+  {
+    keywords: ['location', 'where are you', 'address', 'kolkata', 'city', 'reach', 'coverage', 'assam', 'bihar', 'pan india', 'states'],
+    response: `**Geographic Footprint & Headquarters**
+
+• **Headquarters**: Kolkata, West Bengal, India.
+• **Operational Presence**: We execute projects across Eastern India, North-East India (Assam, Meghalaya, Arunachal Pradesh), Northern India (Uttar Pradesh, Bihar), and industrial corridors nationwide.
+• **Site Mobilization**: Our mobile engineering project management teams deploy dedicated site offices, heavy erection equipment, and certified crews directly to project locations.`,
+    actions: ['Contact Details', 'Discuss a Project', 'Major Projects'],
+  },
+
+  // 17. PRICING, TENDERS & COMMERCIAL QUOTATIONS
+  {
+    keywords: ['price', 'pricing', 'cost', 'quote', 'quotation', 'rate', 'how much', 'estimate', 'tender', 'rfp', 'boq', 'budget'],
+    response: `**Project Quotations & Commercial Tendering**
+
+Turnkey electrical infrastructure costs depend strictly on technical project parameters:
+
+• Approved Single-Line Diagrams (SLD) and load schedules
+• Equipment bill of quantities (BOQ) and preferred OEM makes
+• Site topography, soil resistivity, and cable routing distances
+• Utility interconnection voltage (LT, 11kV, 33kV, 132kV, 220kV)
+
+Our estimating engineers can review your tender documents, drawings, or preliminary requirements to provide an itemized commercial proposal. Would you like to submit your project requirements right now?`,
+    actions: ['Discuss a Project', 'Contact Details', 'Core Capabilities'],
+  },
+
+  // 18. CONTACT & DIRECT COMMUNICATION
+  {
+    keywords: ['contact', 'email', 'phone', 'call', 'reach out', 'inquiry', 'enquiry', 'speak to team', 'office'],
+    response: `**Contact LDS Infrastructure Pvt. Ltd.**
+
+• **Email**: **info@ldsinfrastructure.com**
+• **Headquarters**: Kolkata, West Bengal, India
+• **Business Hours**: Mon – Sat, 9:30 AM – 6:30 PM IST
+
+You can submit an immediate project enquiry by clicking **Discuss a Project** below, or email your RFP documents directly to our engineering desk.`,
+    actions: ['Discuss a Project', 'Core Capabilities', 'Major Projects'],
+  },
+]
+
 // ─────────────────────────────────────────────────────────────────────────────
-// INTENT MATCHER — Exact verified knowledge matching
+// CONVERSATIONAL NLP MATCHING ENGINE
 // ─────────────────────────────────────────────────────────────────────────────
-function getResponse(input: string): { text: string; actions?: string[]; scrollTo?: string } {
-  const q = input.toLowerCase().trim()
+function matchKnowledgeQuery(query: string, previousContext?: string): { text: string; actions?: string[]; scrollTo?: string } {
+  const clean = query.toLowerCase().trim()
 
-  // 1. Specific Projects
-  if (/bihar|vidhan|sabha/i.test(q)) {
-    const p = LDS_KB.projects.biharVidhanSabha
-    return {
-      text: `**${p.title}** (${p.sector})\n\n**Scope:** ${p.scope}\n\n${p.details}`,
-      scrollTo: '#projects',
-      actions: ['All Projects', 'Turnkey Electrification', 'Discuss a Project'],
+  // Score each topic based on keyword matches and context
+  let bestTopic: KnowledgeTopic | null = null
+  let maxScore = 0
+
+  for (const topic of KNOWLEDGE_TOPICS) {
+    let score = 0
+    for (const kw of topic.keywords) {
+      if (clean.includes(kw)) {
+        score += kw.length > 4 ? 3 : 2
+        // Exact whole-word bonus
+        const regex = new RegExp(`\\b${kw}\\b`, 'i')
+        if (regex.test(clean)) {
+          score += 2
+        }
+      }
+    }
+
+    if (score > maxScore) {
+      maxScore = score
+      bestTopic = topic
     }
   }
 
-  if (/kohora|kohra|assam.*substation/i.test(q)) {
-    const p = LDS_KB.projects.kohoraSubstation
+  if (bestTopic && maxScore >= 2) {
     return {
-      text: `**${p.title}** (${p.sector})\n\n**Scope:** ${p.scope}\n\n${p.details}`,
-      scrollTo: '#projects',
-      actions: ['Substations & Switchyards', 'All Projects', 'Discuss a Project'],
+      text: bestTopic.response,
+      actions: bestTopic.actions,
+      scrollTo: bestTopic.scrollTo,
     }
   }
 
-  if (/assam.*(hill|medical|college)/i.test(q)) {
-    const p = LDS_KB.projects.assamHill
-    return {
-      text: `**${p.title}** (${p.sector})\n\n**Scope:** ${p.scope}\n\n${p.details}`,
-      scrollTo: '#projects',
-      actions: ['Healthcare Projects', 'All Projects', 'Discuss a Project'],
-    }
-  }
-
-  if (/sarojini|naidu|agra/i.test(q)) {
-    const p = LDS_KB.projects.sarojiniHospital
-    return {
-      text: `**${p.title}** (${p.sector})\n\n**Scope:** ${p.scope}\n\n${p.details}`,
-      scrollTo: '#projects',
-      actions: ['Healthcare Projects', 'All Projects', 'Discuss a Project'],
-    }
-  }
-
-  if (/shri krishna|shree krishna|skmc|muzaffarpur/i.test(q)) {
-    const p = LDS_KB.projects.skmcMedical
-    return {
-      text: `**${p.title}** (${p.sector})\n\n**Scope:** ${p.scope}\n\n${p.details}`,
-      scrollTo: '#projects',
-      actions: ['Healthcare Projects', 'All Projects', 'Discuss a Project'],
-    }
-  }
-
-  if (/sonotel/i.test(q)) {
-    const p = LDS_KB.projects.sonotel
-    return {
-      text: `**${p.title}** (${p.sector})\n\n**Scope:** ${p.scope}\n\n${p.details}`,
-      scrollTo: '#projects',
-      actions: ['All Projects', 'Turnkey Electrification', 'Discuss a Project'],
-    }
-  }
-
-  if (/taj|hotel/i.test(q)) {
-    const p = LDS_KB.projects.tajHotel
-    return {
-      text: `**${p.title}** (${p.sector})\n\n**Scope:** ${p.scope}\n\n${p.details}`,
-      scrollTo: '#projects',
-      actions: ['All Projects', 'Turnkey Electrification', 'Discuss a Project'],
-    }
-  }
-
-  if (/signature/i.test(q)) {
-    const p = LDS_KB.projects.signature
-    return {
-      text: `**${p.title}** (${p.sector})\n\n**Scope:** ${p.scope}\n\n${p.details}`,
-      scrollTo: '#projects',
-      actions: ['Residential Projects', 'All Projects', 'Discuss a Project'],
-    }
-  }
-
-  if (/shristinagar|sristinagar/i.test(q)) {
-    const p = LDS_KB.projects.shristinagar
-    return {
-      text: `**${p.title}** (${p.sector})\n\n**Scope:** ${p.scope}\n\n${p.details}`,
-      scrollTo: '#projects',
-      actions: ['Residential Projects', 'All Projects', 'Discuss a Project'],
-    }
-  }
-
-  if (/warehouse/i.test(q)) {
-    const p = LDS_KB.projects.warehouseProjects
-    return {
-      text: `**${p.title}** (${p.sector})\n\n**Scope:** ${p.scope}\n\n${p.details}`,
-      scrollTo: '#projects',
-      actions: ['Industrial Projects', 'All Projects', 'Discuss a Project'],
-    }
-  }
-
-  // 2. Healthcare Sector / Medical
-  if (/healthcare|hospital|medical|clinic/i.test(q)) {
-    return {
-      text: `**Healthcare Infrastructure by Lukhdatar & Sons**\n\nLDS provides complete electrical SITC for major medical campuses and research hospitals, ensuring uninterrupted power availability, dual grid failover, isolated grounding, and low-voltage hospital systems.\n\n**Key Healthcare Projects:**\n• **Assam Hill Medical College & Research Institute** — Complete electrical SITC across college blocks, labs & hospital wards.\n• **Sarojini Naidu Medical Hospital, Agra** — Main distribution grids, bus ducts, capacitor banks & grounding.\n• **Shri Krishna Medical College, Muzaffarpur** — Complete electrical SITC, HT VCB panels & illumination.`,
-      scrollTo: '#projects',
-      actions: ['Assam Hill Medical', 'Sarojini Naidu Hospital', 'Shri Krishna Medical', 'Discuss a Project'],
-    }
-  }
-
-  // 3. Government / Institutional
-  if (/government|institutional|govt|public sector|state/i.test(q)) {
-    return {
-      text: `**Government & Institutional Capabilities**\n\nLukhdatar & Sons delivers turnkey infrastructure electrification for government, public-sector, and legislative institutions under strict clearance and safety compliance.\n\n**Key Project:**\n• **Bihar Vidhan Sabha** — Turnkey electrical infrastructure, primary power panels, and backup synchronization for the legislative complex.`,
-      scrollTo: '#projects',
-      actions: ['Bihar Vidhan Sabha', 'Turnkey Electrification', 'Discuss a Project'],
-    }
-  }
-
-  // 4. Turnkey SITC / Electrification
-  if (/turnkey|sitc|what is sitc|electrification capability|end.to.end/i.test(q)) {
-    return {
-      text: `**Turnkey Electrification (SITC) by Lukhdatar & Sons**\n\n${LDS_KB.capabilities.turnkey}\n\n**Core SITC Deliverables:**\n• **Supply**: Spec-compliant procurement of transformers, VCBs, panels, bus ducts, and cables.\n• **Installation**: Erection of towers, panels, cable trays, grounding grids, and underground laying.\n• **Testing**: Pre-energisation hipot checks, relay calibrations, and insulation resistance.\n• **Commissioning**: Utility grid synchronization and statutory clearances.`,
-      scrollTo: '#capabilities',
-      actions: ['Underground Cabling', 'Substations & Lines', 'Beyond Commissioning', 'Discuss a Project'],
-    }
-  }
-
-  // 5. Underground Cable Systems
-  if (/underground|cable|trench|jointing|66kv/i.test(q)) {
-    return {
-      text: `**Underground Cable Systems (up to 66KV)**\n\n${LDS_KB.capabilities.underground}\n\nOur specialized teams manage trench excavation, cable bedding, protective ducting, thermal backfilling, and high-voltage jointing/terminations.`,
-      scrollTo: '#capabilities',
-      actions: ['Turnkey Electrification', 'Substations & Lines', 'Discuss a Project'],
-    }
-  }
-
-  // 6. Substations & Switchyards
-  if (/substation|switchyard|220kv|transformer yard|vcb/i.test(q)) {
-    return {
-      text: `**Substations & Switchyards (up to 220KV)**\n\n${LDS_KB.capabilities.substations}\n\nWe deliver complete engineering, civil foundations, gantry structures, transformer erection, VCB panels, protection relays, and control room SCADA interfacing.`,
-      scrollTo: '#capabilities',
-      actions: ['Kohora Assam Substation', 'Transmission Lines', 'Discuss a Project'],
-    }
-  }
-
-  // 7. Transmission Lines
-  if (/transmission|overhead|400kv|tower|stringing/i.test(q)) {
-    return {
-      text: `**Overhead Transmission Lines (up to 400KV)**\n\n${LDS_KB.capabilities.transmission}\n\nEncompasses site survey, route clearing, tower foundation casting, lattice tower erection, insulator assembly, and tension conductor stringing.`,
-      scrollTo: '#capabilities',
-      actions: ['Substations & Switchyards', 'Turnkey Electrification', 'Discuss a Project'],
-    }
-  }
-
-  // 8. HT / LT Power Distribution
-  if (/ht.*lt|distribution|feeder pillar|rising main|power distribution/i.test(q)) {
-    return {
-      text: `**HT / LT Power Distribution**\n\n${LDS_KB.capabilities.htLt}\n\nDelivered across residential towers (Signature), integrated townships (Shristinagar), industrial parks, and healthcare campuses.`,
-      scrollTo: '#capabilities',
-      actions: ['Equipment Range', 'Residential Projects', 'Discuss a Project'],
-    }
-  }
-
-  // 9. Equipment Range
-  if (/equipment|panel|busduct|bus duct|capacitor|pcc|mcc|amf/i.test(q)) {
-    return {
-      text: `${LDS_KB.equipment.summary}`,
-      scrollTo: '#equipment',
-      actions: ['Turnkey Electrification', 'Request Equipment Info', 'Discuss a Project'],
-    }
-  }
-
-  // 10. Beyond Commissioning / Maintenance
-  if (/maintenan|lifecycle|after commissioning|post.commissioning|preventative/i.test(q)) {
-    return {
-      text: `**Beyond Commissioning — Lifecycle Support**\n\n${LDS_KB.capabilities.lifecycle}\n\nLDS remains committed to asset longevity with preventative maintenance schedules, breakdown repairs, and engineering audits.`,
-      scrollTo: '#capabilities',
-      actions: ['Turnkey Electrification', 'Why Choose LDS', 'Discuss a Project'],
-    }
-  }
-
-  // 11. Company Overview / Who is LDS / About
-  if (/who is|what is|about|tell me about|what do you do|company overview|lukhdatar/i.test(q)) {
-    return {
-      text: LDS_KB.company.about,
-      scrollTo: '#about',
-      actions: ['Capabilities', 'Project Portfolio', 'Leadership', 'Discuss a Project'],
-    }
-  }
-
-  // 12. History / Foundation
-  if (/history|founded|established|when.*start|milestones|1997|2007/i.test(q)) {
-    return {
-      text: `**Company History**\n\n• **1997**: Founded in Kolkata by Mr. Lalit Kumar Sureka as an electrical goods and supply business.\n• **2007**: Managing Director Mr. Shree Mangalam Sureka joined as the company expanded into full-scale Turnkey Electrical Contracting.\n• **Present**: Leading electrical infrastructure firm executing high-voltage substations, transmission lines, and mega turnkey projects across India.`,
-      scrollTo: '#about',
-      actions: ['Leadership', 'Capabilities', 'Project Portfolio'],
-    }
-  }
-
-  // 13. Leadership
-  if (/leadership|founder|lalit|shree|director|management|md/i.test(q)) {
-    return {
-      text: `**Leadership at Lukhdatar & Sons**\n\n• **Founder:** ${LDS_KB.leadership.founder.name} — Established the company in 1997; shaped our deep procurement and installation standards.\n• **Managing Director:** ${LDS_KB.leadership.md.name} — Joined in 2007 to lead the turnkey contracting expansion, overseeing project execution and engineering quality.`,
-      scrollTo: '#about',
-      actions: ['Company History', 'Capabilities', 'Discuss a Project'],
-    }
-  }
-
-  // 14. Why Choose LDS
-  if (/why choose|why lds|advantage|strengths|differentiator/i.test(q)) {
-    return {
-      text: LDS_KB.company.whyChoose,
-      scrollTo: '#about',
-      actions: ['Capabilities', 'Project Portfolio', 'Discuss a Project'],
-    }
-  }
-
-  // 15. Industries / Sectors Served
-  if (/industr|sector|what markets|who do you serve/i.test(q)) {
-    return {
-      text: `**Sectors Served by Lukhdatar & Sons**\n\n${LDS_KB.sectors.map((s, i) => `0${i + 1} — ${s}`).join('\n')}`,
-      scrollTo: '#industries',
-      actions: ['Healthcare', 'Government', 'Industrial / Warehouse', 'Substations'],
-    }
-  }
-
-  // 16. Projects Summary
-  if (/project|portfolio|track record|case stud/i.test(q)) {
-    return {
-      text: `**Lukhdatar & Sons Landmark Projects**\n\n• **Hospitality**: Taj Group of Hotels, Sonotel\n• **Healthcare**: Assam Hill Medical College, Sarojini Naidu Hospital Agra, Shri Krishna Medical College Muzaffarpur\n• **Government**: Bihar Vidhan Sabha\n• **Substations**: Kohora, Assam 2 × 3.15 MVA Substation\n• **Residential**: Signature, Shristinagar\n• **Industrial**: Warehouse Electrification Projects`,
-      scrollTo: '#projects',
-      actions: ['Bihar Vidhan Sabha', 'Kohora Substation', 'Healthcare Projects', 'Discuss a Project'],
-    }
-  }
-
-  // 17. Contact Details
-  if (/contact|email|phone|address|location|reach|where are you located/i.test(q)) {
-    return {
-      text: `**Contact Lukhdatar & Sons**\n\n📍 **Headquarters:** ${LDS_KB.contact.location}\n📧 **Email:** ${LDS_KB.contact.email}\n\nTo discuss project requirements or request an engineering proposal, click **Discuss a Project** below.`,
-      actions: ['Discuss a Project', 'Capabilities'],
-    }
-  }
-
-  // 18. Pricing / Quotation Safeguard
-  if (/price|cost|quote|pricing|how much|rate/i.test(q)) {
-    return {
-      text: `Commercial quotations for electrical infrastructure are custom-engineered based on approved single-line diagrams, site conditions, bill of quantities (BOQ), and statutory scope requirements.\n\nPlease share your project specifications with our engineering desk at **${LDS_KB.contact.email}** or click **Discuss a Project** to submit an enquiry.`,
-      actions: ['Discuss a Project', 'Capabilities'],
-    }
-  }
-
-  // 19. Fallback Safeguard (No Hallucinations)
+  // Conversational contextual fallback (No robotic canned answers)
   return {
-    text: `That specific detail is not available in our public company profile. For custom technical specifications or project-specific queries, our engineering team can assist you directly at **${LDS_KB.contact.email}**.`,
-    actions: ['Capabilities', 'Project Portfolio', 'Why Choose LDS', 'Contact Details'],
+    text: `Thank you for your question. While I don't have a confirmed public specification for that particular detail in my instant knowledge base, LDS Infrastructure specializes in customized turnkey electrical solutions tailored to exact client specifications.
+
+Our chief engineering team in Kolkata can review your exact single-line diagram, technical drawings, or equipment requirements directly.
+
+Would you like to outline your project scope with us or explore our delivered capabilities?`,
+    actions: ['Discuss a Project', 'Turnkey Capabilities', 'Project Portfolio', 'Contact Details'],
   }
 }
 
 // Quick action pill options
 const QUICK_ACTIONS = [
-  { label: 'About LDS',          query: 'What does Lukhdatar & Sons do?' },
-  { label: 'Turnkey SITC',       query: 'What is your turnkey electrification capability?' },
-  { label: 'Project Portfolio',  query: 'What projects has Lukhdatar & Sons delivered?' },
-  { label: 'Healthcare Projects', query: 'Tell me about your healthcare projects' },
-  { label: 'Substations & Lines', query: 'Tell me about your substation and transmission capabilities' },
-  { label: 'Beyond Commissioning', query: 'Can you provide maintenance after commissioning?' },
-  { label: 'Why Choose LDS',     query: 'Why should a client choose LDS?' },
-  { label: 'Contact Details',    query: 'How can I contact your company?' },
+  { label: 'Core Capabilities',  query: 'What are the main turnkey electrical capabilities of LDS?' },
+  { label: 'Major Projects',     query: 'What landmark projects has LDS delivered?' },
+  { label: 'Healthcare SITC',    query: 'Tell me about your healthcare and hospital electrification projects' },
+  { label: 'Substations & Lines', query: 'What are your high voltage substation and transmission line capabilities?' },
+  { label: 'Verified Suppliers', query: 'Which equipment manufacturers and brands do you partner with?' },
+  { label: 'Discuss a Project',  query: 'I would like to discuss an upcoming project enquiry' },
 ]
 
 type EnquiryStep = 'idle' | 'name' | 'company' | 'email' | 'phone' | 'type' | 'location' | 'requirement' | 'done'
@@ -401,6 +347,93 @@ interface Message {
   role: 'user' | 'assistant'
   text: string
   actions?: string[]
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SAFE FORMATTED MESSAGE RENDERER (NO RAW MARKDOWN)
+// ─────────────────────────────────────────────────────────────────────────────
+function FormattedMessage({ text }: { text: string }) {
+  // Parse paragraphs and bullet points safely into clean semantic React nodes
+  const paragraphs = useMemo(() => {
+    return text.split('\n\n').map((para, pIdx) => {
+      const lines = para.split('\n')
+
+      // Check if this paragraph contains bullet points
+      const hasBullets = lines.some(l => l.trim().startsWith('•') || l.trim().startsWith('* ') || l.trim().startsWith('- '))
+
+      if (hasBullets) {
+        return (
+          <div key={pIdx} style={{ display: 'flex', flexDirection: 'column', gap: '6px', margin: '4px 0' }}>
+            {lines.map((line, lIdx) => {
+              const trimmed = line.trim()
+              if (trimmed.startsWith('•') || trimmed.startsWith('* ') || trimmed.startsWith('- ')) {
+                const bulletContent = trimmed.replace(/^[•*-]\s*/, '')
+                return (
+                  <div key={lIdx} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', paddingLeft: '4px' }}>
+                    <span style={{ color: 'var(--accent-gold)', fontSize: '14px', lineHeight: '1.4', flexShrink: 0 }}>•</span>
+                    <span style={{ flex: 1 }}>{renderInlineFormatting(bulletContent)}</span>
+                  </div>
+                )
+              }
+              return (
+                <div key={lIdx}>
+                  {renderInlineFormatting(line)}
+                </div>
+              )
+            })}
+          </div>
+        )
+      }
+
+      return (
+        <p key={pIdx} style={{ margin: 0, lineHeight: 1.6 }}>
+          {lines.map((line, lIdx) => (
+            <span key={lIdx}>
+              {renderInlineFormatting(line)}
+              {lIdx < lines.length - 1 && <br />}
+            </span>
+          ))}
+        </p>
+      )
+    })
+  }, [text])
+
+  return <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>{paragraphs}</div>
+}
+
+// Helper to render bold (**text**), italics (*text*), and clean text without exposing markdown syntax
+function renderInlineFormatting(str: string) {
+  const parts: React.ReactNode[] = []
+  // Match **bold** or *italic*
+  const regex = /(\*\*.*?\*\*|\*.*?\*)/g
+  let lastIndex = 0
+  let match: RegExpExecArray | null
+
+  while ((match = regex.exec(str)) !== null) {
+    // Push preceding plain text
+    if (match.index > lastIndex) {
+      parts.push(str.substring(lastIndex, match.index))
+    }
+
+    const token = match[0]
+    if (token.startsWith('**') && token.endsWith('**')) {
+      const boldText = token.slice(2, -2)
+      parts.push(<strong key={match.index} style={{ fontWeight: 600, color: 'inherit' }}>{boldText}</strong>)
+    } else if (token.startsWith('*') && token.endsWith('*')) {
+      const italicText = token.slice(1, -1)
+      parts.push(<em key={match.index} style={{ fontStyle: 'italic', color: 'rgba(250,248,245,0.85)' }}>{italicText}</em>)
+    } else {
+      parts.push(token)
+    }
+
+    lastIndex = regex.lastIndex
+  }
+
+  if (lastIndex < str.length) {
+    parts.push(str.substring(lastIndex))
+  }
+
+  return parts
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -457,7 +490,7 @@ export default function LDSChatbot() {
       setIsTyping(false)
       addMessage({ role: 'assistant', text, actions })
       if (scrollTo) smoothScrollTo(scrollTo)
-    }, 400 + Math.random() * 200)
+    }, 450 + Math.random() * 200)
   }, [addMessage])
 
   // Handle action click
@@ -467,21 +500,13 @@ export default function LDSChatbot() {
     if (action === 'Discuss a Project') {
       setEnquiryStep('name')
       sendResponse(
-        `I will connect you directly with the Lukhdatar & Sons engineering desk.\n\nTo begin, what is your **name**?`,
+        `I will be glad to record your project specifications and connect you directly with our engineering desk at LDS.\n\nTo begin, what is your **name**?`,
         undefined
       )
       return
     }
 
-    if (action === 'Request Equipment Info') {
-      sendResponse(
-        `For detailed equipment specifications, load ratings, or OEM datasheets, please contact our procurement desk at **${LDS_KB.contact.email}**.\n\nYou can also click **Discuss a Project** to submit your required equipment schedule.`,
-        ['Discuss a Project', 'Turnkey SITC']
-      )
-      return
-    }
-
-    const response = getResponse(action)
+    const response = matchKnowledgeQuery(action)
     sendResponse(response.text, response.actions, response.scrollTo)
   }, [addMessage, sendResponse])
 
@@ -493,7 +518,7 @@ export default function LDSChatbot() {
       email:       { next: 'phone',       field: 'email',    question: 'What is the best **phone number** to reach your project team?' },
       phone:       { next: 'type',        field: 'phone',    question: 'What is the **project sector**? (e.g. Healthcare, Industrial/Warehouse, Substation, Government, Residential)' },
       type:        { next: 'location',    field: 'type',     question: 'Where is the **project site located** (City / State)?' },
-      location:    { next: 'requirement', field: 'location', question: 'Please briefly outline the **technical scope or capacity requirement**.' },
+      location:    { next: 'requirement', field: 'location', question: 'Please briefly outline the **technical scope, voltage class, or capacity requirement**.' },
       requirement: { next: 'done',        field: 'requirement', question: '' },
       idle: { next: 'idle', field: '', question: '' },
       done: { next: 'done', field: '', question: '' },
@@ -507,8 +532,8 @@ export default function LDSChatbot() {
 
     if (enquiryStep === 'requirement') {
       setEnquiryStep('done')
-      const summary = `**Project Enquiry Summary**\n\n• **Name**: ${updatedData.name}\n• **Organisation**: ${updatedData.company}\n• **Email**: ${updatedData.email}\n• **Phone**: ${updatedData.phone}\n• **Sector**: ${updatedData.type}\n• **Location**: ${updatedData.location}\n• **Scope**: ${value}\n\nThank you. Your enquiry has been recorded. Our engineering desk will review your scope and follow up at **${updatedData.email}**.`
-      sendResponse(summary, ['Project Portfolio', 'Turnkey SITC'])
+      const summary = `**Project Enquiry Summary**\n\n• **Name**: ${updatedData.name}\n• **Organisation**: ${updatedData.company}\n• **Email**: ${updatedData.email}\n• **Phone**: ${updatedData.phone}\n• **Sector**: ${updatedData.type}\n• **Location**: ${updatedData.location}\n• **Scope**: ${value}\n\nThank you. Your enquiry has been recorded for technical review. Our chief engineering desk in Kolkata will examine your scope and follow up directly at **${updatedData.email}**.`
+      sendResponse(summary, ['Project Portfolio', 'Core Capabilities', 'Company Background'])
     } else {
       setEnquiryStep(currentStep.next)
       sendResponse(currentStep.question)
@@ -528,7 +553,7 @@ export default function LDSChatbot() {
       return
     }
 
-    const response = getResponse(value)
+    const response = matchKnowledgeQuery(value)
     sendResponse(response.text, response.actions, response.scrollTo)
   }, [inputValue, enquiryStep, addMessage, handleEnquiryInput, sendResponse])
 
@@ -541,7 +566,7 @@ export default function LDSChatbot() {
 
   return (
     <>
-      {/* Floating trigger button */}
+      {/* Floating trigger button matching Explore Capabilities styling */}
       <div
         style={{
           position: 'fixed',
@@ -552,7 +577,7 @@ export default function LDSChatbot() {
       >
         <button
           onClick={() => setIsOpen(!isOpen)}
-          aria-label={isOpen ? 'Close Lukhdatar & Sons Assistant' : 'Open Lukhdatar & Sons Engineering Assistant'}
+          aria-label={isOpen ? 'Close LDS Engineering Assistant' : 'Open LDS Engineering Assistant'}
           aria-expanded={isOpen}
           className="ask-lds-trigger-btn"
         >
@@ -569,28 +594,28 @@ export default function LDSChatbot() {
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Lukhdatar & Sons Engineering Assistant"
+          aria-label="LDS Infrastructure Engineering Assistant"
           style={{
             position: 'fixed',
             bottom: '88px',
             right: '28px',
-            width: 'min(420px, calc(100vw - 36px))',
-            height: 'min(580px, calc(100vh - 120px))',
-            background: 'var(--bg-light)',
-            border: '1px solid var(--line)',
+            width: 'min(440px, calc(100vw - 36px))',
+            height: 'min(590px, calc(100vh - 120px))',
+            background: '#121820',
+            border: '1px solid rgba(201, 160, 82, 0.28)',
             borderTop: '2px solid var(--accent-gold)',
             display: 'flex',
             flexDirection: 'column',
             zIndex: 8999,
-            boxShadow: '0 20px 48px rgba(17,24,32,0.22), 0 4px 16px rgba(17,24,32,0.08)',
+            boxShadow: '0 20px 48px rgba(0,0,0,0.55), 0 4px 16px rgba(201,160,82,0.08)',
           }}
         >
           {/* Header */}
           <div
             style={{
               padding: '16px 20px',
-              borderBottom: '1px solid var(--line)',
-              background: 'var(--bg-primary)',
+              borderBottom: '1px solid rgba(250, 248, 245, 0.10)',
+              background: '#0E131A',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
@@ -603,15 +628,15 @@ export default function LDSChatbot() {
                   height: '8px',
                   borderRadius: '50%',
                   background: '#22c55e',
-                  boxShadow: '0 0 6px rgba(34,197,94,0.6)',
+                  boxShadow: '0 0 8px rgba(34,197,94,0.7)',
                 }}
               />
               <div>
-                <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '0.02em' }}>
+                <div style={{ fontSize: '13px', fontWeight: 600, color: '#FAF8F5', letterSpacing: '0.02em' }}>
                   Ask LDS AI
                 </div>
-                <div style={{ fontSize: '10px', color: 'var(--accent-gold)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                  Engineering Knowledge Desk
+                <div style={{ fontSize: '10px', color: 'var(--accent-gold)', letterSpacing: '0.10em', textTransform: 'uppercase', fontWeight: 500 }}>
+                  LDS Engineering Knowledge Desk
                 </div>
               </div>
             </div>
@@ -621,12 +646,15 @@ export default function LDSChatbot() {
               style={{
                 background: 'none',
                 border: 'none',
-                color: 'var(--text-muted)',
+                color: 'rgba(250,248,245,0.6)',
                 fontSize: '18px',
                 cursor: 'pointer',
                 padding: '4px',
                 lineHeight: 1,
+                transition: 'color 200ms ease',
               }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = '#FAF8F5')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(250,248,245,0.6)')}
             >
               ✕
             </button>
@@ -638,26 +666,27 @@ export default function LDSChatbot() {
             style={{
               flex: 1,
               overflowY: 'auto',
-              padding: '20px',
+              padding: '18px',
               display: 'flex',
               flexDirection: 'column',
-              gap: '16px',
+              gap: '14px',
+              background: '#121820',
             }}
           >
-            {/* Initial Welcome */}
+            {/* Initial Welcome Greeting */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div
                 style={{
                   padding: '14px 16px',
-                  background: 'var(--bg-secondary)',
-                  border: '1px solid var(--line-soft)',
+                  background: '#161F2B',
+                  border: '1px solid rgba(201, 160, 82, 0.20)',
                   borderLeft: '3px solid var(--accent-gold)',
                   fontSize: '13px',
                   lineHeight: 1.6,
-                  color: 'var(--text-primary)',
+                  color: '#FAF8F5',
                 }}
               >
-                Welcome to **Lukhdatar & Sons**. Ask me about our technical capabilities, project portfolio (Kohora Substation, Bihar Vidhan Sabha, Healthcare SITC), leadership, or submit a project enquiry.
+                <FormattedMessage text="Welcome to **LDS Infrastructure Pvt. Ltd. (Lukhdatar & Sons)**. I am your engineering assistant. Ask me about our turnkey SITC capabilities, high-voltage substations, transmission lines, healthcare & institutional projects, or submit an engineering enquiry." />
               </div>
 
               {/* Quick action buttons */}
@@ -666,25 +695,27 @@ export default function LDSChatbot() {
                   {QUICK_ACTIONS.map(a => (
                     <button
                       key={a.label}
-                      onClick={() => handleAction(a.label)}
+                      onClick={() => handleAction(a.query)}
                       style={{
                         padding: '6px 12px',
                         fontSize: '11px',
                         fontWeight: 500,
-                        color: 'var(--text-primary)',
-                        background: 'var(--bg-primary)',
-                        border: '1px solid var(--line)',
+                        color: 'rgba(250, 248, 245, 0.85)',
+                        background: '#182230',
+                        border: '1px solid rgba(250, 248, 245, 0.16)',
                         borderRadius: '2px',
                         cursor: 'pointer',
                         transition: 'all 0.2s ease',
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.borderColor = 'var(--accent-gold)'
-                        e.currentTarget.style.color = 'var(--accent-gold)'
+                        e.currentTarget.style.color = '#FFFFFF'
+                        e.currentTarget.style.background = 'rgba(201, 160, 82, 0.12)'
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.borderColor = 'var(--line)'
-                        e.currentTarget.style.color = 'var(--text-primary)'
+                        e.currentTarget.style.borderColor = 'rgba(250, 248, 245, 0.16)'
+                        e.currentTarget.style.color = 'rgba(250, 248, 245, 0.85)'
+                        e.currentTarget.style.background = '#182230'
                       }}
                     >
                       {a.label}
@@ -700,7 +731,7 @@ export default function LDSChatbot() {
                 key={idx}
                 style={{
                   alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start',
-                  maxWidth: '88%',
+                  maxWidth: '90%',
                 }}
               >
                 <div
@@ -708,14 +739,15 @@ export default function LDSChatbot() {
                     padding: '12px 16px',
                     fontSize: '13px',
                     lineHeight: 1.6,
-                    background: m.role === 'user' ? 'var(--text-primary)' : 'var(--bg-secondary)',
-                    color: m.role === 'user' ? '#FAF8F5' : 'var(--text-primary)',
-                    border: m.role === 'user' ? 'none' : '1px solid var(--line-soft)',
+                    background: m.role === 'user' ? 'var(--accent-gold)' : '#161F2B',
+                    color: m.role === 'user' ? '#0E131A' : '#FAF8F5',
+                    fontWeight: m.role === 'user' ? 500 : 400,
+                    border: m.role === 'user' ? 'none' : '1px solid rgba(201, 160, 82, 0.18)',
                     borderLeft: m.role === 'assistant' ? '3px solid var(--accent-gold)' : undefined,
-                    whiteSpace: 'pre-line',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.25)',
                   }}
                 >
-                  {m.text}
+                  <FormattedMessage text={m.text} />
                 </div>
 
                 {/* Optional response pill buttons */}
@@ -730,19 +762,21 @@ export default function LDSChatbot() {
                           fontSize: '10.5px',
                           fontWeight: 600,
                           color: 'var(--accent-gold)',
-                          background: 'var(--bg-primary)',
-                          border: '1px solid rgba(201,160,82,0.3)',
+                          background: '#182230',
+                          border: '1px solid rgba(201,160,82,0.35)',
                           borderRadius: '2px',
                           cursor: 'pointer',
                           transition: 'all 0.2s ease',
                         }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.background = 'var(--accent-gold)'
-                          e.currentTarget.style.color = '#000'
+                          e.currentTarget.style.color = '#0E131A'
+                          e.currentTarget.style.borderColor = 'var(--accent-gold)'
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.background = 'var(--bg-primary)'
+                          e.currentTarget.style.background = '#182230'
                           e.currentTarget.style.color = 'var(--accent-gold)'
+                          e.currentTarget.style.borderColor = 'rgba(201,160,82,0.35)'
                         }}
                       >
                         {act} →
@@ -758,19 +792,19 @@ export default function LDSChatbot() {
               <div
                 style={{
                   alignSelf: 'flex-start',
-                  padding: '10px 14px',
-                  background: 'var(--bg-secondary)',
-                  border: '1px solid var(--line-soft)',
+                  padding: '10px 16px',
+                  background: '#161F2B',
+                  border: '1px solid rgba(201, 160, 82, 0.18)',
                   borderLeft: '3px solid var(--accent-gold)',
-                  fontSize: '12px',
-                  color: 'var(--text-muted)',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '6px',
                 }}
               >
-                <span>Analyzing knowledge base</span>
-                <span style={{ animation: 'lds-pulse 1s infinite' }}>...</span>
+                <span style={{ fontSize: '11px', color: 'rgba(250, 248, 245, 0.65)', letterSpacing: '0.04em' }}>Consulting LDS engineering records</span>
+                <span className="typing-dot" />
+                <span className="typing-dot" style={{ animationDelay: '0.2s' }} />
+                <span className="typing-dot" style={{ animationDelay: '0.4s' }} />
               </div>
             )}
           </div>
@@ -780,8 +814,8 @@ export default function LDSChatbot() {
             onSubmit={handleSubmit}
             style={{
               padding: '12px 16px',
-              borderTop: '1px solid var(--line)',
-              background: 'var(--bg-primary)',
+              borderTop: '1px solid rgba(250, 248, 245, 0.10)',
+              background: '#0E131A',
               display: 'flex',
               gap: '10px',
               alignItems: 'center',
@@ -796,34 +830,41 @@ export default function LDSChatbot() {
               placeholder={enquiryStep !== 'idle' && enquiryStep !== 'done' ? 'Enter response...' : 'Ask about LDS capabilities, projects, scope...'}
               style={{
                 flex: 1,
-                padding: '10px 14px',
-                background: 'var(--bg-light)',
-                border: '1px solid var(--line)',
-                color: 'var(--text-primary)',
+                padding: '11px 14px',
+                background: '#161F2B',
+                border: '1px solid rgba(250, 248, 245, 0.18)',
+                color: '#FAF8F5',
                 fontSize: '12.5px',
                 outline: 'none',
+                transition: 'border-color 200ms ease',
               }}
               onFocus={(e) => {
                 e.currentTarget.style.borderColor = 'var(--accent-gold)'
               }}
               onBlur={(e) => {
-                e.currentTarget.style.borderColor = 'var(--line)'
+                e.currentTarget.style.borderColor = 'rgba(250, 248, 245, 0.18)'
               }}
             />
             <button
               type="submit"
               aria-label="Send Message"
               style={{
-                padding: '10px 16px',
+                padding: '11px 18px',
                 background: 'var(--accent-gold)',
-                color: '#000',
+                color: '#0E131A',
                 fontWeight: 600,
                 fontSize: '11px',
-                letterSpacing: '0.08em',
+                letterSpacing: '0.10em',
                 textTransform: 'uppercase',
                 border: 'none',
                 cursor: 'pointer',
-                transition: 'opacity 0.2s ease',
+                transition: 'all 200ms ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#DFB56C'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'var(--accent-gold)'
               }}
             >
               Send
@@ -885,6 +926,26 @@ export default function LDSChatbot() {
 
         .ask-lds-trigger-btn:hover .cta-arrow {
           transform: translate(2px, -2px);
+        }
+
+        .typing-dot {
+          display: inline-block;
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background: var(--accent-gold);
+          animation: dot-pulse 1.2s infinite ease-in-out;
+        }
+
+        @keyframes dot-pulse {
+          0%, 80%, 100% {
+            opacity: 0.2;
+            transform: scale(0.8);
+          }
+          40% {
+            opacity: 1;
+            transform: scale(1.2);
+          }
         }
       `}</style>
     </>
