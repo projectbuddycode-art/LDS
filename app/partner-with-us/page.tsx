@@ -2,59 +2,64 @@
 
 import PageLayout from '@/components/layout/PageLayout'
 import BackNav from '@/components/navigation/BackNav'
+import { VERIFIED_RELATIONSHIPS, ECOSYSTEM_LOGOS } from '@/data/content'
+import Image from 'next/image'
+import { openQuoteModal } from '@/lib/quoteEvents'
 
-export default function PartnerPage() {
+export default function ClientsPartnershipsPage() {
   return (
     <PageLayout>
-      {/* Hero section */}
+      {/* ── Hero Section ──────────────────────────────────────────────────────── */}
       <section className="section-py" style={{ background: 'var(--bg-primary)', borderBottom: '1px solid var(--line-soft)', marginTop: '72px' }}>
         <div className="site-container">
           <BackNav fallbackHref="/" label="Home" />
           <div className="section-label">
             <span className="section-label-bullet" />
-            <span className="t-label">Engineering Collaborations</span>
+            <span className="t-label">OUR CLIENTS &amp; RELATIONSHIPS</span>
           </div>
           <h1 className="t-headline" style={{ marginBottom: '24px', fontSize: 'clamp(32px, 5vw, 64px)', lineHeight: 1.05 }}>
-            Engineering Partnerships
+            Trusted Relationships
             <br />
-            <span style={{ color: 'var(--accent-gold)' }}>Built for Execution.</span>
+            <span style={{ color: 'var(--accent-gold)' }}>Across the Electrical Industry.</span>
           </h1>
           <p className="t-body" style={{ maxWidth: '680px', fontSize: 'clamp(16px, 1.2vw, 20px)', lineHeight: 1.6 }}>
-            Lukhdatar & Sons supports OEMs, manufacturers, system integrators, EPC contractors and infrastructure organisations with on-ground engineering, electrical execution, commissioning and lifecycle support.
+            Lukhdatar &amp; Sons builds execution capability through authorized distributorships, OEM system integration, joint ventures, and trusted project relationships across the public and private sectors.
           </p>
         </div>
       </section>
 
-      {/* Collaboration scope */}
+      {/* ── Verified Strategic Relationships & Authorizations (Section 17, 27) ── */}
       <section className="section-py" style={{ background: 'var(--bg-secondary)', borderBottom: '1px solid var(--line-soft)' }}>
         <div className="site-container">
-          <div className="section-label">
+          <div className="section-label" style={{ marginBottom: '20px' }}>
             <span className="section-label-bullet" />
-            <span className="t-label">Collaboration Areas</span>
+            <span className="t-label">PROSPECTUS-VERIFIED CREDENTIALS</span>
           </div>
-          <h2 className="t-headline" style={{ fontSize: 'clamp(24px, 3.5vw, 40px)', marginBottom: '40px' }}>
-            Areas of Factual
+          <h2 className="t-headline" style={{ fontSize: 'clamp(26px, 3.2vw, 40px)', marginBottom: '36px' }}>
+            Authorizations, System House &amp;
             <br />
-            <span style={{ color: 'var(--accent-gold)' }}>Mutual Integration</span>
+            <span style={{ color: 'var(--accent-gold)' }}>Joint Venture Partnerships</span>
           </h2>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2px', background: 'var(--line)', border: '1px solid var(--line)' }}>
-            {[
-              { title: 'Product & System Integration', desc: 'Compliant installation of high-voltage switches, vacuum circuit breakers, control panels, and transformer infrastructure.' },
-              { title: 'Electrical Engineering Execution', desc: 'On-ground execution of design calculations, load distribution alignments, cable lay routing, and site preparation.' },
-              { title: 'Project Installation', desc: 'Supervision and complete placement of physical panels, cable trays, structural tower grids, and lighting assemblies.' },
-              { title: 'Testing & Commissioning', desc: 'Independent insulation checks, HV testing, relay setting calibrations, and commissioning clearance files support.' },
-              { title: 'Field Execution', desc: 'Reliable on-site execution in challenging environments under strict compliance policies.' },
-              { title: 'Retrofit & Modernization', desc: 'Replacing, modifying, and updating legacy switchboards, old panels, and out-of-spec industrial circuits.' },
-              { title: 'Maintenance Support', desc: 'Substation and switchyard preventative servicing, oil filtration schedules, and quick breakdown repairs.' },
-              { title: 'Long-term Lifecycle Support', desc: 'Post-handover lifecycle engineering checks, operational support audits, and continuous safety monitoring.' }
-            ].map((collab, idx) => (
-              <div key={idx} style={{ padding: '32px 28px', background: 'var(--bg-light)' }}>
-                <h3 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '12px' }}>
-                  {collab.title}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
+            {VERIFIED_RELATIONSHIPS.map((rel, idx) => (
+              <div
+                key={idx}
+                style={{
+                  padding: '32px 28px',
+                  background: 'var(--bg-light)',
+                  border: '1px solid var(--line-soft)',
+                  borderTop: '2px solid var(--accent-gold)',
+                }}
+              >
+                <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--accent-gold)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '10px' }}>
+                  {rel.type}
+                </div>
+                <h3 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '12px', lineHeight: 1.3 }}>
+                  {rel.partners}
                 </h3>
-                <p className="t-body" style={{ fontSize: '13px', lineHeight: 1.6, margin: 0 }}>
-                  {collab.desc}
+                <p className="t-body" style={{ fontSize: '13.5px', lineHeight: 1.65, margin: 0 }}>
+                  {rel.details}
                 </p>
               </div>
             ))}
@@ -62,63 +67,75 @@ export default function PartnerPage() {
         </div>
       </section>
 
-      {/* Why Partner with Us */}
+      {/* ── Brand Ecosystem — Neutral Relationship Framing (Section 17, 18) ───── */}
       <section className="section-py" style={{ background: 'var(--bg-primary)', borderBottom: '1px solid var(--line-soft)' }}>
         <div className="site-container">
-          <div className="two-col" style={{ alignItems: 'start' }}>
-            <div>
-              <div className="section-label">
-                <span className="section-label-bullet" />
-                <span className="t-label">Enterprise Value</span>
-              </div>
-              <h2 className="t-headline" style={{ fontSize: 'clamp(24px, 3.5vw, 40px)', marginBottom: '24px' }}>
-                Why Partner
-                <br />
-                <span style={{ color: 'var(--accent-gold)' }}>With Us</span>
-              </h2>
-              <p className="t-body" style={{ maxWidth: '480px' }}>
-                Lukhdatar & Sons brings decades of on-ground contracting experience and vendor accountability. We operate as an execution extension for major technology developers and developers across India.
-              </p>
-            </div>
+          <div className="section-label" style={{ marginBottom: '16px' }}>
+            <span className="section-label-bullet" />
+            <span className="t-label">BRANDS &amp; INDUSTRY RELATIONSHIPS</span>
+          </div>
+          <h2 className="t-headline" style={{ fontSize: 'clamp(24px, 3vw, 38px)', marginBottom: '16px' }}>
+            Integrated Brands
+            <br />
+            <span style={{ color: 'var(--accent-gold)' }}>&amp; Components</span>
+          </h2>
+          <p className="t-body" style={{ maxWidth: '640px', marginBottom: '36px' }}>
+            LDS procures, configures, and installs high-grade switchgear, cables, transformers, and distribution components from leading approved electrical manufacturers:
+          </p>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px', borderLeft: '1px solid var(--line-soft)', paddingLeft: 'clamp(20px, 3vw, 48px)' }}>
-              {[
-                { title: 'Established Project Delivery Experience', desc: 'Operating as a turnkey electrical contractor since 2007 with a factual background in grid projects.' },
-                { title: 'End-to-End SITC Capability', desc: 'Managing the entire sequence from load design, panel supply, site layout, test validations, through to final commissioning.' },
-                { title: 'Complex Electrical Infrastructure Execution', desc: 'Erecting high-voltage substations up to 220KV and transmission corridors up to 400KV.' },
-                { title: 'Multi-sector Project Experience', desc: 'Successful delivery of hospitality, healthcare, institutional, residential, and industrial electrical projects.' },
-                { title: 'Maintenance Beyond Commissioning', desc: 'Supporting developers with structured maintenance shutdown schedules and operational support plans.' },
-                { title: 'Accountability-driven Execution', desc: 'Transparent site safety systems, documented clearances, and single-point coordination accountability.' }
-              ].map((reason, idx) => (
-                <div key={idx}>
-                  <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '6px' }}>
-                    {reason.title}
-                  </h3>
-                  <p className="t-body" style={{ fontSize: '13px', margin: 0 }}>
-                    {reason.desc}
-                  </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '16px' }}>
+            {ECOSYSTEM_LOGOS.map((brand) => (
+              <div
+                key={brand.name}
+                style={{
+                  padding: '24px 16px',
+                  background: 'var(--bg-light)',
+                  border: '1px solid var(--line-soft)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  minHeight: '110px',
+                  textAlign: 'center',
+                  gap: '12px',
+                }}
+              >
+                <div style={{ width: '80px', height: '40px', position: 'relative' }}>
+                  <Image
+                    src={brand.logo}
+                    alt={brand.alt}
+                    fill
+                    style={{ objectFit: 'contain' }}
+                  />
                 </div>
-              ))}
-            </div>
+                <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                  {brand.name}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* CTA section */}
+      {/* ── CTA Section ───────────────────────────────────────────────────────── */}
       <section className="section-py" style={{ background: 'var(--bg-secondary)', textAlign: 'center' }}>
         <div className="site-container">
-          <h2 className="t-headline" style={{ fontSize: 'clamp(24px, 3.5vw, 40px)', marginBottom: '24px' }}>
-            Become a Delivery Partner
+          <h2 className="t-headline" style={{ fontSize: 'clamp(24px, 3.5vw, 40px)', marginBottom: '20px' }}>
+            Discuss a Project with LDS
           </h2>
-          <p className="t-body" style={{ maxWidth: '520px', marginLeft: 'auto', marginRight: 'auto', marginBottom: '40px' }}>
-            We work with manufacturers, EPC companies, and developers to deliver compliant infrastructure. Discuss collaboration opportunities with Lukhdatar & Sons.
+          <p className="t-body" style={{ maxWidth: '520px', margin: '0 auto 36px' }}>
+            Looking for a turnkey electrical contractor, equipment partner, or substation execution team? Contact LDS today.
           </p>
-          <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="/vendor-capabilities?type=Partnership" className="cta-btn cta-btn-primary">
-              Discuss a Partnership
-            </a>
-            <a href="/vendor-capabilities?type=CompanyProfile" className="cta-btn">
-              Request Company Profile
+          <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => openQuoteModal()}
+              className="cta-btn cta-btn-primary"
+              style={{ cursor: 'pointer', fontFamily: 'inherit' }}
+            >
+              Get a Quote ↗
+            </button>
+            <a href="/company" className="cta-btn">
+              About Us ↗
             </a>
           </div>
         </div>

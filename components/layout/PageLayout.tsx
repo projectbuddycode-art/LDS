@@ -5,6 +5,7 @@ import { useLenis } from '@/lib/lenis'
 import Header from '@/components/navigation/Header'
 import Footer from '@/components/footer/Footer'
 import LDSChatbot from '@/components/chatbot/LDSChatbot'
+import QuoteModal from '@/components/quote/QuoteModal'
 
 export default function PageLayout({ children }: { children: React.ReactNode }) {
   // Initialize Lenis smooth scroll for pages
@@ -23,6 +24,7 @@ export default function PageLayout({ children }: { children: React.ReactNode }) 
       </main>
       <Footer />
       <LDSChatbot />
+      <QuoteModal />
     </div>
   )
 }

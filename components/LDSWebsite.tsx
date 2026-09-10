@@ -23,8 +23,9 @@ import IndustriesSection from '@/components/industries/IndustriesSection'
 import AccountabilitySection from '@/components/accountability/AccountabilitySection'
 import FinalCTA from '@/components/cta/FinalCTA'
 
-// LDS Engineering Assist chatbot
+// LDS Engineering Assist chatbot & Quote Modal
 import LDSChatbot from '@/components/chatbot/LDSChatbot'
+import QuoteModal from '@/components/quote/QuoteModal'
 
 export default function LDSWebsite() {
   const [introComplete, setIntroComplete] = useState(false)
@@ -32,18 +33,17 @@ export default function LDSWebsite() {
   // Initialize Lenis smooth scroll (only after intro)
   useLenis()
 
-  // Once intro completes: reveal body content
+  // Lock scroll during intro, restore once complete
   useEffect(() => {
     if (introComplete) {
       document.body.style.overflow = ''
+    } else {
+      document.body.style.overflow = 'hidden'
+    }
+    return () => {
+      document.body.style.overflow = ''
     }
   }, [introComplete])
-
-  // Lock scroll during intro
-  useEffect(() => {
-    document.body.style.overflow = 'hidden'
-    return () => { document.body.style.overflow = '' }
-  }, [])
 
   return (
     <>
@@ -105,6 +105,9 @@ export default function LDSWebsite() {
         {/* ─ LDS Engineering Assist ─────── */}
         {/* Rendered outside main so it floats above all sections */}
         <LDSChatbot />
+
+        {/* ─ LDS Unified Quote Modal ─────── */}
+        <QuoteModal />
       </div>
     </>
   )

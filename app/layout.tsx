@@ -114,6 +114,8 @@ export default function RootLayout({
     <html lang="en" className={inter.variable}>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="preload" href="/media/posters/intro-101.jpg" as="image" type="image/jpeg" fetchPriority="high" />
+        <link rel="preload" href="/media/intro-101.mp4" as="video" type="video/mp4" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <script

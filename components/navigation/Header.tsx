@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { NAV_LINKS } from '@/data/content'
+import { openQuoteModal } from '@/lib/quoteEvents'
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false)
@@ -16,7 +17,7 @@ export default function Header() {
     function onScroll() {
       if (!rafId) {
         rafId = window.requestAnimationFrame(() => {
-          const isScrolled = window.scrollY > 60
+          const isScrolled = window.scrollY > 40
           if (isScrolled !== lastScrolled) {
             lastScrolled = isScrolled
             setScrolled(isScrolled)
@@ -51,11 +52,27 @@ export default function Header() {
   }, [menuOpen])
 
   return (
-    <header ref={headerRef} className={`nav-root${scrolled ? ' scrolled' : ''}`}>
+    <header
+      ref={headerRef}
+      className={`nav-root${scrolled ? ' scrolled' : ''}`}
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 100,
+        background: scrolled
+          ? 'var(--nav-bg-scrolled)'
+          : 'linear-gradient(to bottom, rgba(10, 14, 18, 0.45) 0%, transparent 100%)',
+        backdropFilter: scrolled ? 'blur(12px)' : 'none',
+        WebkitBackdropFilter: scrolled ? 'blur(12px)' : 'none',
+        transition: 'background 400ms ease, backdrop-filter 400ms ease',
+      }}
+    >
       <div className="site-container">
-        <nav className="nav-inner" aria-label="Main navigation">
+        <nav className="nav-inner" aria-label="Main navigation" style={{ height: scrolled ? '62px' : '72px' }}>
 
-          {/* ── Logo ── actual LDS logo asset */}
+          {/* ── Logo ── clearly positioned, responsive, no distortion or overlap ── */}
           <Link
             href="/"
             aria-label="Lukhdatar & Sons — Home"
@@ -64,36 +81,32 @@ export default function Header() {
               alignItems: 'center',
               textDecoration: 'none',
               flexShrink: 0,
+              position: 'relative',
+              zIndex: 10,
             }}
           >
-            {/*
-              The actual logo has a white background.
-              On the dark hero: mix-blend-mode multiply makes white transparent,
-              leaving the dark LDS letterforms and gold bolt visible.
-              On scrolled (light ivory bg): the white bg merges with the header bg naturally.
-            */}
             <Image
               src="/media/lds-logo-v2.png"
               alt="Lukhdatar & Sons"
-              width={120}
-              height={52}
+              width={140}
+              height={50}
               priority
               style={{
-                height: '40px',
+                height: scrolled ? '36px' : '40px',
                 width: 'auto',
-                maxWidth: '120px',
+                maxWidth: '140px',
                 objectFit: 'contain',
-                mixBlendMode: scrolled ? 'normal' : 'multiply',
-                transition: 'all 400ms ease',
-                // On dark hero, invert makes the logo appear in light tones
-                filter: scrolled ? 'none' : 'invert(1) contrast(0.9) brightness(1.1)',
+                transition: 'all 350ms ease',
+                filter: scrolled
+                  ? 'none'
+                  : 'brightness(0) invert(1) drop-shadow(0 2px 6px rgba(0,0,0,0.45))',
               }}
             />
           </Link>
 
           {/* Desktop nav links */}
           <div
-            style={{ display: 'flex', alignItems: 'center', gap: 'clamp(24px, 3vw, 40px)' }}
+            style={{ display: 'flex', alignItems: 'center', gap: 'clamp(20px, 2.6vw, 36px)' }}
             className="hidden-mobile"
           >
             {NAV_LINKS.map((link) => (
@@ -106,51 +119,67 @@ export default function Header() {
                   fontWeight: 500,
                   letterSpacing: '0.12em',
                   textTransform: 'uppercase',
-                  color: scrolled ? 'var(--text-secondary)' : 'rgba(250,248,245,0.80)',
+                  color: scrolled ? 'var(--text-secondary)' : 'rgba(250,248,245,0.85)',
                   textDecoration: 'none',
                   transition: 'color 250ms ease',
                   position: 'relative',
                 }}
                 onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-gold)')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = scrolled ? 'var(--text-secondary)' : 'rgba(250,248,245,0.80)')}
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.color = scrolled ? 'var(--text-secondary)' : 'rgba(250,248,245,0.85)')
+                }
               >
                 {link.label}
               </Link>
             ))}
 
-            <a
-              href="#contact"
+            {/* GET A QUOTE CTA — High contrast, fully accessible */}
+            <button
+              onClick={() => openQuoteModal()}
               className="header-cta-btn"
               style={{
-                fontSize: '12px',
+                background: scrolled ? 'var(--text-primary)' : 'rgba(201, 160, 82, 0.20)',
+                border: scrolled ? '1px solid var(--text-primary)' : '1px solid var(--accent-gold)',
+                borderRadius: '2px',
+                fontSize: '11px',
                 fontWeight: 600,
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
-                color: 'var(--accent-gold)',
-                textDecoration: 'none',
-                paddingLeft: '20px',
-                borderLeft: '1px solid var(--line-gold)',
-                transition: 'opacity 250ms ease',
+                color: '#FAF8F5',
+                padding: '8px 16px',
+                cursor: 'pointer',
+                transition: 'all 250ms ease',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '6px',
+                textShadow: scrolled ? 'none' : '0 1px 2px rgba(0,0,0,0.4)',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.opacity = '0.75'
+                e.currentTarget.style.background = 'var(--accent-gold)'
+                e.currentTarget.style.borderColor = 'var(--accent-gold)'
+                e.currentTarget.style.color = '#111820'
                 const arrow = e.currentTarget.querySelector('.hdr-arrow') as HTMLSpanElement
-                if (arrow) arrow.style.transform = 'translateX(4px)'
+                if (arrow) {
+                  arrow.style.transform = 'translateX(3px)'
+                  arrow.style.color = '#111820'
+                }
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.opacity = '1'
+                e.currentTarget.style.background = scrolled ? 'var(--text-primary)' : 'rgba(201, 160, 82, 0.20)'
+                e.currentTarget.style.borderColor = scrolled ? 'var(--text-primary)' : 'var(--accent-gold)'
+                e.currentTarget.style.color = '#FAF8F5'
                 const arrow = e.currentTarget.querySelector('.hdr-arrow') as HTMLSpanElement
-                if (arrow) arrow.style.transform = 'translateX(0)'
+                if (arrow) {
+                  arrow.style.transform = 'translateX(0)'
+                  arrow.style.color = 'var(--accent-gold)'
+                }
               }}
             >
-              Start a Project
-              <span className="hdr-arrow" style={{ display: 'inline-block', transition: 'transform 300ms ease' }}>
+              Get a Quote
+              <span className="hdr-arrow" style={{ color: 'var(--accent-gold)', display: 'inline-block', transition: 'transform 300ms ease, color 250ms ease' }}>
                 ↗
               </span>
-            </a>
+            </button>
           </div>
 
           {/* Mobile menu button */}
@@ -218,20 +247,40 @@ export default function Header() {
               {link.label}
             </Link>
           ))}
-          <a
-            href="#contact"
+          <button
+            onClick={() => {
+              setMenuOpen(false)
+              openQuoteModal()
+            }}
             style={{
+              background: 'var(--text-primary)',
+              color: '#FAF8F5',
+              border: '1px solid var(--text-primary)',
+              borderRadius: '2px',
+              padding: '14px 20px',
+              textAlign: 'center',
+              cursor: 'pointer',
               fontSize: '13px',
               fontWeight: 600,
               letterSpacing: '0.12em',
               textTransform: 'uppercase',
-              color: 'var(--accent-gold)',
-              textDecoration: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              transition: 'all 250ms ease',
             }}
-            onClick={() => setMenuOpen(false)}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'var(--accent-gold)'
+              e.currentTarget.style.color = '#111820'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'var(--text-primary)'
+              e.currentTarget.style.color = '#FAF8F5'
+            }}
           >
-            Start a Project ↗
-          </a>
+            Get a Quote <span style={{ color: 'inherit' }}>↗</span>
+          </button>
         </div>
       )}
 

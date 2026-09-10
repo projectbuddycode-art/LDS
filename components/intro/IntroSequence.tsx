@@ -10,29 +10,29 @@ interface IntroSequenceProps {
 export default function IntroSequence({ onComplete }: IntroSequenceProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-
-  const [videoReady, setVideoReady] = useState(false)
-  const [hasError, setHasError] = useState(false)
   const isDoneRef = useRef(false)
   const fallbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false)
 
   const finishSequence = useCallback(() => {
     if (isDoneRef.current) return
     isDoneRef.current = true
+
     if (fallbackTimerRef.current) {
       clearTimeout(fallbackTimerRef.current)
     }
 
     const container = containerRef.current
     if (container) {
-      container.style.transition = 'opacity 850ms cubic-bezier(0.4, 0, 0.2, 1)'
+      // 450ms subtle cinematic crossfade into the homepage hero
+      container.style.transition = 'opacity 450ms cubic-bezier(0.4, 0, 0.2, 1)'
       container.style.opacity = '0'
       container.style.pointerEvents = 'none'
     }
 
     setTimeout(() => {
       onComplete()
-    }, 870)
+    }, 480)
   }, [onComplete])
 
   const handleEnded = useCallback(() => {
@@ -41,31 +41,48 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
 
   const handleError = useCallback(() => {
     if (isDoneRef.current) return
-    console.warn('Intro video failed to load, triggering fallback')
-    setHasError(true)
-    setTimeout(finishSequence, 1500)
+    console.warn('[IntroSequence] Video playback issue, proceeding smoothly to homepage')
+    finishSequence()
   }, [finishSequence])
 
   useEffect(() => {
+    // Respect prefers-reduced-motion
+    if (typeof window !== 'undefined') {
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      if (prefersReduced) {
+        finishSequence()
+        return
+      }
+    }
+
     const video = videoRef.current
     if (!video) return
 
-    // Lock playback rate to 1.0 natural timing
+    // Ensure muted & playsinline attributes are strictly applied on the DOM instance
+    video.muted = true
+    video.defaultMuted = true
+    video.playsInline = true
+    video.setAttribute('playsinline', '')
+    video.setAttribute('webkit-playsinline', '')
+    video.setAttribute('muted', '')
     video.playbackRate = 1.0
 
     function handleVideoReady() {
       if (isDoneRef.current) return
-      setVideoReady(true)
       const playPromise = video?.play()
       if (playPromise !== undefined) {
-        playPromise.catch((err) => {
-          console.warn('Autoplay deferred or restricted:', err)
-          setTimeout(finishSequence, 2000)
-        })
+        playPromise
+          .then(() => {
+            setIsVideoPlaying(true)
+          })
+          .catch((err) => {
+            console.warn('[IntroSequence] Autoplay deferred:', err)
+            // If browser prevents autoplay, advance after a short moment
+            setTimeout(finishSequence, 1500)
+          })
       }
     }
 
-    // Check if video is already ready (e.g. cached)
     if (video.readyState >= 2) {
       handleVideoReady()
     } else {
@@ -77,15 +94,15 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
     video.addEventListener('ended', handleEnded)
     video.addEventListener('error', handleError)
 
-    // Force explicit load attempt
+    // Explicit load
     video.load()
 
-    // Fallback safety timeout
+    // Safety timeout: transition after 11s maximum in case video hangs
     fallbackTimerRef.current = setTimeout(() => {
       if (!isDoneRef.current) {
         finishSequence()
       }
-    }, 8000)
+    }, 11000)
 
     return () => {
       if (fallbackTimerRef.current) {
@@ -102,44 +119,61 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
   return (
     <div
       ref={containerRef}
-      className="intro-overlay-container"
+      className="intro-fullscreen-overlay"
       onClick={finishSequence}
       style={{
         position: 'fixed',
         inset: 0,
-        zIndex: 200,
-        background: 'var(--bg-primary)',
+        width: '100vw',
+        height: '100dvh',
+        zIndex: 99999,
+        background: '#0A0E12',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         overflow: 'hidden',
         opacity: 1,
         willChange: 'opacity',
-        height: '100svh',
         cursor: 'pointer',
-        padding: 'env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)',
       }}
-      aria-label="Intro Sequence (Click or tap to enter site)"
+      aria-label="LDS Cinematic Intro 101"
     >
-      {/* Intro Video — Autoplays immediately with poster fallback */}
+      {/* ── Instant Fallback Poster (Zero layout shift, zero blank frame) ── */}
+      <img
+        src="/media/posters/intro-101.jpg"
+        alt=""
+        aria-hidden="true"
+        fetchPriority="high"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          width: '100vw',
+          height: '100dvh',
+          objectFit: 'cover',
+          objectPosition: 'center',
+          display: 'block',
+          zIndex: 1,
+          pointerEvents: 'none',
+        }}
+      />
+
+      {/* ── True Full-Screen INTRO 101 Video — 100vw × 100dvh ── */}
       <video
         ref={videoRef}
         src={MEDIA.introVideo}
-        poster="/media/posters/white-logo-intro.jpg"
+        poster="/media/posters/intro-101.jpg"
         autoPlay
         muted
         playsInline
         preload="auto"
-        onPlay={() => setVideoReady(true)}
-        onPlaying={() => setVideoReady(true)}
+        onPlaying={() => setIsVideoPlaying(true)}
         onTimeUpdate={(e) => {
-          setVideoReady(true)
           const target = e.currentTarget
+          // Trigger subtle crossfade ~0.25s before end to avoid any frame stutter
           if (target.duration > 0 && target.currentTime >= target.duration - 0.25) {
-            // Near end of video — trigger smooth transition
             const container = containerRef.current
-            if (container) {
-              container.style.transition = 'opacity 800ms cubic-bezier(0.4, 0, 0.2, 1)'
+            if (container && !isDoneRef.current) {
+              container.style.transition = 'opacity 450ms cubic-bezier(0.4, 0, 0.2, 1)'
               container.style.opacity = '0'
               container.style.pointerEvents = 'none'
             }
@@ -148,119 +182,45 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
         onEnded={handleEnded}
         onError={handleError}
         aria-hidden="true"
-        className="intro-video-element"
+        className="intro-101-video"
         style={{
           position: 'absolute',
           inset: 0,
-          width: '100%',
-          height: '100%',
-          opacity: 1,
-          transition: 'opacity 400ms ease',
-        }}
-      />
-
-      {/* Top right Skip indicator */}
-      <button
-        onClick={(e) => {
-          e.stopPropagation()
-          finishSequence()
-        }}
-        aria-label="Skip Introduction"
-        style={{
-          position: 'absolute',
-          top: '24px',
-          right: '24px',
-          zIndex: 10,
-          background: 'rgba(14, 19, 26, 0.65)',
-          backdropFilter: 'blur(8px)',
-          border: '1px solid rgba(250, 248, 245, 0.20)',
-          color: 'rgba(250, 248, 245, 0.85)',
-          padding: '8px 14px',
-          fontSize: '10px',
-          fontWeight: 600,
-          letterSpacing: '0.14em',
-          textTransform: 'uppercase',
-          cursor: 'pointer',
-          borderRadius: '2px',
-          transition: 'all 200ms ease',
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.borderColor = 'var(--accent-gold)'
-          e.currentTarget.style.color = '#FFFFFF'
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.borderColor = 'rgba(250, 248, 245, 0.20)'
-          e.currentTarget.style.color = 'rgba(250, 248, 245, 0.85)'
-        }}
-      >
-        Skip Intro ↗
-      </button>
-
-      {/* Thin gold rule overlay — communicates brand */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: '2px',
-          background: 'linear-gradient(to right, transparent, var(--accent-gold), transparent)',
-          opacity: 0.6,
-          zIndex: 3,
-        }}
-      />
-
-      {/* Brand mark — visible while video loads or on fallback, fades when video is ready */}
-      <div
-        style={{
-          position: 'relative',
+          width: '100vw',
+          height: '100dvh',
+          objectFit: 'cover',
+          objectPosition: 'center',
+          display: 'block',
           zIndex: 2,
-          textAlign: 'center',
-          opacity: videoReady && !hasError ? 0 : 1,
-          transition: 'opacity 500ms ease',
-          pointerEvents: 'none',
-          padding: '0 20px',
+          opacity: isVideoPlaying ? 1 : 0.99,
         }}
-      >
-        <div
-          style={{
-            fontFamily: 'var(--font-inter), Inter, sans-serif',
-            fontSize: 'clamp(28px, 4vw, 48px)',
-            fontWeight: 700,
-            letterSpacing: '-0.020em',
-            color: 'var(--text-primary)',
-            lineHeight: 1,
-            marginBottom: '4px',
-          }}
-        >
-          Lukhdatar & Sons<span style={{ color: 'var(--accent-gold)' }}>.</span>
-        </div>
-
-        <div
-          style={{
-            width: '32px',
-            height: '1px',
-            background: 'var(--accent-gold)',
-            margin: '20px auto 0',
-            opacity: 0.7,
-          }}
-        />
-      </div>
+      />
 
       <style>{`
-        /* Desktop: Cinematic full cover */
-        .intro-video-element {
-          object-fit: cover;
-          object-position: center;
+        .intro-fullscreen-overlay {
+          width: 100vw !important;
+          height: 100dvh !important;
+          height: 100svh !important;
+          height: 100vh !important;
         }
 
-        /* Mobile Safari & mobile screens: preserve complete brand composition without cropping */
+        .intro-101-video {
+          width: 100vw !important;
+          height: 100dvh !important;
+          height: 100svh !important;
+          height: 100vh !important;
+          object-fit: cover !important;
+          object-position: center !important;
+        }
+
+        /* Mobile full-screen cover protection */
         @media (max-width: 768px) {
-          .intro-overlay-container {
+          .intro-fullscreen-overlay,
+          .intro-101-video {
+            width: 100vw !important;
+            height: 100dvh !important;
             height: 100svh !important;
-          }
-          .intro-video-element {
-            object-fit: contain !important;
+            object-fit: cover !important;
             object-position: center !important;
           }
         }
@@ -268,5 +228,3 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
     </div>
   )
 }
-
-

@@ -1,6 +1,9 @@
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
 import { COMPANY, FOOTER_SECTIONS } from '@/data/content'
+import { openQuoteModal } from '@/lib/quoteEvents'
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
@@ -22,12 +25,11 @@ export default function Footer() {
                 width={160}
                 height={68}
                 style={{
-                  height: '60px',
+                  height: '52px',
                   width: 'auto',
                   maxWidth: '160px',
                   objectFit: 'contain',
-                  // Invert white-bg logo for dark footer background
-                  filter: 'invert(1) brightness(0.92) contrast(1.05)',
+                  filter: 'brightness(0) invert(1) drop-shadow(0 2px 8px rgba(0,0,0,0.5))',
                 }}
               />
             </Link>
@@ -36,35 +38,58 @@ export default function Footer() {
               fontSize: '14px',
               lineHeight: 1.7,
               color: 'rgba(250,248,245,0.50)',
-              maxWidth: '260px',
-              marginBottom: '32px',
+              maxWidth: '280px',
+              marginBottom: '28px',
             }}>
-              Complete electrical infrastructure — engineered, supplied,
-              installed, tested and commissioned as one accountable delivery.
+              Complete electrical solutions from design and equipment supply to installation, testing, commissioning and maintenance.
             </p>
 
-            <div style={{ fontSize: '13px', color: 'rgba(250,248,245,0.40)', lineHeight: 1.8 }}>
-              <div>{COMPANY.location}</div>
-              <div style={{ marginTop: '8px' }}>
+            <div style={{ fontSize: '12.5px', color: 'rgba(250,248,245,0.45)', lineHeight: 1.7, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div>
+                <strong style={{ color: 'rgba(250,248,245,0.70)', fontWeight: 600 }}>Registered Office:</strong>
+                <br />
+                {COMPANY.registeredAddress}
+              </div>
+              <div>
+                <strong style={{ color: 'rgba(250,248,245,0.70)', fontWeight: 600 }}>Project Office:</strong>
+                <br />
+                {COMPANY.projectOffice}
+              </div>
+              <div style={{ marginTop: '4px' }}>
                 <a
-                  href="mailto:info@ldsinfrastructure.com"
+                  href={`mailto:${COMPANY.emails[0]}`}
                   style={{
                     color: 'var(--accent-gold)',
                     textDecoration: 'none',
                     transition: 'opacity 250ms ease',
+                    display: 'block',
                   }}
                   onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.7')}
                   onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
                 >
-                  info@ldsinfrastructure.com
+                  {COMPANY.emails[0]}
+                </a>
+                <a
+                  href={`mailto:${COMPANY.emails[1]}`}
+                  style={{
+                    color: 'var(--accent-gold)',
+                    textDecoration: 'none',
+                    transition: 'opacity 250ms ease',
+                    display: 'block',
+                    marginTop: '2px',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.7')}
+                  onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
+                >
+                  {COMPANY.emails[1]}
                 </a>
               </div>
             </div>
 
-            {/* Discuss a Project CTA */}
+            {/* Get a Quote CTA */}
             <div style={{ marginTop: '32px' }}>
-              <a
-                href="#contact"
+              <button
+                onClick={() => openQuoteModal()}
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -73,24 +98,28 @@ export default function Footer() {
                   fontWeight: 600,
                   letterSpacing: '0.12em',
                   textTransform: 'uppercase',
-                  color: 'var(--accent-gold)',
-                  textDecoration: 'none',
+                  color: '#FAF8F5',
+                  background: 'rgba(201,160,82,0.18)',
+                  cursor: 'pointer',
                   padding: '12px 20px',
-                  border: '1px solid rgba(201,160,82,0.35)',
+                  border: '1px solid var(--accent-gold)',
+                  borderRadius: '2px',
                   transition: 'all 300ms ease',
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.borderColor = 'var(--accent-gold)'
-                  e.currentTarget.style.background = 'rgba(201,160,82,0.08)'
+                  e.currentTarget.style.background = 'var(--accent-gold)'
+                  e.currentTarget.style.color = '#111820'
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(201,160,82,0.35)'
-                  e.currentTarget.style.background = 'transparent'
+                  e.currentTarget.style.borderColor = 'var(--accent-gold)'
+                  e.currentTarget.style.background = 'rgba(201,160,82,0.18)'
+                  e.currentTarget.style.color = '#FAF8F5'
                 }}
               >
-                Discuss a Project
+                Get a Quote
                 <span style={{ display: 'inline-block', transition: 'transform 250ms ease' }}>↗</span>
-              </a>
+              </button>
             </div>
           </div>
 

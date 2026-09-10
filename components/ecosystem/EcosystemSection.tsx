@@ -13,7 +13,7 @@ export default function EcosystemSection() {
   const scrollLeftRef = useRef(0)
   const resumeTimerRef = useRef<NodeJS.Timeout | null>(null)
 
-  // ── High-performance GSAP viewport entry reveal ───────────────────────────
+  // ── Viewport entry reveal ─────────────────────────────────────────────────
   useEffect(() => {
     let isUnmounted = false
     let ctx: any
@@ -111,7 +111,7 @@ export default function EcosystemSection() {
     }, 3000)
   }
 
-  // Double list for continuous seamless infinite loop
+  // Double list for continuous seamless infinite loop (Single-line continuous moving logo spotlight)
   const doubledLogos = [...ECOSYSTEM_LOGOS, ...ECOSYSTEM_LOGOS]
 
   return (
@@ -124,12 +124,12 @@ export default function EcosystemSection() {
         position: 'relative',
         overflow: 'hidden',
       }}
-      aria-label="Industry ecosystem — suppliers and verified manufacturers"
+      aria-label="Our clients and trusted industry relationships"
     >
       <div className="site-container" style={{ marginBottom: '36px' }}>
         <div data-reveal className="section-label" style={{ marginBottom: '20px' }}>
           <span className="section-label-bullet" />
-          <span className="t-label">03 — Industry Ecosystem</span>
+          <span className="t-label">03 — Our Clients &amp; Industry Relationships</span>
         </div>
 
         <div
@@ -142,10 +142,9 @@ export default function EcosystemSection() {
           }}
         >
           <h2 data-reveal className="t-headline">
-            Built through
+            Trusted Relationships
             <br />
-            relationships that{' '}
-            <span style={{ color: 'var(--accent-gold)' }}>power industry.</span>
+            <span style={{ color: 'var(--accent-gold)' }}>Across the Electrical Industry.</span>
           </h2>
           <div>
             <p
@@ -153,14 +152,12 @@ export default function EcosystemSection() {
               className="t-body"
               style={{ maxWidth: '440px', marginBottom: '24px' }}
             >
-              Lukhdatar &amp; Sons integrates equipment from India&apos;s leading electrical
-              manufacturers and specialized engineering partners — ensuring every project
-              is built with spec-compliant equipment from verified supply chains.
+              Lukhdatar &amp; Sons maintains authorized stocking, system integration, and project joint ventures with India&apos;s leading electrical manufacturers and technology brands.
             </p>
 
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
               <a
-                href="#capabilities"
+                href="/partner-with-us"
                 data-reveal
                 className="cta-btn"
                 style={{
@@ -188,7 +185,7 @@ export default function EcosystemSection() {
                   e.currentTarget.style.background = 'transparent'
                 }}
               >
-                View Capabilities ↗
+                Our Clients &amp; Relationships ↗
               </a>
 
               {/* ── Circular Carousel Navigation Arrows ── */}
@@ -217,9 +214,9 @@ export default function EcosystemSection() {
         </div>
       </div>
 
-      {/* ── Horizontal Moving Carousel with Moving Spotlight (Crisp Edges) ── */}
+      {/* ── Single-Line Horizontal Moving Logo Spotlight (Seamless 30s Loop) ── */}
       <div className="eco-carousel-viewport">
-        {/* Moving Architectural Spotlight Light Beam (Enters from outside left, sweeps across, exits outside right) */}
+        {/* Center Spotlight Effect */}
         <div className="eco-spotlight-beam" aria-hidden="true" />
 
         {/* Carousel Track */}
@@ -270,7 +267,7 @@ export default function EcosystemSection() {
             opacity: 0.70,
           }}
         >
-          Established supply chain relationships — equipment sourced from verified manufacturers
+          Brands and industry relationships — Authorized Super Stockist of HPL, Lucy Electric, Huphen · System House of L&amp;T · JVs with CG Power &amp; Areva T&amp;D
         </div>
       </div>
 
@@ -326,53 +323,31 @@ export default function EcosystemSection() {
           transform: scale(0.95);
         }
 
-        /* ── Carousel Viewport (Sharp Edges, No Blurring Overlays) ── */
+        /* ── Carousel Viewport ── */
         .eco-carousel-viewport {
           position: relative;
           width: 100%;
           overflow: hidden;
-          padding: 8px 0;
+          padding: 12px 0;
         }
 
-        /* ── Moving Cinematic Spotlight Beam (Enters outside left, sweeps across, exits outside right) ── */
+        /* ── Subtle Center Spotlight Effect ── */
         .eco-spotlight-beam {
           position: absolute;
           top: 50%;
-          width: 480px;
-          height: 260px;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: min(600px, 80vw);
+          height: 200px;
           border-radius: 50%;
           pointer-events: none;
           z-index: 3;
-          will-change: transform, opacity;
           background: radial-gradient(
             ellipse 50% 50% at center,
-            rgba(201, 160, 82, 0.24) 0%,
-            rgba(201, 160, 82, 0.07) 50%,
+            rgba(201, 160, 82, 0.14) 0%,
+            rgba(201, 160, 82, 0.04) 50%,
             transparent 75%
           );
-          transform: translate3d(-520px, -50%, 0);
-          animation: eco-spotlight-sweep 18s ease-in-out infinite;
-        }
-
-        @keyframes eco-spotlight-sweep {
-          0% {
-            transform: translate3d(-520px, -50%, 0);
-            opacity: 0;
-          }
-          4% {
-            opacity: 0.85;
-          }
-          50% {
-            transform: translate3d(calc(100vw + 200px), -50%, 0);
-            opacity: 0.85;
-          }
-          54% {
-            opacity: 0;
-          }
-          100% {
-            transform: translate3d(-520px, -50%, 0);
-            opacity: 0;
-          }
         }
 
         /* ── Carousel Track Wrapper ── */
@@ -393,10 +368,10 @@ export default function EcosystemSection() {
           cursor: grabbing;
         }
 
-        /* ── Continuous Horizontal Moving Track ── */
+        /* ── Single-Line Continuous Horizontal Moving Track (Approx 32s cycle, seamless) ── */
         .eco-carousel-track {
           display: flex;
-          gap: 14px;
+          gap: 16px;
           width: max-content;
           animation: eco-marquee 32s linear infinite;
           will-change: transform;
@@ -415,7 +390,7 @@ export default function EcosystemSection() {
           }
         }
 
-        /* ── Dark Premium Logo Card (High-presence containment, 5-10% safe margin) ── */
+        /* ── Premium Logo Card ── */
         .eco-logo-card {
           flex-shrink: 0;
           width: clamp(170px, 14vw, 210px);
@@ -426,7 +401,7 @@ export default function EcosystemSection() {
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 6px 10px;
+          padding: 6px 12px;
           position: relative;
           overflow: hidden;
           transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1),
@@ -461,8 +436,8 @@ export default function EcosystemSection() {
           max-height: 82%;
           object-fit: contain;
           object-position: center;
-          opacity: 0.95;
-          transition: opacity 300ms ease, filter 300ms ease;
+          opacity: 1;
+          transition: transform 300ms ease, filter 300ms ease;
           filter: contrast(1.05);
         }
 

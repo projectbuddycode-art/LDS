@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { COMPANY } from '@/data/content'
+import { openQuoteModal } from '@/lib/quoteEvents'
 
 export default function FinalCTA() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -49,7 +51,7 @@ export default function FinalCTA() {
 
         <div data-reveal className="section-label" style={{ marginBottom: '24px' }}>
           <span className="section-label-bullet" />
-          <span className="t-label">Lukhdatar & Sons / Let&apos;s Build</span>
+          <span className="t-label">Lukhdatar & Sons / Get a Quote</span>
         </div>
 
         <h2 data-reveal style={{
@@ -63,23 +65,31 @@ export default function FinalCTA() {
         </h2>
 
         <p data-reveal className="t-body-lg" style={{ maxWidth: '560px', marginBottom: 'clamp(36px, 4vw, 56px)' }}>
-          Looking for an established contractor for complete electrical SITC, HT/LT power distribution, substation erection, or cable infrastructure? Discuss your project scope and execution timeline directly with our team.
+          Tell us about your electrical project and our team will get in touch. Looking for turnkey electrical contracting, HT/LT power distribution, substation erection, or equipment supply? Discuss your scope directly with LDS.
         </p>
 
         <div data-reveal style={{ width: '100%', height: '1px', background: 'var(--line-soft)', marginBottom: 'clamp(32px, 4vw, 48px)' }} />
 
         <div data-reveal style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, auto))', gap: '12px', maxWidth: '720px' }}>
-          <a href="mailto:info@ldsinfrastructure.com" className="cta-btn cta-btn-primary" style={{ justifyContent: 'space-between' }}>
-            Discuss a Project <span className="cta-arrow">↗</span>
-          </a>
-          <a href="mailto:info@ldsinfrastructure.com?subject=Equipment Enquiry" className="cta-btn" style={{ justifyContent: 'space-between' }}>
+          <button
+            onClick={() => openQuoteModal()}
+            className="cta-btn cta-btn-primary"
+            style={{ justifyContent: 'space-between', cursor: 'pointer', fontFamily: 'inherit' }}
+          >
+            Get a Quote <span className="cta-arrow">↗</span>
+          </button>
+          <button
+            onClick={() => openQuoteModal('Electrical Equipment Supply')}
+            className="cta-btn"
+            style={{ justifyContent: 'space-between', cursor: 'pointer', fontFamily: 'inherit' }}
+          >
             Request Equipment <span className="cta-arrow">↗</span>
+          </button>
+          <a href="/capabilities" className="cta-btn" style={{ justifyContent: 'space-between' }}>
+            Our Services <span className="cta-arrow">↗</span>
           </a>
-          <a href="#capabilities" className="cta-btn" style={{ justifyContent: 'space-between' }}>
-            Explore Capabilities <span className="cta-arrow">↗</span>
-          </a>
-          <a href="#projects" className="cta-btn" style={{ justifyContent: 'space-between' }}>
-            View Project Experience <span className="cta-arrow">↗</span>
+          <a href="/insights" className="cta-btn" style={{ justifyContent: 'space-between' }}>
+            Projects & Industries <span className="cta-arrow">↗</span>
           </a>
         </div>
 
@@ -98,12 +108,7 @@ export default function FinalCTA() {
           transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
         }
         .cta-btn:hover .cta-arrow {
-          transform: translateX(4px) translateY(-2px);
-        }
-        @media (max-width: 640px) {
-          #contact [data-reveal]:nth-child(6) {
-            grid-template-columns: 1fr !important;
-          }
+          transform: translate(2px, -2px);
         }
       `}</style>
     </section>

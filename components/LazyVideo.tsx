@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, memo } from 'react'
+import { useEffect, useRef, useState, memo } from 'react'
 
 interface LazyVideoProps extends React.VideoHTMLAttributes<HTMLVideoElement> {
   src: string
@@ -18,13 +18,20 @@ function LazyVideo({
   preloadImmediate = false,
   className,
   style,
+  onError,
   ...props
 }: LazyVideoProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const playDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [hasError, setHasError] = useState(false)
 
   useEffect(() => {
+    setHasError(false)
+  }, [src])
+
+  useEffect(() => {
+    if (hasError) return
     const video = videoRef.current
     const container = containerRef.current
     if (!video) return
@@ -85,7 +92,15 @@ function LazyVideo({
       }
       observer.disconnect()
     }
-  }, [src, preloadImmediate])
+  }, [src, preloadImmediate, hasError])
+
+  const handleVideoError = (e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
+    setHasError(true)
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn(`[LazyVideo] Failed to load video: ${src}. Falling back to poster: ${poster}`)
+    }
+    if (onError) onError(e)
+  }
 
   return (
     <div
@@ -102,40 +117,64 @@ function LazyVideo({
       }}
       className={className}
     >
-      <video
-        ref={(el) => {
-          if (el) {
-            el.muted = true
-            el.defaultMuted = true
-            el.playsInline = true
-          }
-          videoRef.current = el
-        }}
-        src={src}
-        poster={poster}
-        autoPlay={preloadImmediate}
-        muted
-        playsInline
-        loop
-        preload={preloadImmediate ? 'auto' : 'metadata'}
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          inset: 0,
-          width: '100%',
-          height: '100%',
-          objectFit: style?.objectFit || 'cover',
-          objectPosition: style?.objectPosition || 'center center',
-          display: 'block',
-          backgroundColor: '#0E131A',
-          ...style,
-        }}
-        {...props}
-      />
+      {/* Background Poster Fallback Image (always present, guarantees 0 layout shift or blank frame) */}
+      {poster && (
+        <img
+          src={poster}
+          alt=""
+          aria-hidden="true"
+          loading="lazy"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: (style?.objectFit as any) || 'cover',
+            objectPosition: (style?.objectPosition as any) || 'center center',
+            display: 'block',
+            zIndex: 1,
+            pointerEvents: 'none',
+          }}
+        />
+      )}
+
+      {/* Video Element */}
+      {!hasError && (
+        <video
+          ref={(el) => {
+            if (el) {
+              el.muted = true
+              el.defaultMuted = true
+              el.playsInline = true
+            }
+            videoRef.current = el
+          }}
+          src={src}
+          poster={poster}
+          autoPlay={preloadImmediate}
+          muted
+          playsInline
+          loop
+          preload={preloadImmediate ? 'auto' : 'metadata'}
+          onError={handleVideoError}
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: style?.objectFit || 'cover',
+            objectPosition: style?.objectPosition || 'center center',
+            display: 'block',
+            backgroundColor: '#0E131A',
+            zIndex: 2,
+            ...style,
+          }}
+          {...props}
+        />
+      )}
     </div>
   )
 }
 
 export default memo(LazyVideo)
-
-

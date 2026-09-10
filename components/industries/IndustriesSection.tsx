@@ -6,23 +6,25 @@ import { INDUSTRIES } from '@/data/content'
 
 // Per-industry object-position for optimal video framing
 const OBJECT_POSITIONS: Record<string, string> = {
-  education:      'center 25%',
-  commercial:     'center 20%',
-  residential:    'center 22%',
-  medical:        'center 20%',
-  township:       'center 28%',
-  warehousing:    'center 25%',
-  manufacturing:  'center 22%',
+  manufacturing:        'center 22%',
+  commercial:           'center 20%',
+  warehousing:          'center 25%',
+  realEstate:           'center 22%',
+  institutions:         'center 25%',
+  utilities:            'center 20%',
+  industrialFacilities: 'center 22%',
+  infrastructure:       'center 25%',
 }
 
 const POSTER_MAP: Record<string, string> = {
-  education:      '/media/posters/campus.jpg',
-  commercial:     '/media/posters/commercial.jpg',
-  residential:    '/media/posters/residential.jpg',
-  medical:        '/media/posters/hospital.jpg',
-  township:       '/media/posters/township.jpg',
-  warehousing:    '/media/posters/warehouse.jpg',
-  manufacturing:  '/media/posters/industrial.jpg',
+  manufacturing:        '/media/posters/industrial.jpg',
+  commercial:           '/media/posters/commercial.jpg',
+  warehousing:          '/media/posters/warehouse.jpg',
+  realEstate:           '/media/posters/residential.jpg',
+  institutions:         '/media/posters/campus.jpg',
+  utilities:            '/media/posters/substation.jpg',
+  industrialFacilities: '/media/posters/industrial.jpg',
+  infrastructure:       '/media/posters/infrastructure.jpg',
 }
 
 export default function IndustriesSection() {
@@ -148,55 +150,53 @@ export default function IndustriesSection() {
           const tl = gsap.timeline({
             scrollTrigger: {
               trigger: section,
-              start: 'top top',
-              end: () => `+=${getDistance()}`,
-              scrub: 0.6,
               pin: true,
-              pinSpacing: true,
               anticipatePin: 1,
+              scrub: 0.8,
+              start: 'top top',
+              end: () => `+=${distance * 1.5}`,
               invalidateOnRefresh: true,
               onUpdate: (self) => {
                 const progress = self.progress
-                const cardIndex = Math.min(
-                  Math.floor(progress * numCards),
-                  numCards - 1
-                )
+                const rawIdx = progress * (numCards - 1)
+                const activeIdx = Math.min(Math.round(rawIdx), numCards - 1)
 
-                if (cardIndex !== activeIndexRef.current) {
-                  activeIndexRef.current = cardIndex
-                  updateVideoPlayback(cardIndex)
-                  updateCardDOMStyles(cardIndex)
+                if (activeIdx !== activeIndexRef.current) {
+                  activeIndexRef.current = activeIdx
+                  updateVideoPlayback(activeIdx)
+                  updateCardDOMStyles(activeIdx)
                 }
-
-                cardRefs.current.forEach((card, i) => {
-                  if (!card) return
-                  const cardProgress = i / (numCards - 1)
-                  const diff = Math.abs(progress - cardProgress) * (numCards - 1)
-                  const scale = Math.max(0.95, 1 - diff * 0.035)
-                  const opacity = Math.max(0.55, 1 - diff * 0.35)
-                  card.style.transform = `scale3d(${scale}, ${scale}, 1)`
-                  card.style.opacity = String(opacity)
-                })
               },
             },
           })
 
           tl.to(track, {
-            x: () => -getDistance(),
+            x: -distance,
             ease: 'none',
-            duration: 1,
           })
-        }
 
-        const headerEl = section.querySelector('[data-header]')
-        if (headerEl) {
-          gsap.fromTo(headerEl,
-            { y: 20, opacity: 0 },
-            {
-              y: 0, opacity: 1, duration: 0.75, ease: 'power3.out',
-              scrollTrigger: { trigger: headerEl, start: 'top 88%', once: true },
-            }
-          )
+          cardRefs.current.forEach((card, i) => {
+            if (!card) return
+            const startRatio = i / numCards
+            const peakRatio = (i + 0.5) / numCards
+            const endRatio = (i + 1) / numCards
+
+            gsap.timeline({
+              scrollTrigger: {
+                trigger: section,
+                start: 'top top',
+                end: () => `+=${distance * 1.5}`,
+                scrub: 0.8,
+              }
+            })
+            .fromTo(card, 
+              { scale: 0.94, opacity: 0.72 },
+              { scale: 1.0, opacity: 1, duration: peakRatio - startRatio, ease: 'power2.out' }
+            )
+            .to(card,
+              { scale: 0.94, opacity: 0.72, duration: endRatio - peakRatio, ease: 'power2.in' }
+            )
+          })
         }
       }, section)
     }
@@ -244,14 +244,12 @@ export default function IndustriesSection() {
           alignItems: 'end',
         }}>
           <h2 className="t-headline">
-            Every sector.
+            POWERING EVERY
             <br />
-            <span style={{ color: 'var(--accent-gold)' }}>One standard.</span>
+            <span style={{ color: 'var(--accent-gold)' }}>SECTOR.</span>
           </h2>
-          <p className="t-body" style={{ maxWidth: '380px' }}>
-            From manufacturing plants and hospitals to commercial complexes, warehouses
-            and educational campuses — Lukhdatar & Sons delivers the same engineering rigour across
-            every environment.
+          <p className="t-body" style={{ maxWidth: '440px' }}>
+            From manufacturing plants and warehouses to institutional campuses, commercial facilities, and utilities — Lukhdatar &amp; Sons delivers the same engineering precision across every industrial sector.
           </p>
         </div>
       </div>
@@ -297,36 +295,55 @@ export default function IndustriesSection() {
                 >
                   {/* Video wrapper */}
                   <div style={{ position: 'absolute', inset: 0 }}>
+                    {POSTER_MAP[industry.mediaKey] && (
+                      <img
+                        src={POSTER_MAP[industry.mediaKey]}
+                        alt=""
+                        aria-hidden="true"
+                        loading="lazy"
+                        style={{
+                          position: 'absolute',
+                          inset: 0,
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          objectPosition: objPos,
+                          zIndex: 1,
+                          pointerEvents: 'none',
+                        }}
+                      />
+                    )}
                     <video
                       ref={(el) => { desktopVideoRefs.current[index] = el }}
                       src={videoSrc}
                       poster={POSTER_MAP[industry.mediaKey]}
-                      autoPlay={isInitialActive}
                       muted
                       playsInline
                       loop
                       preload="metadata"
-                      aria-hidden="true"
                       style={{
+                        position: 'relative',
+                        zIndex: 2,
                         width: '100%',
                         height: '100%',
                         objectFit: 'cover',
                         objectPosition: objPos,
-                        display: 'block',
-                        transform: 'none',
                       }}
+                      aria-label={`Video showing ${industry.label} electrification`}
                     />
                   </div>
 
-                  {/* Gradient overlay */}
-                  <div style={{
-                    position: 'absolute',
-                    inset: 0,
-                    background: 'linear-gradient(to top, rgba(10,14,18,0.85) 0%, rgba(10,14,18,0.20) 60%, transparent 100%)',
-                    zIndex: 2,
-                  }} />
+                  {/* Gradient overlays */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      background: 'linear-gradient(to top, rgba(10,14,18,0.85) 0%, rgba(10,14,18,0.20) 40%, transparent 70%)',
+                      zIndex: 2,
+                    }}
+                  />
 
-                  {/* Active indicator top bar */}
+                  {/* Active top gold bar */}
                   <div
                     data-active-bar
                     style={{
@@ -336,58 +353,60 @@ export default function IndustriesSection() {
                       right: 0,
                       height: '2px',
                       background: 'var(--accent-gold)',
-                      zIndex: 4,
                       opacity: isInitialActive ? 1 : 0,
                       transition: 'opacity 300ms ease',
+                      zIndex: 3,
                     }}
                   />
 
-                  {/* Card label & metadata */}
-                  <div style={{
-                    position: 'absolute',
-                    bottom: '24px',
-                    left: '20px',
-                    right: '20px',
-                    zIndex: 3,
-                  }}>
-                    <div
-                      data-card-num
-                      style={{
-                        fontSize: '10px',
-                        fontWeight: 600,
-                        letterSpacing: '0.18em',
-                        color: 'var(--accent-gold)',
-                        marginBottom: '6px',
-                        opacity: isInitialActive ? 1 : 0.6,
-                        transition: 'opacity 300ms ease',
-                      }}
-                    >
-                      {String(index + 1).padStart(2, '0')}
+                  {/* Content overlay */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: '28px',
+                      left: '24px',
+                      right: '24px',
+                      zIndex: 3,
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                      <span
+                        data-card-num
+                        style={{
+                          fontSize: '10px',
+                          fontWeight: 600,
+                          color: 'var(--accent-gold)',
+                          letterSpacing: '0.14em',
+                          opacity: isInitialActive ? 1 : 0.6,
+                          transition: 'opacity 300ms ease',
+                        }}
+                      >
+                        0{index + 1}
+                      </span>
+                      <div
+                        data-card-line
+                        style={{
+                          width: isInitialActive ? '32px' : '16px',
+                          height: '1px',
+                          background: 'var(--accent-gold)',
+                          opacity: isInitialActive ? 0.9 : 0.4,
+                          transition: 'width 300ms ease, opacity 300ms ease',
+                        }}
+                      />
                     </div>
                     <div
                       data-card-label
                       style={{
-                        fontSize: 'clamp(16px, 1.4vw, 22px)',
+                        fontSize: 'clamp(17px, 1.4vw, 22px)',
                         fontWeight: isInitialActive ? 600 : 500,
                         color: isInitialActive ? '#FAF8F5' : 'rgba(250,248,245,0.70)',
                         letterSpacing: '-0.01em',
+                        transition: 'color 300ms ease, font-weight 300ms ease',
                         lineHeight: 1.2,
-                        transition: 'color 300ms ease',
                       }}
                     >
                       {industry.label}
                     </div>
-                    <div
-                      data-card-line
-                      style={{
-                        width: isInitialActive ? '32px' : '16px',
-                        height: '1px',
-                        background: 'var(--accent-gold)',
-                        marginTop: '10px',
-                        opacity: isInitialActive ? 0.9 : 0.4,
-                        transition: 'width 300ms ease, opacity 300ms ease',
-                      }}
-                    />
                   </div>
                 </div>
               )
@@ -396,128 +415,197 @@ export default function IndustriesSection() {
         </div>
       )}
 
-      {/* ── Mobile: Vertical Accordion Card Stack ── */}
+      {/* ── Mobile: Native Smooth-Snapping Horizontal Carousel ── */}
       {isMobile && (
-        <div style={{ padding: '0 var(--container-px) clamp(40px, 8vw, 60px)' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+        <div style={{ paddingBottom: '48px' }}>
+          <div
+            className="industries-mobile-snap-track"
+            style={{
+              display: 'flex',
+              gap: '12px',
+              overflowX: 'auto',
+              scrollSnapType: 'x mandatory',
+              paddingLeft: 'var(--container-px)',
+              paddingRight: 'var(--container-px)',
+              paddingBottom: '16px',
+              WebkitOverflowScrolling: 'touch',
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+            }}
+          >
             {INDUSTRIES.map((industry, index) => {
               const videoSrc = MEDIA.industries[industry.mediaKey]
+              const objPos = OBJECT_POSITIONS[industry.mediaKey] || 'center center'
               const isActive = index === mobileActiveIndex
-              const objPos = OBJECT_POSITIONS[industry.id] || 'center 25%'
 
               return (
                 <div
                   key={industry.id}
                   onClick={() => handleMobileCardTap(index)}
-                  role="button"
-                  aria-label={`${industry.label} — ${isActive ? 'active' : 'tap to activate'}`}
-                  tabIndex={0}
-                  onKeyDown={(e) => e.key === 'Enter' && handleMobileCardTap(index)}
+                  aria-label={`Industry: ${industry.label}`}
                   style={{
+                    flexShrink: 0,
+                    width: 'calc(100vw - 48px)',
+                    maxWidth: '340px',
+                    height: '420px',
+                    scrollSnapAlign: 'center',
                     position: 'relative',
-                    height: isActive ? 'clamp(220px, 55vw, 300px)' : '72px',
                     overflow: 'hidden',
                     background: 'var(--surface)',
-                    cursor: 'pointer',
-                    transition: 'height 500ms cubic-bezier(0.16, 1, 0.3, 1)',
-                    borderBottom: isActive ? '2px solid var(--accent-gold)' : '2px solid transparent',
+                    border: isActive ? '1px solid rgba(201,160,82,0.45)' : '1px solid var(--line-soft)',
+                    transition: 'border-color 300ms ease',
                   }}
                 >
-                  {/* Video / Poster */}
+                  {/* Video wrapper */}
                   <div style={{ position: 'absolute', inset: 0 }}>
+                    {POSTER_MAP[industry.mediaKey] && (
+                      <img
+                        src={POSTER_MAP[industry.mediaKey]}
+                        alt=""
+                        aria-hidden="true"
+                        loading="lazy"
+                        style={{
+                          position: 'absolute',
+                          inset: 0,
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          objectPosition: objPos,
+                          zIndex: 1,
+                          pointerEvents: 'none',
+                        }}
+                      />
+                    )}
                     <video
                       ref={(el) => { mobileVideoRefs.current[index] = el }}
                       src={videoSrc}
                       poster={POSTER_MAP[industry.mediaKey]}
-                      autoPlay={isActive}
                       muted
                       playsInline
                       loop
                       preload="metadata"
-                      aria-hidden="true"
                       style={{
+                        position: 'relative',
+                        zIndex: 2,
                         width: '100%',
                         height: '100%',
                         objectFit: 'cover',
                         objectPosition: objPos,
-                        display: 'block',
                       }}
+                      aria-label={`Video showing ${industry.label} electrification`}
                     />
                   </div>
 
-                  {/* Gradient */}
-                  <div style={{
-                    position: 'absolute',
-                    inset: 0,
-                    background: isActive
-                      ? 'linear-gradient(to top, rgba(10,14,18,0.85) 0%, rgba(10,14,18,0.20) 60%, transparent 100%)'
-                      : 'linear-gradient(to right, rgba(10,14,18,0.85) 0%, rgba(10,14,18,0.60) 100%)',
-                    zIndex: 2,
-                    transition: 'background 400ms ease',
-                  }} />
+                  {/* Gradient overlays */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      background: 'linear-gradient(to top, rgba(10,14,18,0.88) 0%, rgba(10,14,18,0.20) 40%, transparent 70%)',
+                      zIndex: 2,
+                    }}
+                  />
 
-                  {/* Content */}
-                  <div style={{
-                    position: 'absolute',
-                    bottom: isActive ? '20px' : '0',
-                    top: isActive ? 'auto' : '0',
-                    left: '20px',
-                    right: '20px',
-                    zIndex: 3,
-                    display: 'flex',
-                    flexDirection: isActive ? 'column' : 'row',
-                    alignItems: isActive ? 'flex-start' : 'center',
-                    justifyContent: isActive ? 'flex-end' : 'space-between',
-                    transition: 'all 400ms ease',
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <span style={{
-                        fontSize: '10px',
-                        fontWeight: 600,
-                        letterSpacing: '0.18em',
-                        color: 'var(--accent-gold)',
-                      }}>
-                        {String(index + 1).padStart(2, '0')}
+                  {/* Active top gold bar */}
+                  {isActive && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: '2px',
+                        background: 'var(--accent-gold)',
+                        zIndex: 3,
+                      }}
+                    />
+                  )}
+
+                  {/* Content overlay */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: '24px',
+                      left: '20px',
+                      right: '20px',
+                      zIndex: 3,
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                      <span
+                        style={{
+                          fontSize: '10px',
+                          fontWeight: 600,
+                          color: 'var(--accent-gold)',
+                          letterSpacing: '0.14em',
+                        }}
+                      >
+                        0{index + 1}
                       </span>
-                      <span style={{
-                        fontSize: isActive ? '18px' : '15px',
-                        fontWeight: isActive ? 600 : 500,
+                      <div
+                        style={{
+                          width: '24px',
+                          height: '1px',
+                          background: 'var(--accent-gold)',
+                          opacity: 0.8,
+                        }}
+                      />
+                    </div>
+                    <div
+                      style={{
+                        fontSize: '18px',
+                        fontWeight: 600,
                         color: '#FAF8F5',
                         letterSpacing: '-0.01em',
-                        transition: 'font-size 300ms ease',
-                      }}>
-                        {industry.label}
-                      </span>
+                        lineHeight: 1.2,
+                      }}
+                    >
+                      {industry.label}
                     </div>
-
-                    {!isActive && (
-                      <span style={{
-                        fontSize: '11px',
-                        color: 'rgba(250,248,245,0.40)',
-                        letterSpacing: '0.10em',
-                        textTransform: 'uppercase',
-                      }}>
-                        Expand +
-                      </span>
-                    )}
-
-                    {isActive && (
-                      <div style={{
-                        width: '32px',
-                        height: '1px',
-                        background: 'var(--accent-gold)',
-                        marginTop: '8px',
-                      }} />
-                    )}
                   </div>
                 </div>
               )
             })}
           </div>
+
+          {/* Mobile pagination indicator dots */}
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '6px',
+              paddingTop: '8px',
+            }}
+          >
+            {INDUSTRIES.map((_, i) => (
+              <div
+                key={i}
+                style={{
+                  width: i === mobileActiveIndex ? '20px' : '6px',
+                  height: '3px',
+                  borderRadius: '2px',
+                  background: i === mobileActiveIndex ? 'var(--accent-gold)' : 'var(--line)',
+                  transition: 'all 250ms ease',
+                }}
+              />
+            ))}
+          </div>
         </div>
       )}
 
+      {/* Scoped styles */}
       <style>{`
+        #industries-header {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: clamp(24px, 4vw, 64px);
+          align-items: end;
+        }
+
+        .industries-mobile-snap-track::-webkit-scrollbar {
+          display: none;
+        }
+
         @media (max-width: 768px) {
           #industries-header {
             grid-template-columns: 1fr !important;

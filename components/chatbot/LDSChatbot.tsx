@@ -1,542 +1,607 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
+import { COMPANY } from '@/data/content'
+import { openQuoteModal } from '@/lib/quoteEvents'
 
 // ─────────────────────────────────────────────────────────────────────────────
-// LDS COMPREHENSIVE ENGINEERING KNOWLEDGE REPOSITORY
+// LDS FACTUAL KNOWLEDGE REPOSITORY (STRICTLY GROUNDED IN LDS PROSPECTUS)
 // ─────────────────────────────────────────────────────────────────────────────
 interface KnowledgeTopic {
   keywords: string[]
   response: string
   actions?: string[]
   scrollTo?: string
+  navigateUrl?: string
+  isExternalLink?: boolean
 }
 
 const KNOWLEDGE_TOPICS: KnowledgeTopic[] = [
   // 1. GREETINGS & INTRODUCTIONS
   {
     keywords: ['hello', 'hi', 'hey', 'good morning', 'good afternoon', 'good evening', 'greetings', 'who are you', 'what is this'],
-    response: `Hello! I am your **LDS Engineering Assistant** representing **LDS Infrastructure Pvt. Ltd. (Lukhdatar & Sons)**.
+    response: `Hello! I am **Ask LDS Bot**, the official assistant for **Lukhdatar & Sons (LDS)**.
 
-We are a specialized turnkey electrical infrastructure contractor founded in Kolkata in 1997. I can help you with:
+We provide complete electrical solutions from design and equipment supply to installation, testing, commissioning and maintenance. I can assist you with:
 
-• **Turnkey SITC Electrification** across industrial, commercial, and utility sectors
-• **High-Voltage Substations & Switchyards** (AIS / GIS up to 220kV / 400kV)
-• **Overhead Transmission Lines** & lattice tower stringing
-• **Underground HT/LT Cable Networks** (up to 66kV with HDD trenchless crossings)
-• **HT/LT Power Distribution Panels** (PCC, MCC, Bus Ducts, APFC banks)
-• **Critical Infrastructure & Hospital Electrification**
-• **Project Portfolio & Case Studies** (Kohora Substation, Bihar Vidhan Sabha, Medical Colleges)
+• **Our Electrical Services** (Turnkey SITC, Industrial & Warehouse Electrification)
+• **Substations & Switchyards** (Engineering & SITC up to 220KV)
+• **Overhead Transmission Lines** (11KV, 33KV, 66KV, 132KV, 220KV, 400KV)
+• **Underground Cable Systems** (Laying, jointing & maintenance up to 66KV)
+• **Products & Equipment** (Transformers, Switchgear, PCC, MCC, APFC & Bus Ducts)
+• **Project Highlights** (Kohora Substation, Taj Hotels, Medical Colleges)
+• **Company Catalog Download & Direct Quotes**
 
-How can I assist your engineering team today?`,
-    actions: ['Core Capabilities', 'Major Projects', 'Discuss a Project', 'Company Background'],
+Would you like us to send your requirement to the LDS team?`,
+    actions: ['GET A QUOTE', 'OUR SERVICES', 'PRODUCTS & EQUIPMENT', 'PROJECTS', 'DOWNLOAD CATALOG', 'CHAT ON WHATSAPP'],
   },
 
-  // 2. COMPANY BACKGROUND & LEADERSHIP
+  // 2. COMPANY BACKGROUND & HISTORY
   {
-    keywords: ['about', 'company background', 'who is lds', 'what is lds', 'lukhdatar', 'overview', 'profile', 'history', 'founded', 'established', 'heritage'],
-    response: `**LDS Infrastructure Pvt. Ltd. (Lukhdatar & Sons)** is a premier turnkey electrical engineering contractor with over **27 years of field excellence**.
+    keywords: ['about', 'company background', 'who is lds', 'what is lds', 'lukhdatar', 'overview', 'profile', 'history', 'founded', 'established', 'heritage', 'journey'],
+    response: `**Lukhdatar & Sons (LDS)** has been serving the electrical industry since 1997.
 
-• **1997**: Founded in Kolkata by **Mr. Lalit Kumar Sureka** as an electrical equipment and goods supplier.
-• **2007**: Under the leadership of Managing Director **Mr. Shree Mangalam Sureka**, LDS expanded into full-scale **Turnkey Electrical Contracting (SITC)**.
-• **Present**: LDS executes complex high-voltage utility substations, transmission corridors, underground distribution networks, and critical institution electrification across India.
+• **1997**: Formed in Kolkata by **Mr. Lalit Kumar Sureka** as an electrical goods supplier.
+• **2007**: Expanded into **Turnkey Electrical Contracting** under Managing Director **Mr. Shree Mangalam Sureka**.
+• **Present**: LDS undertakes turnkey electrical projects in both **Government and Private sectors**, delivering commercial, housing, industrial, public, and substation projects.
 
-We take single-point responsibility for **Engineering Coordination**, **Spec-Compliant Procurement**, **Field Installation**, **Statutory Clearances**, and **Grid Energisation**.`,
-    scrollTo: '#about',
-    actions: ['Turnkey Capabilities', 'Project Track Record', 'Leadership', 'Discuss a Project'],
+From supplying electrical equipment to executing complete turnkey electrical projects, LDS has grown through experience, customer relationships, technical capability and project execution.
+
+Would you like us to send your requirement to the LDS team?`,
+    scrollTo: '#company',
+    actions: ['GET A QUOTE', 'OUR SERVICES', 'PROJECTS', 'DOWNLOAD CATALOG'],
   },
 
   {
     keywords: ['leadership', 'director', 'managing director', 'md', 'founder', 'management', 'shree mangalam', 'lalit kumar', 'sureka'],
-    response: `**Executive Leadership at LDS Infrastructure Pvt. Ltd.:**
+    response: `**Leadership at Lukhdatar & Sons:**
 
-• **Mr. Lalit Kumar Sureka (Founder)**: Established Lukhdatar & Sons in Kolkata in 1997, building foundational supply chain relationships and technical procurement benchmarks.
-• **Mr. Shree Mangalam Sureka (Managing Director)**: Joined in 2007 to lead the transition into full turnkey EPC contracting. He personally oversees engineering coordination, on-ground project execution teams, utility client relationships, and safety standards across public and private sector developments.`,
-    scrollTo: '#about',
-    actions: ['Company Background', 'Core Capabilities', 'Discuss a Project'],
+• **Mr. Lalit Kumar Sureka (Founder)**: Formed LDS in Kolkata in 1997 as an electrical goods supplier, establishing direct manufacturer distribution channels and high standards of electrical equipment supply.
+• **Mr. Shree Mangalam Sureka (Managing Director)**: Joined in 2007 to lead the company's expansion into turnkey electrical contracting, overseeing project execution teams, client relationships, engineering quality, and on-site delivery.
+
+Would you like us to send your requirement to the LDS team?`,
+    scrollTo: '#company',
+    actions: ['GET A QUOTE', 'OUR SERVICES', 'DOWNLOAD CATALOG'],
   },
 
-  // 3. TURNKEY SITC ELECTRIFICATION
+  // 3. TURNKEY ELECTRICAL SERVICES
   {
-    keywords: ['turnkey', 'sitc', 'what is sitc', 'supply installation testing commissioning', 'end to end', 'electrification capability', 'contracting', 'epc'],
-    response: `**Turnkey Electrification (SITC) by LDS**
+    keywords: ['service', 'services', 'turnkey', 'sitc', 'what is sitc', 'electrical work', 'contracting', 'what do you do', 'in house'],
+    response: `**Our Electrical Services**
 
-We provide end-to-end single-point execution covering the entire lifecycle of power infrastructure:
+LDS provides complete electrical solutions from design and equipment supply to installation, testing, commissioning and maintenance.
 
-• **Supply**: Spec-compliant procurement of tier-1 transformers, switchgear, VCB panels, bus ducts, cables, and earthing materials from verified manufacturers.
-• **Installation**: Precision erection of structural gantries, panel switchboards, cable tray networks, transformer yards, and lightning protection grids.
-• **Testing**: Rigorous pre-energisation testing including insulation resistance, secondary current injection, protection relay calibration, and Hi-Pot cable testing.
-• **Commissioning & Energisation**: Coordination with DISCOMs, state utilities, and electrical inspectorates for statutory clearances and seamless grid synchronisation.`,
-    scrollTo: '#capabilities',
-    actions: ['Substations & Switchyards', 'Underground Cabling', 'Project Portfolio', 'Discuss a Project'],
+**Key In-House & Contracted Services:**
+1. Turnkey Electrical Projects (Government & Private sectors)
+2. Industrial Electrification & Warehouse Electrification
+3. Substation & Switchyard Services (up to 220KV)
+4. Transmission Line Services (up to 400KV)
+5. Underground Cable Laying (up to 66KV)
+6. HT & LT Electrical Distribution
+7. Internal & External Electrification
+8. Lighting Systems (Normal, Emergency, High Mast, Aviation)
+9. Earthing & Lightning Protection
+10. Electrical Panels & Control Systems (PCC, MCC, APFC, AMF)
+11. Equipment Supply & Installation
+12. Testing & Commissioning
+13. Routine Electrical Maintenance
+14. Fabrication & Erection of Cable Trays, Ducts & Towers
+15. UPS / Power Systems, Public Address, Fire Detection & Cabling
+
+Would you like us to send your requirement to the LDS team?`,
+    actions: ['GET A QUOTE', 'PRODUCTS & EQUIPMENT', 'PROJECTS', 'DOWNLOAD CATALOG'],
   },
 
-  // 4. SUBSTATIONS & SWITCHYARDS
+  // 4. SUBSTATION & SWITCHYARD SERVICES
   {
-    keywords: ['substation', 'switchyard', 'ais', 'gis', '220kv', '132kv', '66kv', '33kv', '11kv', 'transformer yard', 'vcb', 'gantry', 'scada'],
-    response: `**High-Voltage Substations & Switchyards (up to 220kV / 400kV)**
+    keywords: ['substation', 'switchyard', '220kv', '132kv', '66kv', '33kv', '11kv', 'vcb', 'gantry', 'scada', 'gis', 'transformer yard'],
+    response: `**Substation & Switchyard Services (up to 220KV)**
 
-LDS delivers complete engineering, procurement, civil construction, erection, and commissioning for utility and industrial substations:
+LDS provides complete substation and switchyard services including engineering, procurement, construction, testing and commissioning:
 
-• **Air-Insulated (AIS) & Gas-Insulated (GIS) Substations**: Customized for challenging terrain, high seismic zones, and space-constrained industrial footprints.
-• **Key Equipment Scope**: Power transformers, vacuum circuit breakers (VCBs), SF6 breakers, CT/PT metering units, isolators, lightning arrestors, and battery banks.
-• **Control & Protection**: SCADA automation, microprocessor-based numerical relay integration, and remote telemetry control units.
+• Site design & foundation design
+• Substation design & earth mat design
+• Protection & control systems
+• SCADA system design & automation integration
+• GIS and open-air design
+• Capacitor bank design
+• Testing & commissioning
 
-*Landmark Delivery:* We engineered and energized the **2 × 3.15 MVA Substation at Kohora, Assam** in just **100 working days**, overcoming severe monsoon flood challenges.`,
-    scrollTo: '#capabilities',
-    actions: ['Kohora Substation Case Study', 'Transmission Lines', 'Underground Cabling', 'Discuss a Project'],
+**Verified Experience Highlight:**
+LDS commissioned a complete 2 x 3.15 MVA substation with control room and 9 VCB panels at **Kohora, Assam** in just 100 working days.
+
+Would you like us to send your requirement to the LDS team?`,
+    scrollTo: '#turnkey',
+    actions: ['GET A QUOTE', 'PROJECTS', 'PRODUCTS & EQUIPMENT'],
   },
 
-  // 5. OVERHEAD TRANSMISSION LINES
+  // 5. TRANSMISSION LINES
   {
-    keywords: ['transmission', 'transmission line', 'overhead line', '400kv', 'lattice tower', 'conductor', 'stringing', 'tower erection', 'corridor'],
-    response: `**Overhead High-Voltage Transmission Lines (up to 400kV)**
+    keywords: ['transmission', 'transmission line', 'overhead line', 'tower', '400kv', 'conductor', 'tower erection', 'sagging', 'stringing'],
+    response: `**Transmission Line Services**
 
-LDS has delivered over **2,500+ circuit kilometres** of transmission lines across diverse and difficult topographies:
+LDS undertakes supply, installation, testing and commissioning of overhead transmission lines across verified voltage levels:
 
-• **Survey & Route Optimization**: Route profiling, contour mapping, and statutory forest/railway/river crossing clearances.
-• **Civil Foundations**: Cast-in-situ RCC pile and stub foundations engineered for high water table, marshland, and rocky hill conditions.
-• **Tower Erection & Stringing**: Lattice steel tower assembly, hardware fitting, and precision tension stringing of ACSR/HTLS conductors with optical ground wire (OPGW).`,
-    scrollTo: '#capabilities',
-    actions: ['Substations & Switchyards', 'Turnkey SITC', 'Discuss a Project'],
+• **11KV** & **33KV** Distribution Lines
+• **66KV** & **132KV** Regional Transmission Lines
+• **220KV** & **400KV** Extra High Voltage (EHV) Transmission Corridors
+
+Services include route surveying, foundation design, tower fabrication & erection, conductor stringing, sagging, insulator disc installation, and statutory utility clearance.
+
+Would you like us to send your requirement to the LDS team?`,
+    scrollTo: '#transmission',
+    actions: ['GET A QUOTE', 'OUR SERVICES', 'DOWNLOAD CATALOG'],
   },
 
   // 6. UNDERGROUND CABLE SYSTEMS
   {
-    keywords: ['underground', 'cabling', 'cable laying', 'trenching', 'hdd', 'trenchless', 'jointing', 'termination', 'xlpe', '66kv cable', 'ht cable'],
-    response: `**Underground HT / LT Cable Networks (up to 66kV)**
+    keywords: ['underground', 'cable', 'cabling', 'trench', 'xlpe', 'jointing', 'cable laying', 'cable repair', '66kv cable'],
+    response: `**Underground Cable Systems (up to 66KV)**
 
-LDS specializes in high-reliability underground cable installations in dense urban corridors and industrial facilities:
+LDS provides underground cable laying services up to 66KV:
 
-• **Trenching & Bedding**: Mechanical and manual excavation, thermal backfill bedding, concrete protective slab laying, and route warning tape placement.
-• **Trenchless HDD Crossings**: Horizontal Directional Drilling under active highways, railway tracks, and waterways without surface disruption.
-• **Certified Jointing & Terminations**: Heat-shrink and cold-shrink straight-through joints and outdoor terminations performed by certified jointers.
-• **Diagnostics**: VLF Hipot testing, sheath integrity verification, and time-domain reflectometry (TDR) fault profiling.`,
-    scrollTo: '#capabilities',
-    actions: ['Power Distribution Panels', 'Turnkey SITC', 'Discuss a Project'],
+• **Supply**: High-grade XLPE insulated cables with manufacturer test certifications
+• **Laying**: Direct buried, concrete trenching, HDD (Horizontal Directional Drilling) and conduit routing
+• **Repair & Splicing**: Certified straight-through jointing and end terminations
+• **Maintenance**: Route inspection, sheath fault testing, and thermal hot-spot auditing
+• **Replacement**: Seamless changeover of degraded underground feeders without industrial downtime
+
+Would you like us to send your requirement to the LDS team?`,
+    scrollTo: '#cable-systems',
+    actions: ['GET A QUOTE', 'OUR SERVICES', 'DOWNLOAD CATALOG'],
   },
 
-  // 7. HT / LT DISTRIBUTION & PANELS
+  // 7. INDUSTRIAL & WAREHOUSE ELECTRIFICATION
   {
-    keywords: ['panel', 'switchboard', 'pcc', 'mcc', 'bus duct', 'busduct', 'apfc', 'capacitor bank', 'feeder pillar', 'rising main', 'distribution board', 'amf', 'dg sync'],
-    response: `**HT / LT Power Distribution & Switchboards**
+    keywords: ['industrial', 'factory', 'plant', 'manufacturing', 'warehouse', 'logistics', 'process plant'],
+    response: `**Industrial & Warehouse Electrification**
 
-LDS engineers, procures, and commissions heavy-duty industrial and commercial power distribution assemblies:
+LDS provides turnkey electrical solutions for industries, process plants and warehouses, including design and engineering:
 
-• **Power Control Centres (PCC)**: Up to 6300A high-fault withstand main incoming and distribution switchboards.
-• **Motor Control Centres (MCC)**: Draw-out and fixed type intelligent motor control boards with VFDs and soft starters.
-• **Sandwich & Air-Insulated Bus Ducts**: High-current busway systems linking transformers, DG sets, and main distribution panels.
-• **APFC Capacitor Banks**: Automatic power factor correction panels ensuring unity power factor and eliminating utility penalties.
-• **Rising Mains & Feeder Pillars**: Multi-level vertical power distribution for medical towers, residential complexes, and commercial towers.`,
-    scrollTo: '#capabilities',
-    actions: ['Turnkey SITC', 'Healthcare Infrastructure', 'Discuss a Project'],
+• Complete electrical design & HT/LT distribution network
+• Industrial power cabling & heavy-duty cable tray networks
+• Power Control Centres (PCC) & Motor Control Centres (MCC)
+• Plant lighting, high-bay warehouse luminaires, and emergency lighting
+• Transformer & DG sync panels installation
+• Full pre-commissioning testing, energisation and maintenance
+
+Would you like us to send your requirement to the LDS team?`,
+    scrollTo: '#capability',
+    actions: ['GET A QUOTE', 'PROJECTS', 'DOWNLOAD CATALOG'],
   },
 
-  // 8. HEALTHCARE & HOSPITAL INFRASTRUCTURE
+  // 8. PRODUCTS & EQUIPMENT
   {
-    keywords: ['hospital', 'healthcare', 'medical', 'medical college', 'surgical', 'icu', 'clean power', 'assam hill', 'sarojini naidu', 'skmc'],
-    response: `**Healthcare & Critical Medical Infrastructure Electrification**
+    keywords: ['equipment', 'product', 'products', 'panel', 'switchgear', 'transformer', 'pcc', 'mcc', 'apfc', 'bus duct', 'feeder pillar', 'distribution board'],
+    response: `**Products & Equipment Built for Reliable Performance**
 
-Hospitals require zero-failover power continuity. LDS has electrified landmark medical colleges and multi-specialty hospitals:
+LDS supplies and installs spec-compliant electrical equipment across major categories:
 
-• **Assam Hill Medical College & Research Institute (Diphu)**: Full turnkey SITC across college blocks, laboratories, surgical wards, and residential quarters.
-• **Sarojini Naidu Medical College & Hospital (Agra)**: Modernization of main power grids, capacitor banks, LT rising mains, and bus duct networks with zero disruption to active critical care.
-• **Shri Krishna Medical College (Muzaffarpur)**: Complete turnkey power distribution, HT VCB substations, isolated grounding, and emergency lighting.
+1. **Transformers**: Power & distribution transformers
+2. **LV / MV Switchgear**: Vacuum circuit breakers (VCB) & load break switches
+3. **Power Control Centres (PCC)**: High-capacity power distribution boards
+4. **Motor Control Centres (MCC)**: Industrial motor control assemblies
+5. **Capacitor Panels (APFC)**: Power factor correction & capacitor banks
+6. **AMF Panels**: Auto mains failure & generator synchronisation
+7. **Instrumentation & Control Panels**: Process automation panels
+8. **LT Bus Ducts**: High-current copper/aluminium sandwich bus duct systems
+9. **LT Distribution Boards & Feeder Pillars**: Weatherproof distribution boxes
+10. **Draw-Out & Non-Draw-Out Switchboards**
 
-*Key Specializations:* Isolated earthing for sensitive diagnostic equipment, dual DG synchronization failover, and segregated medical gas / emergency circuits.`,
+Would you like us to send your requirement to the LDS team?`,
+    scrollTo: '#equipment',
+    actions: ['GET A QUOTE', 'OUR SERVICES', 'DOWNLOAD CATALOG'],
+  },
+
+  // 9. PROJECTS & CASE STUDIES
+  {
+    keywords: ['project', 'projects', 'case study', 'portfolio', 'taj', 'hospital', 'medical college', 'assam hill', 'sarojini naidu', 'shri krishna', 'sonotel', 'hotel'],
+    response: `**Verified Project Highlights**
+
+LDS has delivered major turnkey electrical works across Government and Private sectors:
+
+• **Kohora Substation (Assam)**: 2 x 3.15 MVA Substation with control room and 9 VCB panels completed in **100 working days**.
+• **Assam Hill Medical College & Hospital**: Complete institutional HT/LT electrical SITC, distribution networks and hospital power systems.
+• **Sarojini Naidu Medical College & Hospital**: High-reliability clinical power distribution and emergency backup infrastructure.
+• **Shri Krishna Medical College & Hospital**: Complete healthcare campus electrification.
+• **Taj Group of Hotels / Sonotel**: Premium hospitality electrical engineering, bespoke lighting, DG backup and control panels.
+• **Warehouse Electrification**: Rapid-deployment electrification for large logistics hubs.
+
+Would you like us to send your requirement to the LDS team?`,
     scrollTo: '#projects',
-    actions: ['Assam Hill Medical College', 'Sarojini Naidu Hospital', 'Discuss a Project'],
+    actions: ['GET A QUOTE', 'OUR SERVICES', 'DOWNLOAD CATALOG'],
   },
 
-  // 9. GOVERNMENT & INSTITUTIONAL COMPLEXES
+  // 10. CLIENTS, PARTNERSHIPS & BRAND RELATIONSHIPS
   {
-    keywords: ['government', 'institutional', 'bihar vidhan sabha', 'vidhan sabha', 'public sector', 'legislative', 'patna'],
-    response: `**Government & High-Security Institutional Electrification**
+    keywords: ['client', 'clients', 'partner', 'partnerships', 'relationship', 'brands', 'super stockist', 'l&t', 'channel partner', 'cg', 'areva', 'hpl', 'lucy electric', 'huphen'],
+    response: `**Trusted Relationships Across the Electrical Industry**
 
-LDS has a trusted track record executing high-profile public sector and government projects under strict compliance and security standards:
+LDS maintains verified authorizations and industry relationships:
 
-• **Bihar Vidhan Sabha (Patna)**: Complete turnkey electrification of the state legislative assembly complex, featuring high-reliability primary power distribution, secure underground feeder loops, and instantaneous DG synchronization.
-• **Compliance & Approvals**: Experienced in navigating PWD, CPWD, state electricity board approvals, and CEIG statutory clearances.`,
-    scrollTo: '#projects',
-    actions: ['Project Portfolio', 'Turnkey SITC', 'Discuss a Project'],
-  },
+• **Super Stockist / Channel Partner**: HPL Electric & Power Ltd, Lucy Electric, Huphen Electromech
+• **System House**: Larsen & Toubro Limited (L&T)
+• **Joint Ventures**:
+  - JV with **Crompton Greaves** for 132KV Substation at Assam
+  - JV with **Areva T&D Ltd** for 33/11KV Substation at Asansol
 
-  // 10. INDUSTRIAL & WAREHOUSE ELECTRIFICATION
-  {
-    keywords: ['industrial', 'warehouse', 'factory', 'plant', 'logistics', 'manufacturing', 'high bay', 'high mast'],
-    response: `**Industrial Plants & Logistics Warehouse Electrification**
+LDS also integrates equipment from leading brands including Schneider Electric, ABB, Legrand, Siemens, Havells, Polycab, Finolex, and Raychem RPG.
 
-We design and construct high-capacity electrical systems for industrial manufacturing plants and large-scale logistics warehouses:
-
-• Heavy overhead cable tray and trunking networks
-• High-bay industrial LED illumination and automated yard high-mast lighting
-• Machinery motor control centers (MCC), sub-distribution boards, and busways
-• Comprehensive lightning protection grids and earth pit arrays with low-resistance testing.`,
-    scrollTo: '#projects',
-    actions: ['Project Portfolio', 'Turnkey SITC', 'Discuss a Project'],
-  },
-
-  // 11. HOSPITALITY & TOWNSHIPS
-  {
-    keywords: ['hospitality', 'hotel', 'taj', 'sonotel', 'residential', 'township', 'signature', 'shristinagar', 'housing'],
-    response: `**Hospitality & Integrated Township Electrification**
-
-• **Taj Group of Hotels & Sonotel**: Full turnkey SITC for luxury hospitality properties, incorporating aesthetic lighting control, dual utility grid failovers, and heavy HVAC power distribution.
-• **Signature & Shristinagar Townships**: Comprehensive outdoor and indoor power distribution, multi-storey rising mains, weatherproof LT feeder pillars, and automated street lighting grids.`,
-    scrollTo: '#projects',
-    actions: ['Project Portfolio', 'Core Capabilities', 'Discuss a Project'],
-  },
-
-  // 12. KOHORA SUBSTATION SPECIFIC
-  {
-    keywords: ['kohora', 'assam substation', '100 days', '2x3.15', 'flood', 'kaziranga'],
-    response: `**Case Study: Kohora 2 × 3.15 MVA Substation (Assam)**
-
-• **Client & Location**: Power distribution utility at Kohora, near Kaziranga, Assam.
-• **Scope**: Turnkey civil foundations, 2 × 3.15 MVA power transformers, control room construction, 9-panel HT VCB switchgear, protection relay integration, and grid tie-in.
-• **Engineering Feat**: Executed and energized in **100 working days** in challenging flood-prone terrain with specialized elevated foundations and all-weather cable trenches.`,
-    scrollTo: '#projects',
-    actions: ['Substations & Switchyards', 'All Projects', 'Discuss a Project'],
-  },
-
-  // 13. SUPPLY CHAIN & VERIFIED MANUFACTURER PARTNERS
-  {
-    keywords: ['supplier', 'manufacturer', 'vendor', 'brand', 'abb', 'l&t', 'schneider', 'havells', 'crompton', 'finolex', 'kei', 'legrand', 'oem', 'supply chain'],
-    response: `**Verified Supply Chain & OEM Ecosystem**
-
-LDS integrates spec-compliant equipment from India's most respected electrical manufacturers:
-
-• **Switchgear & Automation**: L&T, ABB, Schneider Electric, Legrand, Lucy Electric
-• **Cables & Conductors**: Polycab, KEI Wires & Cables, Finolex, Havells, Utkarsh India, Raychem RPG
-• **Transformers & Power Panels**: CG Power, Crompton, Volamp, Daga Power Group, Huphen Electromech
-• **Lighting & Commercial Systems**: Philips, Wipro, Anchor by Panasonic, Bajaj Electricals, HPL Electric
-
-Every component is delivered with manufacturer test certificates (MTC), routine inspection reports, and full specification compliance.`,
+Would you like us to send your requirement to the LDS team?`,
     scrollTo: '#ecosystem',
-    actions: ['Turnkey SITC', 'Core Capabilities', 'Discuss a Project'],
+    actions: ['GET A QUOTE', 'OUR SERVICES', 'DOWNLOAD CATALOG'],
   },
 
-  // 14. QUALITY, SAFETY & COMPLIANCE
+  // 11. TESTING, COMMISSIONING & MAINTENANCE
   {
-    keywords: ['quality', 'safety', 'iso', 'certification', 'standards', 'cea', 'compliance', 'hazard', 'inspection'],
-    response: `**Quality, Safety & Statutory Compliance**
+    keywords: ['testing', 'commissioning', 'maintenance', 'routine maintenance', 'support', 'hipot', 'megger', 'amc', 'repair', 'servicing'],
+    response: `**Testing, Commissioning & Maintenance**
 
-• **Certifications**: Certified to **ISO 9001:2015** (Quality Management) and **ISO 45001:2018** (Occupational Health & Safety).
-• **Statutory Standards**: Full adherence to Central Electricity Authority (CEA) safety guidelines, Indian Electricity Rules, and State DISCOM engineering codes.
-• **Zero-Accident Protocol**: Daily safety tool-box talks (TBT), mandatory PPE compliance, calibrated safety interlocks, and verified LOTO (Lockout/Tagout) procedures during all commissioning phases.`,
-    scrollTo: '#capabilities',
-    actions: ['Turnkey SITC', 'Why Choose LDS', 'Discuss a Project'],
+LDS delivers end-to-end electrical testing, energisation and lifecycle maintenance:
+
+• **Testing**: Hipot testing, insulation resistance (Megger), relay calibration, contact resistance, earth pit resistance audits
+• **Commissioning**: Utility sync, trial energisation, load balancing and handover certification
+• **Maintenance**: Dedicated team for routine maintenance of ongoing and completed installations, transformer oil filtration, and switchgear overhaul
+
+Would you like us to send your requirement to the LDS team?`,
+    scrollTo: '#commissioning',
+    actions: ['GET A QUOTE', 'OUR SERVICES', 'DOWNLOAD CATALOG'],
   },
 
-  // 15. POST-COMMISSIONING & MAINTENANCE
+  // 12. CONTACT INFORMATION & OFFICES
   {
-    keywords: ['maintenance', 'after commissioning', 'lifecycle', 'amc', 'oil filtration', 'testing', 'breakdown', 'preventative'],
-    response: `**Beyond Commissioning — Lifecycle Support & Asset Management**
+    keywords: ['contact', 'address', 'office', 'phone', 'email', 'location', 'kolkata', 'reach', 'quote', 'get in touch', 'enquiry'],
+    response: `**Contact Lukhdatar & Sons (LDS)**
 
-Our commitment extends far beyond energisation:
+• **Registered Address**:
+  Eight Mandir Street, 4th Floor, Kolkata – 700073, West Bengal, India.
 
-• **Preventative Maintenance Contracts**: Scheduled shutdowns, busbar torque audits, and thermographic infrared inspections to detect hot-spots before failures occur.
-• **Transformer Servicing**: Dielectric oil breakdown voltage (BDV) testing, moisture de-gassing, and on-site high-vacuum oil filtration.
-• **Relay Recalibration & Testing**: Periodic secondary injection testing of numerical protection relays and breaker trip timing checks.`,
-    scrollTo: '#capabilities',
-    actions: ['Core Capabilities', 'Why Choose LDS', 'Discuss a Project'],
-  },
+• **Project Office**:
+  46C Jawaharlal Nehru Road, Everest House, Office No. 6B, Kolkata – 700071.
 
-  // 16. GEOGRAPHIC REACH & LOCATIONS
-  {
-    keywords: ['location', 'where are you', 'address', 'kolkata', 'city', 'reach', 'coverage', 'assam', 'bihar', 'pan india', 'states'],
-    response: `**Geographic Footprint & Headquarters**
+• **Official Emails**:
+  ${COMPANY.emails[0]}
+  ${COMPANY.emails[1]}
 
-• **Headquarters**: Kolkata, West Bengal, India.
-• **Operational Presence**: We execute projects across Eastern India, North-East India (Assam, Meghalaya, Arunachal Pradesh), Northern India (Uttar Pradesh, Bihar), and industrial corridors nationwide.
-• **Site Mobilization**: Our mobile engineering project management teams deploy dedicated site offices, heavy erection equipment, and certified crews directly to project locations.`,
-    actions: ['Contact Details', 'Discuss a Project', 'Major Projects'],
-  },
+• **Contact Persons**:
+  Mr. Lalit Kumar Sureka (Founder)
+  Mr. Shree Mangalam Sureka (Managing Director)
 
-  // 17. PRICING, TENDERS & COMMERCIAL QUOTATIONS
-  {
-    keywords: ['price', 'pricing', 'cost', 'quote', 'quotation', 'rate', 'how much', 'estimate', 'tender', 'rfp', 'boq', 'budget'],
-    response: `**Project Quotations & Commercial Tendering**
-
-Turnkey electrical infrastructure costs depend strictly on technical project parameters:
-
-• Approved Single-Line Diagrams (SLD) and load schedules
-• Equipment bill of quantities (BOQ) and preferred OEM makes
-• Site topography, soil resistivity, and cable routing distances
-• Utility interconnection voltage (LT, 11kV, 33kV, 132kV, 220kV)
-
-Our estimating engineers can review your tender documents, drawings, or preliminary requirements to provide an itemized commercial proposal. Would you like to submit your project requirements right now?`,
-    actions: ['Discuss a Project', 'Contact Details', 'Core Capabilities'],
-  },
-
-  // 18. CONTACT & DIRECT COMMUNICATION
-  {
-    keywords: ['contact', 'email', 'phone', 'call', 'reach out', 'inquiry', 'enquiry', 'speak to team', 'office'],
-    response: `**Contact LDS Infrastructure Pvt. Ltd.**
-
-• **Email**: **info@ldsinfrastructure.com**
-• **Headquarters**: Kolkata, West Bengal, India
-• **Business Hours**: Mon – Sat, 9:30 AM – 6:30 PM IST
-
-You can submit an immediate project enquiry by clicking **Discuss a Project** below, or email your RFP documents directly to our engineering desk.`,
-    actions: ['Discuss a Project', 'Core Capabilities', 'Major Projects'],
+Would you like to submit your project requirements directly to the LDS team now?`,
+    actions: ['GET A QUOTE', 'CHAT ON WHATSAPP', 'DOWNLOAD CATALOG'],
   },
 ]
 
-// ─────────────────────────────────────────────────────────────────────────────
-// CONVERSATIONAL NLP MATCHING ENGINE
-// ─────────────────────────────────────────────────────────────────────────────
-function matchKnowledgeQuery(query: string, previousContext?: string): { text: string; actions?: string[]; scrollTo?: string } {
-  const clean = query.toLowerCase().trim()
+// Fallback topic for unverified/unsupported queries
+const FALLBACK_TOPIC: KnowledgeTopic = {
+  keywords: [],
+  response: `I don't have that specific information in the official LDS documentation.
 
-  // Score each topic based on keyword matches and context
-  let bestTopic: KnowledgeTopic | null = null
-  let maxScore = 0
+Lukhdatar & Sons is a turnkey electrical infrastructure contractor established in 1997, specializing in substations up to 220KV, transmission lines up to 400KV, underground cabling up to 66KV, industrial electrification, and equipment supply.
 
-  for (const topic of KNOWLEDGE_TOPICS) {
-    let score = 0
-    for (const kw of topic.keywords) {
-      if (clean.includes(kw)) {
-        score += kw.length > 4 ? 3 : 2
-        // Exact whole-word bonus
-        const regex = new RegExp(`\\b${kw}\\b`, 'i')
-        if (regex.test(clean)) {
-          score += 2
-        }
-      }
-    }
-
-    if (score > maxScore) {
-      maxScore = score
-      bestTopic = topic
-    }
-  }
-
-  if (bestTopic && maxScore >= 2) {
-    return {
-      text: bestTopic.response,
-      actions: bestTopic.actions,
-      scrollTo: bestTopic.scrollTo,
-    }
-  }
-
-  // Conversational contextual fallback (No robotic canned answers)
-  return {
-    text: `Thank you for your question. While I don't have a confirmed public specification for that particular detail in my instant knowledge base, LDS Infrastructure specializes in customized turnkey electrical solutions tailored to exact client specifications.
-
-Our chief engineering team in Kolkata can review your exact single-line diagram, technical drawings, or equipment requirements directly.
-
-Would you like to outline your project scope with us or explore our delivered capabilities?`,
-    actions: ['Discuss a Project', 'Turnkey Capabilities', 'Project Portfolio', 'Contact Details'],
-  }
+Would you like us to collect your project requirement and send it directly to the LDS team for technical confirmation?`,
+  actions: ['GET A QUOTE', 'CHAT ON WHATSAPP', 'OUR SERVICES', 'DOWNLOAD CATALOG'],
 }
 
-// Quick action pill options
-const QUICK_ACTIONS = [
-  { label: 'Core Capabilities',  query: 'What are the main turnkey electrical capabilities of LDS?' },
-  { label: 'Major Projects',     query: 'What landmark projects has LDS delivered?' },
-  { label: 'Healthcare SITC',    query: 'Tell me about your healthcare and hospital electrification projects' },
-  { label: 'Substations & Lines', query: 'What are your high voltage substation and transmission line capabilities?' },
-  { label: 'Verified Suppliers', query: 'Which equipment manufacturers and brands do you partner with?' },
-  { label: 'Discuss a Project',  query: 'I would like to discuss an upcoming project enquiry' },
+// 6 Core Quick Action Definitions
+const CORE_QUICK_ACTIONS = [
+  { label: 'GET A QUOTE',          type: 'quote' },
+  { label: 'OUR SERVICES',         type: 'services' },
+  { label: 'PRODUCTS & EQUIPMENT', type: 'equipment' },
+  { label: 'PROJECTS',             type: 'projects' },
+  { label: 'DOWNLOAD CATALOG',     type: 'catalog' },
+  { label: 'CHAT ON WHATSAPP',     type: 'whatsapp' },
 ]
 
-type EnquiryStep = 'idle' | 'name' | 'company' | 'email' | 'phone' | 'type' | 'location' | 'requirement' | 'done'
+type EnquiryStep = 'idle' | 'mode_select' | 'name' | 'company' | 'phone' | 'email' | 'type' | 'location' | 'requirement' | 'confirm' | 'done'
 
 interface Message {
-  role: 'user' | 'assistant'
+  role: 'bot' | 'user'
   text: string
   actions?: string[]
+  scrollTo?: string
+  isFormatted?: boolean
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SAFE FORMATTED MESSAGE RENDERER (NO RAW MARKDOWN)
-// ─────────────────────────────────────────────────────────────────────────────
+// Helper: Formatted text renderer
 function FormattedMessage({ text }: { text: string }) {
-  // Parse paragraphs and bullet points safely into clean semantic React nodes
-  const paragraphs = useMemo(() => {
-    return text.split('\n\n').map((para, pIdx) => {
-      const lines = para.split('\n')
-
-      // Check if this paragraph contains bullet points
-      const hasBullets = lines.some(l => l.trim().startsWith('•') || l.trim().startsWith('* ') || l.trim().startsWith('- '))
-
-      if (hasBullets) {
-        return (
-          <div key={pIdx} style={{ display: 'flex', flexDirection: 'column', gap: '6px', margin: '4px 0' }}>
-            {lines.map((line, lIdx) => {
-              const trimmed = line.trim()
-              if (trimmed.startsWith('•') || trimmed.startsWith('* ') || trimmed.startsWith('- ')) {
-                const bulletContent = trimmed.replace(/^[•*-]\s*/, '')
-                return (
-                  <div key={lIdx} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', paddingLeft: '4px' }}>
-                    <span style={{ color: 'var(--accent-gold)', fontSize: '14px', lineHeight: '1.4', flexShrink: 0 }}>•</span>
-                    <span style={{ flex: 1 }}>{renderInlineFormatting(bulletContent)}</span>
-                  </div>
-                )
-              }
-              return (
-                <div key={lIdx}>
-                  {renderInlineFormatting(line)}
-                </div>
-              )
-            })}
-          </div>
-        )
-      }
-
+  const formatted = useMemo(() => {
+    const lines = text.split('\n')
+    return lines.map((line, i) => {
+      let content = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      content = content.replace(/\*(.*?)\*/g, '<em>$1</em>')
       return (
-        <p key={pIdx} style={{ margin: 0, lineHeight: 1.6 }}>
-          {lines.map((line, lIdx) => (
-            <span key={lIdx}>
-              {renderInlineFormatting(line)}
-              {lIdx < lines.length - 1 && <br />}
-            </span>
-          ))}
-        </p>
+        <span
+          key={i}
+          style={{ display: 'block', minHeight: line.trim() === '' ? '8px' : 'auto' }}
+          dangerouslySetInnerHTML={{ __html: content }}
+        />
       )
     })
   }, [text])
 
-  return <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>{paragraphs}</div>
+  return <div>{formatted}</div>
 }
 
-// Helper to render bold (**text**), italics (*text*), and clean text without exposing markdown syntax
-function renderInlineFormatting(str: string) {
-  const parts: React.ReactNode[] = []
-  // Match **bold** or *italic*
-  const regex = /(\*\*.*?\*\*|\*.*?\*)/g
-  let lastIndex = 0
-  let match: RegExpExecArray | null
-
-  while ((match = regex.exec(str)) !== null) {
-    // Push preceding plain text
-    if (match.index > lastIndex) {
-      parts.push(str.substring(lastIndex, match.index))
-    }
-
-    const token = match[0]
-    if (token.startsWith('**') && token.endsWith('**')) {
-      const boldText = token.slice(2, -2)
-      parts.push(<strong key={match.index} style={{ fontWeight: 600, color: 'inherit' }}>{boldText}</strong>)
-    } else if (token.startsWith('*') && token.endsWith('*')) {
-      const italicText = token.slice(1, -1)
-      parts.push(<em key={match.index} style={{ fontStyle: 'italic', color: 'rgba(250,248,245,0.85)' }}>{italicText}</em>)
-    } else {
-      parts.push(token)
-    }
-
-    lastIndex = regex.lastIndex
-  }
-
-  if (lastIndex < str.length) {
-    parts.push(str.substring(lastIndex))
-  }
-
-  return parts
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// CHATBOT COMPONENT
-// ─────────────────────────────────────────────────────────────────────────────
 export default function LDSChatbot() {
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const [inputValue, setInputValue] = useState('')
-  const [enquiryStep, setEnquiryStep] = useState<EnquiryStep>('idle')
-  const [enquiryData, setEnquiryData] = useState<Record<string, string>>({})
   const [isTyping, setIsTyping] = useState(false)
+
+  // Conversational Lead Collection State
+  const [enquiryStep, setEnquiryStep] = useState<EnquiryStep>('idle')
+  const [enquiryData, setEnquiryData] = useState({
+    name: '',
+    company: '',
+    phone: '',
+    email: '',
+    type: 'Industrial Electrification',
+    location: '',
+    requirement: '',
+  })
+
   const scrollRef = useRef<HTMLDivElement>(null)
+  const modalRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // Auto-scroll on new message
+  // Scroll to bottom on new messages
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }
   }, [messages, isTyping])
 
-  // Focus input when opened
+  // Focus input when chat opens
   useEffect(() => {
-    if (isOpen && inputRef.current) {
-      setTimeout(() => inputRef.current?.focus(), 120)
+    if (isOpen) {
+      setTimeout(() => inputRef.current?.focus(), 150)
     }
   }, [isOpen])
 
-  // Handle escape key
+  // Strict scroll event isolation to prevent background page scroll chaining
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        setIsOpen(false)
+    const scrollEl = scrollRef.current
+    if (!scrollEl || !isOpen) return
+
+    const handleWheel = (e: WheelEvent) => {
+      e.stopPropagation()
+      const { scrollTop, scrollHeight, clientHeight } = scrollEl
+      const isAtTop = scrollTop <= 0
+      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1
+      if ((e.deltaY < 0 && isAtTop) || (e.deltaY > 0 && isAtBottom)) {
+        e.preventDefault()
       }
     }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+
+    const handleTouchMove = (e: TouchEvent) => {
+      e.stopPropagation()
+    }
+
+    scrollEl.addEventListener('wheel', handleWheel, { passive: false })
+    scrollEl.addEventListener('touchmove', handleTouchMove, { passive: false })
+
+    return () => {
+      scrollEl.removeEventListener('wheel', handleWheel)
+      scrollEl.removeEventListener('touchmove', handleTouchMove)
+    }
   }, [isOpen])
 
-  const smoothScrollTo = (hash: string) => {
-    if (typeof window === 'undefined') return
-    const el = document.querySelector(hash)
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
+  // Direct actions
+  const openWhatsApp = useCallback(() => {
+    const phone = process.env.NEXT_PUBLIC_LDS_WHATSAPP_NUMBER || '919433059863'
+    const msg = encodeURIComponent('Hello LDS, I would like to know more about your electrical services/project.')
+    window.open(`https://wa.me/${phone}?text=${msg}`, '_blank', 'noopener,noreferrer')
+  }, [])
+
+  const downloadCatalog = useCallback(() => {
+    const link = document.createElement('a')
+    link.href = '/LDS-prospectus.pdf'
+    link.download = 'LDS-Company-Catalog.pdf'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }, [])
 
   const addMessage = useCallback((msg: Message) => {
-    setMessages(prev => [...prev, msg])
+    setMessages((prev) => [...prev, msg])
   }, [])
 
   const sendResponse = useCallback((text: string, actions?: string[], scrollTo?: string) => {
     setIsTyping(true)
     setTimeout(() => {
       setIsTyping(false)
-      addMessage({ role: 'assistant', text, actions })
-      if (scrollTo) smoothScrollTo(scrollTo)
-    }, 450 + Math.random() * 200)
+      addMessage({ role: 'bot', text, actions, scrollTo, isFormatted: true })
+    }, 350)
   }, [addMessage])
+
+  // Knowledge matching engine
+  const matchKnowledgeQuery = (query: string): { text: string; actions?: string[]; scrollTo?: string } => {
+    const q = query.toLowerCase().trim()
+
+    for (const topic of KNOWLEDGE_TOPICS) {
+      if (topic.keywords.some((k) => q.includes(k.toLowerCase()))) {
+        return { text: topic.response, actions: topic.actions, scrollTo: topic.scrollTo }
+      }
+    }
+    return { text: FALLBACK_TOPIC.response, actions: FALLBACK_TOPIC.actions }
+  }
+
+  // Submit collected lead to unified backend
+  const submitLeadToBackend = async (data: typeof enquiryData) => {
+    try {
+      const summaryText = `Lead collected via Ask LDS Bot: ${data.name} (${data.company || 'N/A'}) - Project Type: ${data.type}, Location: ${data.location || 'N/A'}. Requirement: ${data.requirement}`
+      const log = messages.map(m => `${m.role.toUpperCase()}: ${m.text}`).slice(-8)
+
+      await fetch('/api/quote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: data.name,
+          company: data.company,
+          phone: data.phone,
+          email: data.email,
+          projectType: data.type,
+          location: data.location,
+          requirement: data.requirement,
+          source: 'Ask LDS Bot',
+          conversationSummary: summaryText,
+          conversationLog: log,
+        }),
+      })
+    } catch (err) {
+      console.error('[Ask LDS Bot lead submission error]:', err)
+    }
+  }
 
   // Handle action click
   const handleAction = useCallback((action: string) => {
-    addMessage({ role: 'user', text: action })
+    const actUpper = action.toUpperCase().trim()
 
-    if (action === 'Discuss a Project') {
+    if (actUpper === 'CHAT ON WHATSAPP' || actUpper.includes('WHATSAPP')) {
+      addMessage({ role: 'user', text: 'Chat on WhatsApp' })
+      openWhatsApp()
+      sendResponse('Opening WhatsApp chat with LDS engineering desk...', ['GET A QUOTE', 'OUR SERVICES', 'DOWNLOAD CATALOG'])
+      return
+    }
+
+    if (actUpper === 'DOWNLOAD CATALOG' || actUpper.includes('CATALOG')) {
+      addMessage({ role: 'user', text: 'Download Company Catalog' })
+      downloadCatalog()
+      sendResponse('Downloading official LDS Company Catalog (PDF)...', ['GET A QUOTE', 'OUR SERVICES', 'CHAT ON WHATSAPP'])
+      return
+    }
+
+    if (actUpper === 'FILL QUOTE FORM') {
+      addMessage({ role: 'user', text: 'Fill Quote Form' })
+      openQuoteModal(enquiryData.type)
+      sendResponse('Opening official LDS Quote Form. You can fill your requirement details directly.', ['CHAT WITH LDS BOT', 'OUR SERVICES', 'CHAT ON WHATSAPP'])
+      setEnquiryStep('idle')
+      return
+    }
+
+    if (actUpper === 'CHAT WITH LDS BOT') {
+      addMessage({ role: 'user', text: 'Chat with LDS Bot' })
       setEnquiryStep('name')
+      sendResponse('Please provide your project details conversationally and our team will get in touch with an itemized quote.\n\nTo begin, may I know your **Name**?')
+      return
+    }
+
+    if (actUpper === 'GET A QUOTE' || actUpper === 'START A PROJECT') {
+      addMessage({ role: 'user', text: 'Get a Quote' })
+      setEnquiryStep('mode_select')
       sendResponse(
-        `I will be glad to record your project specifications and connect you directly with our engineering desk at LDS.\n\nTo begin, what is your **name**?`,
-        undefined
+        'Would you prefer to fill our quick Quote Form or chat step-by-step with Ask LDS Bot to send your requirements to the LDS team?',
+        ['FILL QUOTE FORM', 'CHAT WITH LDS BOT', 'CHAT ON WHATSAPP']
       )
       return
     }
 
-    const response = matchKnowledgeQuery(action)
-    sendResponse(response.text, response.actions, response.scrollTo)
-  }, [addMessage, sendResponse])
-
-  // Handle step-by-step project enquiry flow
-  const handleEnquiryInput = useCallback((value: string) => {
-    const steps: Record<EnquiryStep, { next: EnquiryStep; question: string; field: string }> = {
-      name:        { next: 'company',     field: 'name',     question: `Thank you, ${value}. What is the name of your **company or organisation**?` },
-      company:     { next: 'email',       field: 'company',  question: 'What **email address** should we send the technical proposal to?' },
-      email:       { next: 'phone',       field: 'email',    question: 'What is the best **phone number** to reach your project team?' },
-      phone:       { next: 'type',        field: 'phone',    question: 'What is the **project sector**? (e.g. Healthcare, Industrial/Warehouse, Substation, Government, Residential)' },
-      type:        { next: 'location',    field: 'type',     question: 'Where is the **project site located** (City / State)?' },
-      location:    { next: 'requirement', field: 'location', question: 'Please briefly outline the **technical scope, voltage class, or capacity requirement**.' },
-      requirement: { next: 'done',        field: 'requirement', question: '' },
-      idle: { next: 'idle', field: '', question: '' },
-      done: { next: 'done', field: '', question: '' },
+    if (actUpper === 'SEND TO LDS TEAM') {
+      addMessage({ role: 'user', text: 'Send to LDS Team' })
+      submitLeadToBackend(enquiryData)
+      setEnquiryStep('done')
+      const confirmationMsg = `**REQUEST RECEIVED**\n\nThank you. Your project enquiry has been received by LDS. Our team will review your requirement and get in touch directly at **${enquiryData.phone}** / **${enquiryData.email}**.`
+      sendResponse(confirmationMsg, ['OUR SERVICES', 'PRODUCTS & EQUIPMENT', 'DOWNLOAD CATALOG', 'CHAT ON WHATSAPP'])
+      return
     }
 
-    const currentStep = steps[enquiryStep]
-    if (!currentStep || enquiryStep === 'idle' || enquiryStep === 'done') return
+    if (actUpper === 'EDIT DETAILS') {
+      addMessage({ role: 'user', text: 'Edit Details' })
+      setEnquiryStep('name')
+      sendResponse('Let\'s update your project details. What is your **Name**?')
+      return
+    }
 
-    const updatedData = { ...enquiryData, [currentStep.field]: value }
-    setEnquiryData(updatedData)
+    // Quick selection of project types during lead flow
+    if (enquiryStep === 'type') {
+      setEnquiryData(prev => ({ ...prev, type: action }))
+      addMessage({ role: 'user', text: action })
+      setEnquiryStep('location')
+      sendResponse(`Selected **${action}**.\n\nWhere is the **Project Location** (City / State)?`)
+      return
+    }
+
+    if (actUpper === 'OUR SERVICES' || actUpper === 'VIEW SERVICES') {
+      addMessage({ role: 'user', text: 'Our Services' })
+      const res = matchKnowledgeQuery('services')
+      sendResponse(res.text, res.actions)
+      return
+    }
+
+    if (actUpper === 'PRODUCTS & EQUIPMENT' || actUpper === 'VIEW EQUIPMENT') {
+      addMessage({ role: 'user', text: 'Products & Equipment' })
+      const res = matchKnowledgeQuery('equipment')
+      sendResponse(res.text, res.actions)
+      return
+    }
+
+    if (actUpper === 'PROJECTS' || actUpper === 'VIEW PROJECTS') {
+      addMessage({ role: 'user', text: 'Projects & Industries' })
+      const res = matchKnowledgeQuery('projects')
+      sendResponse(res.text, res.actions)
+      return
+    }
+
+    addMessage({ role: 'user', text: action })
+    const response = matchKnowledgeQuery(action)
+    sendResponse(response.text, response.actions, response.scrollTo)
+  }, [addMessage, openWhatsApp, downloadCatalog, sendResponse, enquiryData, enquiryStep])
+
+  // Handle conversational lead input
+  const handleEnquiryInput = useCallback((value: string) => {
+    if (enquiryStep === 'name') {
+      setEnquiryData(prev => ({ ...prev, name: value }))
+      setEnquiryStep('company')
+      sendResponse(`Thank you, ${value}. Which **Company / Organisation** are you from?`)
+      return
+    }
+
+    if (enquiryStep === 'company') {
+      setEnquiryData(prev => ({ ...prev, company: value }))
+      setEnquiryStep('phone')
+      sendResponse('What is your **Phone Number**?')
+      return
+    }
+
+    if (enquiryStep === 'phone') {
+      setEnquiryData(prev => ({ ...prev, phone: value }))
+      setEnquiryStep('email')
+      sendResponse('What is your **Email Address**?')
+      return
+    }
+
+    if (enquiryStep === 'email') {
+      setEnquiryData(prev => ({ ...prev, email: value }))
+      setEnquiryStep('type')
+      sendResponse(
+        'What type of project do you need help with?',
+        ['Industrial Electrification', 'Substation / Switchyard', 'Transmission Lines', 'Underground Cable Work', 'Warehouse Electrification', 'Equipment Supply', 'Other']
+      )
+      return
+    }
+
+    if (enquiryStep === 'type') {
+      setEnquiryData(prev => ({ ...prev, type: value }))
+      setEnquiryStep('location')
+      sendResponse('Where is the **Project Location** (City / State)?')
+      return
+    }
+
+    if (enquiryStep === 'location') {
+      setEnquiryData(prev => ({ ...prev, location: value }))
+      setEnquiryStep('requirement')
+      sendResponse('Please briefly tell me what you need (estimated scope, equipment, voltage rating, or timeline).')
+      return
+    }
 
     if (enquiryStep === 'requirement') {
-      setEnquiryStep('done')
-      const summary = `**Project Enquiry Summary**\n\n• **Name**: ${updatedData.name}\n• **Organisation**: ${updatedData.company}\n• **Email**: ${updatedData.email}\n• **Phone**: ${updatedData.phone}\n• **Sector**: ${updatedData.type}\n• **Location**: ${updatedData.location}\n• **Scope**: ${value}\n\nThank you. Your enquiry has been recorded for technical review. Our chief engineering desk in Kolkata will examine your scope and follow up directly at **${updatedData.email}**.`
-      sendResponse(summary, ['Project Portfolio', 'Core Capabilities', 'Company Background'])
-    } else {
-      setEnquiryStep(currentStep.next)
-      sendResponse(currentStep.question)
+      const updated = { ...enquiryData, requirement: value }
+      setEnquiryData(updated)
+      setEnquiryStep('confirm')
+      const preview = `Thanks. I have your requirement:\n\n• **Name**: ${updated.name}\n• **Company**: ${updated.company || 'N/A'}\n• **Phone**: ${updated.phone}\n• **Email**: ${updated.email}\n• **Project Type**: ${updated.type}\n• **Location**: ${updated.location || 'N/A'}\n• **Requirement**: ${value}\n\nShall I send these details to the LDS team?`
+      sendResponse(preview, ['SEND TO LDS TEAM', 'EDIT DETAILS', 'CHAT ON WHATSAPP'])
+      return
     }
   }, [enquiryStep, enquiryData, sendResponse])
 
@@ -548,7 +613,7 @@ export default function LDSChatbot() {
     addMessage({ role: 'user', text: value })
     setInputValue('')
 
-    if (enquiryStep !== 'idle' && enquiryStep !== 'done') {
+    if (enquiryStep !== 'idle' && enquiryStep !== 'done' && enquiryStep !== 'confirm') {
       handleEnquiryInput(value)
       return
     }
@@ -566,7 +631,7 @@ export default function LDSChatbot() {
 
   return (
     <>
-      {/* Floating trigger button matching Explore Capabilities styling */}
+      {/* Floating trigger button */}
       <div
         style={{
           position: 'fixed',
@@ -577,24 +642,27 @@ export default function LDSChatbot() {
       >
         <button
           onClick={() => setIsOpen(!isOpen)}
-          aria-label={isOpen ? 'Close LDS Engineering Assistant' : 'Open LDS Engineering Assistant'}
+          aria-label={isOpen ? 'Close Ask LDS Bot' : 'Open Ask LDS Bot'}
           aria-expanded={isOpen}
           className="ask-lds-trigger-btn"
         >
           <span className="ask-lds-dot" />
-          <span>{isOpen ? '✕ Close' : 'Ask LDS AI'}</span>
+          <span>{isOpen ? '✕ Close' : 'Ask LDS Bot'}</span>
           {!isOpen && (
             <span className="cta-arrow">↗</span>
           )}
         </button>
       </div>
 
-      {/* Chat modal container */}
+      {/* Chat modal container with complete Lenis scroll isolation */}
       {isOpen && (
         <div
+          ref={modalRef}
           role="dialog"
           aria-modal="true"
-          aria-label="LDS Infrastructure Engineering Assistant"
+          aria-label="Ask LDS Bot — Electrical Engineering Assistant"
+          data-lenis-prevent="true"
+          className="lds-chat-modal"
           style={{
             position: 'fixed',
             bottom: '88px',
@@ -608,6 +676,8 @@ export default function LDSChatbot() {
             flexDirection: 'column',
             zIndex: 8999,
             boxShadow: '0 20px 48px rgba(0,0,0,0.55), 0 4px 16px rgba(201,160,82,0.08)',
+            overscrollBehavior: 'contain',
+            touchAction: 'pan-y',
           }}
         >
           {/* Header */}
@@ -619,6 +689,7 @@ export default function LDSChatbot() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
+              userSelect: 'none',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -633,10 +704,10 @@ export default function LDSChatbot() {
               />
               <div>
                 <div style={{ fontSize: '13px', fontWeight: 600, color: '#FAF8F5', letterSpacing: '0.02em' }}>
-                  Ask LDS AI
+                  Ask LDS Bot
                 </div>
                 <div style={{ fontSize: '10px', color: 'var(--accent-gold)', letterSpacing: '0.10em', textTransform: 'uppercase', fontWeight: 500 }}>
-                  LDS Engineering Knowledge Desk
+                  Lukhdatar &amp; Sons Engineering Desk
                 </div>
               </div>
             </div>
@@ -660,17 +731,20 @@ export default function LDSChatbot() {
             </button>
           </div>
 
-          {/* Messages list */}
+          {/* Independent Messages Scroll Container */}
           <div
             ref={scrollRef}
+            data-lenis-prevent="true"
             style={{
               flex: 1,
               overflowY: 'auto',
+              overscrollBehavior: 'contain',
               padding: '18px',
               display: 'flex',
               flexDirection: 'column',
               gap: '14px',
               background: '#121820',
+              WebkitOverflowScrolling: 'touch',
             }}
           >
             {/* Initial Welcome Greeting */}
@@ -686,36 +760,37 @@ export default function LDSChatbot() {
                   color: '#FAF8F5',
                 }}
               >
-                <FormattedMessage text="Welcome to **LDS Infrastructure Pvt. Ltd. (Lukhdatar & Sons)**. I am your engineering assistant. Ask me about our turnkey SITC capabilities, high-voltage substations, transmission lines, healthcare & institutional projects, or submit an engineering enquiry." />
+                <FormattedMessage text="Welcome to **Lukhdatar & Sons (LDS)**. I can provide verified information on our turnkey electrical services, equipment supply, substations, transmission lines, download our company catalog, or connect you for a direct quote." />
               </div>
 
-              {/* Quick action buttons */}
+              {/* 6 Quick Action Pill Buttons */}
               {messages.length === 0 && (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '4px' }}>
-                  {QUICK_ACTIONS.map(a => (
+                  {CORE_QUICK_ACTIONS.map(a => (
                     <button
                       key={a.label}
-                      onClick={() => handleAction(a.query)}
+                      onClick={() => handleAction(a.label)}
                       style={{
-                        padding: '6px 12px',
+                        padding: '7px 14px',
                         fontSize: '11px',
-                        fontWeight: 500,
-                        color: 'rgba(250, 248, 245, 0.85)',
-                        background: '#182230',
-                        border: '1px solid rgba(250, 248, 245, 0.16)',
+                        fontWeight: 600,
+                        letterSpacing: '0.06em',
+                        color: a.type === 'whatsapp' ? '#22c55e' : (a.type === 'quote' ? '#FAF8F5' : 'rgba(250, 248, 245, 0.90)'),
+                        background: a.type === 'quote' ? 'rgba(201, 160, 82, 0.22)' : '#182230',
+                        border: a.type === 'whatsapp' ? '1px solid rgba(34, 197, 94, 0.45)' : (a.type === 'quote' ? '1px solid var(--accent-gold)' : '1px solid rgba(250, 248, 245, 0.22)'),
                         borderRadius: '2px',
                         cursor: 'pointer',
                         transition: 'all 0.2s ease',
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.borderColor = 'var(--accent-gold)'
-                        e.currentTarget.style.color = '#FFFFFF'
-                        e.currentTarget.style.background = 'rgba(201, 160, 82, 0.12)'
+                        e.currentTarget.style.color = '#111820'
+                        e.currentTarget.style.background = 'var(--accent-gold)'
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.borderColor = 'rgba(250, 248, 245, 0.16)'
-                        e.currentTarget.style.color = 'rgba(250, 248, 245, 0.85)'
-                        e.currentTarget.style.background = '#182230'
+                        e.currentTarget.style.borderColor = a.type === 'whatsapp' ? 'rgba(34, 197, 94, 0.45)' : (a.type === 'quote' ? 'var(--accent-gold)' : '1px solid rgba(250, 248, 245, 0.22)')
+                        e.currentTarget.style.color = a.type === 'whatsapp' ? '#22c55e' : (a.type === 'quote' ? '#FAF8F5' : 'rgba(250, 248, 245, 0.90)')
+                        e.currentTarget.style.background = a.type === 'quote' ? 'rgba(201, 160, 82, 0.22)' : '#182230'
                       }}
                     >
                       {a.label}
@@ -730,56 +805,60 @@ export default function LDSChatbot() {
               <div
                 key={idx}
                 style={{
-                  alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start',
-                  maxWidth: '90%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: m.role === 'user' ? 'flex-end' : 'flex-start',
+                  gap: '8px',
                 }}
               >
                 <div
                   style={{
+                    maxWidth: '88%',
                     padding: '12px 16px',
                     fontSize: '13px',
                     lineHeight: 1.6,
+                    color: m.role === 'user' ? '#111820' : '#FAF8F5',
                     background: m.role === 'user' ? 'var(--accent-gold)' : '#161F2B',
-                    color: m.role === 'user' ? '#0E131A' : '#FAF8F5',
-                    fontWeight: m.role === 'user' ? 500 : 400,
-                    border: m.role === 'user' ? 'none' : '1px solid rgba(201, 160, 82, 0.18)',
-                    borderLeft: m.role === 'assistant' ? '3px solid var(--accent-gold)' : undefined,
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.25)',
+                    border: m.role === 'user' ? 'none' : '1px solid rgba(250, 248, 245, 0.10)',
+                    borderLeft: m.role === 'bot' ? '3px solid var(--accent-gold)' : 'none',
+                    borderRadius: '2px',
+                    wordBreak: 'break-word',
                   }}
                 >
-                  <FormattedMessage text={m.text} />
+                  {m.isFormatted ? <FormattedMessage text={m.text} /> : m.text}
                 </div>
 
-                {/* Optional response pill buttons */}
+                {/* Optional action buttons following a bot message */}
                 {m.actions && m.actions.length > 0 && (
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '8px' }}>
-                    {m.actions.map(act => (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '2px' }}>
+                    {m.actions.map((act) => (
                       <button
                         key={act}
                         onClick={() => handleAction(act)}
                         style={{
-                          padding: '5px 10px',
-                          fontSize: '10.5px',
+                          padding: '6px 12px',
+                          fontSize: '11px',
                           fontWeight: 600,
-                          color: 'var(--accent-gold)',
-                          background: '#182230',
-                          border: '1px solid rgba(201,160,82,0.35)',
+                          letterSpacing: '0.06em',
+                          color: act.includes('WHATSAPP') ? '#22c55e' : (act.includes('QUOTE') || act.includes('SEND') ? '#FAF8F5' : '#FAF8F5'),
+                          background: (act.includes('QUOTE') || act.includes('SEND')) ? 'rgba(201, 160, 82, 0.22)' : '#182230',
+                          border: act.includes('WHATSAPP') ? '1px solid rgba(34, 197, 94, 0.45)' : (act.includes('QUOTE') || act.includes('SEND') ? '1px solid var(--accent-gold)' : '1px solid rgba(250, 248, 245, 0.22)'),
                           borderRadius: '2px',
                           cursor: 'pointer',
                           transition: 'all 0.2s ease',
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.background = 'var(--accent-gold)'
-                          e.currentTarget.style.color = '#0E131A'
                           e.currentTarget.style.borderColor = 'var(--accent-gold)'
+                          e.currentTarget.style.color = '#111820'
+                          e.currentTarget.style.background = 'var(--accent-gold)'
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.background = '#182230'
-                          e.currentTarget.style.color = 'var(--accent-gold)'
-                          e.currentTarget.style.borderColor = 'rgba(201,160,82,0.35)'
+                          e.currentTarget.style.borderColor = act.includes('WHATSAPP') ? 'rgba(34, 197, 94, 0.45)' : (act.includes('QUOTE') || act.includes('SEND') ? 'var(--accent-gold)' : '1px solid rgba(250, 248, 245, 0.22)')
+                          e.currentTarget.style.color = act.includes('WHATSAPP') ? '#22c55e' : '#FAF8F5'
+                          e.currentTarget.style.background = (act.includes('QUOTE') || act.includes('SEND')) ? 'rgba(201, 160, 82, 0.22)' : '#182230'
                         }}
                       >
-                        {act} →
+                        {act}
                       </button>
                     ))}
                   </div>
@@ -787,29 +866,29 @@ export default function LDSChatbot() {
               </div>
             ))}
 
-            {/* Typing indicator */}
+            {/* Typing Indicator */}
             {isTyping && (
               <div
                 style={{
                   alignSelf: 'flex-start',
-                  padding: '10px 16px',
+                  padding: '10px 14px',
                   background: '#161F2B',
-                  border: '1px solid rgba(201, 160, 82, 0.18)',
+                  border: '1px solid rgba(250, 248, 245, 0.10)',
                   borderLeft: '3px solid var(--accent-gold)',
+                  borderRadius: '2px',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '6px',
+                  gap: '5px',
                 }}
               >
-                <span style={{ fontSize: '11px', color: 'rgba(250, 248, 245, 0.65)', letterSpacing: '0.04em' }}>Consulting LDS engineering records</span>
-                <span className="typing-dot" />
-                <span className="typing-dot" style={{ animationDelay: '0.2s' }} />
-                <span className="typing-dot" style={{ animationDelay: '0.4s' }} />
+                <span className="typing-dot" style={{ animationDelay: '0ms' }} />
+                <span className="typing-dot" style={{ animationDelay: '200ms' }} />
+                <span className="typing-dot" style={{ animationDelay: '400ms' }} />
               </div>
             )}
           </div>
 
-          {/* Input Footer */}
+          {/* Chat Input Field */}
           <form
             onSubmit={handleSubmit}
             style={{
@@ -827,45 +906,39 @@ export default function LDSChatbot() {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={enquiryStep !== 'idle' && enquiryStep !== 'done' ? 'Enter response...' : 'Ask about LDS capabilities, projects, scope...'}
+              placeholder={enquiryStep !== 'idle' && enquiryStep !== 'done' ? "Type your answer..." : "Ask about services, equipment, substations, quotes..."}
+              aria-label="Message to Ask LDS Bot"
               style={{
                 flex: 1,
-                padding: '11px 14px',
+                padding: '10px 14px',
                 background: '#161F2B',
-                border: '1px solid rgba(250, 248, 245, 0.18)',
+                border: '1px solid rgba(250, 248, 245, 0.15)',
                 color: '#FAF8F5',
-                fontSize: '12.5px',
+                fontSize: '13px',
                 outline: 'none',
+                borderRadius: '2px',
                 transition: 'border-color 200ms ease',
               }}
-              onFocus={(e) => {
-                e.currentTarget.style.borderColor = 'var(--accent-gold)'
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(250, 248, 245, 0.18)'
-              }}
+              onFocus={(e) => (e.target.style.borderColor = 'var(--accent-gold)')}
+              onBlur={(e) => (e.target.style.borderColor = 'rgba(250, 248, 245, 0.15)')}
             />
             <button
               type="submit"
-              aria-label="Send Message"
+              aria-label="Send message"
               style={{
-                padding: '11px 18px',
+                padding: '10px 16px',
                 background: 'var(--accent-gold)',
-                color: '#0E131A',
-                fontWeight: 600,
-                fontSize: '11px',
-                letterSpacing: '0.10em',
-                textTransform: 'uppercase',
                 border: 'none',
+                color: '#111820',
+                fontSize: '13px',
+                fontWeight: 600,
+                letterSpacing: '0.08em',
+                borderRadius: '2px',
                 cursor: 'pointer',
-                transition: 'all 200ms ease',
+                transition: 'opacity 200ms ease',
               }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#DFB56C'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'var(--accent-gold)'
-              }}
+              onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.85')}
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
             >
               Send
             </button>
@@ -873,79 +946,53 @@ export default function LDSChatbot() {
         </div>
       )}
 
-      {/* ── Scoped Styles for Ask LDS Trigger Button matching Explore Capabilities button ── */}
+      {/* Scoped Bot CSS */}
       <style>{`
         .ask-lds-trigger-btn {
           display: inline-flex;
           align-items: center;
           gap: 10px;
-          padding: 14px 22px;
-          background: rgba(17, 24, 32, 0.94);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          border: 1px solid rgba(250, 248, 245, 0.32);
-          cursor: pointer;
-          font-size: 11px;
-          font-weight: 600;
-          letter-spacing: 0.14em;
-          text-transform: uppercase;
+          padding: 13px 22px;
+          background: #121820;
+          border: 1px solid var(--accent-gold);
           color: #FAF8F5;
+          font-size: 12px;
+          font-weight: 600;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          cursor: pointer;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
           transition: all 300ms ease;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
-          user-select: none;
+          border-radius: 2px;
         }
-
         .ask-lds-trigger-btn:hover {
-          border-color: var(--accent-gold);
-          color: #FFFFFF;
-          background: rgba(201, 160, 82, 0.10);
-          box-shadow: 0 0 20px rgba(201, 160, 82, 0.20), 0 8px 24px rgba(0, 0, 0, 0.45);
+          background: #182230;
+          box-shadow: 0 12px 32px rgba(201, 160, 82, 0.25);
+          transform: translateY(-2px);
         }
-
         .ask-lds-dot {
           width: 7px;
           height: 7px;
           border-radius: 50%;
-          background: var(--accent-gold);
-          flex-shrink: 0;
-          box-shadow: 0 0 8px rgba(201, 160, 82, 0.8);
-          transition: transform 250ms ease;
+          background: #22c55e;
+          box-shadow: 0 0 8px rgba(34, 197, 94, 0.8);
+          animation: pulse-green 2s infinite ease-in-out;
         }
-
-        .ask-lds-trigger-btn:hover .ask-lds-dot {
-          transform: scale(1.2);
-          box-shadow: 0 0 12px rgba(201, 160, 82, 1);
+        @keyframes pulse-green {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.4; transform: scale(0.85); }
         }
-
-        .ask-lds-trigger-btn .cta-arrow {
-          display: inline-block;
-          color: var(--accent-gold);
-          font-size: 13px;
-          transition: transform 250ms ease;
-        }
-
-        .ask-lds-trigger-btn:hover .cta-arrow {
-          transform: translate(2px, -2px);
-        }
-
         .typing-dot {
-          display: inline-block;
-          width: 4px;
-          height: 4px;
-          border-radius: 50%;
+          width: 5px;
+          height: 5px;
           background: var(--accent-gold);
-          animation: dot-pulse 1.2s infinite ease-in-out;
+          border-radius: 50%;
+          display: inline-block;
+          animation: typing-blink 1.2s infinite ease-in-out;
         }
-
-        @keyframes dot-pulse {
-          0%, 80%, 100% {
-            opacity: 0.2;
-            transform: scale(0.8);
-          }
-          40% {
-            opacity: 1;
-            transform: scale(1.2);
-          }
+        @keyframes typing-blink {
+          0%, 80%, 100% { transform: scale(0.6); opacity: 0.3; }
+          40% { transform: scale(1); opacity: 1; }
         }
       `}</style>
     </>

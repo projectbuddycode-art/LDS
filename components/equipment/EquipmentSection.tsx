@@ -34,7 +34,7 @@ export default function EquipmentSection() {
         section.querySelectorAll('[data-eq-card]').forEach((card, i) => {
           gsap.fromTo(card,
             { scale: 0.96, opacity: 0 },
-            { scale: 1, opacity: 1, duration: 0.75, ease: 'power2.out', delay: i * 0.12,
+            { scale: 1, opacity: 1, duration: 0.75, ease: 'power2.out', delay: i * 0.1,
               scrollTrigger: { trigger: card, start: 'top 88%', once: true } }
           )
         })
@@ -49,15 +49,21 @@ export default function EquipmentSection() {
   }, [])
 
   const mediaMap: Record<string, string> = {
-    busduct: MEDIA.equipment.busduct,
-    capacitorBank: MEDIA.equipment.capacitorBank,
+    transformers:       MEDIA.equipment.transformers,
+    switchgear:         MEDIA.equipment.switchgear,
     powerControlCenter: MEDIA.equipment.powerControlCenter,
+    capacitorBank:      MEDIA.equipment.capacitorBank,
+    busduct:            MEDIA.equipment.busduct,
+    apfcControlPanels:  MEDIA.equipment.apfcControlPanels,
   }
 
   const posterMap: Record<string, string> = {
-    busduct: '/media/posters/busduct.jpg',
-    capacitorBank: '/media/posters/capacitor-bank.jpg',
+    transformers:       '/media/posters/hero-bg.jpg',
+    switchgear:         '/media/posters/substation.jpg',
     powerControlCenter: '/media/posters/power-control-center.jpg',
+    capacitorBank:      '/media/posters/capacitor-bank.jpg',
+    busduct:            '/media/posters/busduct.jpg',
+    apfcControlPanels:  '/media/posters/capacitor-bank.jpg',
   }
 
   return (
@@ -72,21 +78,26 @@ export default function EquipmentSection() {
         <div style={{ marginBottom: 'clamp(36px, 4vw, 56px)' }}>
           <div data-reveal className="section-label">
             <span className="section-label-bullet" />
-            <span className="t-label">07 — Equipment Range</span>
+            <span className="t-label">07 — Products &amp; Equipment</span>
           </div>
           <h2 data-reveal className="t-headline" style={{ marginBottom: '16px' }}>
-            Delivered &
+            Electrical Equipment Built for
             <br />
-            <span style={{ color: 'var(--accent-gold)' }}>installed.</span>
+            <span style={{ color: 'var(--accent-gold)' }}>Reliable Performance.</span>
           </h2>
-          <p data-reveal className="t-body" style={{ maxWidth: '380px' }}>
-            Lukhdatar & Sons supplies and installs a complete range of HT/LT electrical equipment —
-            from bus ducts and capacitor banks to MCC/PCC panels, transformers and distribution boards.
+          <p data-reveal className="t-body" style={{ maxWidth: '440px' }}>
+            Lukhdatar &amp; Sons supplies and installs a complete range of HT/LT electrical equipment —
+            from transformers and MV/LV switchgear to bus ducts, capacitor banks, PCC/MCC panels and distribution boards.
           </p>
         </div>
 
-        {/* Equipment video cards */}
-        <div id="equipment-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2px', marginBottom: 'clamp(40px, 5vw, 64px)' }}>
+        {/* Equipment video cards (6 categories mapped to cinematics) */}
+        <div id="equipment-grid" style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: '12px',
+          marginBottom: 'clamp(40px, 5vw, 64px)'
+        }}>
           {EQUIPMENT_RANGE.map((item) => (
             <div key={item.id} data-eq-card className="equipment-card" style={{
               position: 'relative', aspectRatio: '4/5',
@@ -94,20 +105,23 @@ export default function EquipmentSection() {
             }}>
               <div className="equipment-card-media" style={{ position: 'absolute', inset: 0, transition: 'transform 500ms cubic-bezier(0.16, 1, 0.3, 1)' }}>
                 <LazyVideo
-                  src={mediaMap[item.mediaKey]}
-                  poster={posterMap[item.mediaKey]}
+                  src={mediaMap[item.mediaKey] || MEDIA.equipment.busduct}
+                  poster={posterMap[item.mediaKey] || '/media/posters/busduct.jpg'}
                   aria-label={item.title}
                 />
               </div>
               <div style={{
                 position: 'absolute', inset: 0,
-                background: 'linear-gradient(to top, rgba(10,14,18,0.78) 0%, transparent 50%)',
+                background: 'linear-gradient(to top, rgba(10,14,18,0.85) 0%, rgba(10,14,18,0.2) 40%, transparent 70%)',
                 zIndex: 2,
               }} />
               <div style={{ position: 'absolute', bottom: '24px', left: '24px', right: '24px', zIndex: 3 }}>
-                <div className="t-label" style={{ color: 'rgba(250,248,245,0.50)', marginBottom: '6px' }}>Equipment</div>
-                <div style={{ fontSize: 'clamp(15px, 1.3vw, 18px)', fontWeight: 600, color: '#FAF8F5', letterSpacing: '-0.01em' }}>
+                <div className="t-label" style={{ color: 'var(--accent-gold)', marginBottom: '6px' }}>Equipment Category</div>
+                <div style={{ fontSize: 'clamp(16px, 1.3vw, 19px)', fontWeight: 600, color: '#FAF8F5', letterSpacing: '-0.01em', marginBottom: '4px' }}>
                   {item.title}
+                </div>
+                <div style={{ fontSize: '12px', color: 'rgba(250,248,245,0.65)', lineHeight: 1.4 }}>
+                  {item.desc}
                 </div>
               </div>
             </div>
@@ -120,11 +134,11 @@ export default function EquipmentSection() {
             display: 'flex', alignItems: 'center', gap: '16px',
             marginBottom: '24px', borderBottom: '1px solid var(--line)', paddingBottom: '16px',
           }}>
-            <span className="t-label" style={{ color: 'var(--text-muted)' }}>Full Equipment Range</span>
+            <span className="t-label" style={{ color: 'var(--text-muted)' }}>Complete Equipment &amp; Panel Range</span>
             <div style={{ flex: 1, height: '1px', background: 'var(--line-soft)' }} />
           </div>
           <div style={{
-            display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+            display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
             border: '1px solid var(--line)',
           }}>
             {EQUIPMENT_CATEGORIES.map((cat) => (
@@ -155,13 +169,8 @@ export default function EquipmentSection() {
           transform: scale(1.03);
         }
         @media (max-width: 768px) {
-          #equipment-header {
-            grid-template-columns: 1fr !important;
-            gap: 16px !important;
-          }
           #equipment-grid {
             grid-template-columns: 1fr !important;
-            gap: 12px !important;
           }
         }
       `}</style>

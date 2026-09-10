@@ -1,10 +1,9 @@
 // Centralized media manifest for LDS Infrastructure website
-// All paths are relative to /public/media/
-// When replacing placeholders, update only this file.
+// Sourced strictly from verified project assets in /public/media/
 
 export const MEDIA = {
   // ── Intro + Hero ─────────────────────────────────────────
-  introVideo: '/media/white-logo-intro.mp4',
+  introVideo: '/media/intro-101.mp4',
   heroVideo: '/media/hero-bg.mp4',
 
   // ── Leadership ───────────────────────────────────────────
@@ -19,11 +18,14 @@ export const MEDIA = {
   // ── Transmission ─────────────────────────────────────────
   transmission: '/media/substation.mp4',
 
-  // ── Equipment Range ──────────────────────────────────────
+  // ── Equipment Range & Cinematic Mapping ──────────────────
   equipment: {
-    busduct:           '/media/busduct.mp4',
-    capacitorBank:     '/media/capacitor-bank.mp4',
+    transformers:       '/media/hero-bg.mp4',
+    switchgear:         '/media/substation.mp4',
+    busduct:            '/media/busduct.mp4',
+    capacitorBank:      '/media/capacitor-bank.mp4',
     powerControlCenter: '/media/power-control-center.mp4',
+    apfcControlPanels:  '/media/capacitor-bank.mp4',
   },
 
   // ── Turnkey / Workforce ──────────────────────────────────
@@ -43,22 +45,25 @@ export const MEDIA = {
     shristinagar:      '/media/shristinagar.mp4',
   },
 
-  // ── Industries Section ───────────────────────────────────
-  // Keys match INDUSTRIES[].mediaKey in data/content.ts exactly.
-  // Filenames verified against /public/media/ directory.
+  // ── Industries Section (8 Dedicated Sectors) ─────────────
+  // Dedicated videos mapped per specification.
   industries: {
-    education:      '/media/campus.mp4',        // 01 — Campus/Educational electrical infrastructure
-    commercial:     '/media/commercial.mp4',    // 02 — Commercial complex electrical infrastructure
-    residential:    '/media/residential.mp4',   // 03 — Residential / township electrical infrastructure
-    medical:        '/media/hospital.mp4',      // 04 — Hospital electrical infrastructure
-    township:       '/media/township.mp4',      // 05 — Township electrification
-    warehousing:    '/media/warehouse.mp4',     // 06 — Warehouse / logistics electrical systems
-    manufacturing:  '/media/industrial.mp4',    // 07 — Industrial electrical infrastructure
+    manufacturing:        '/media/industrial.mp4',      // 01 — Manufacturing
+    commercial:           '/media/commercial.mp4',      // 02 — Commercial
+    warehousing:          '/media/warehouse.mp4',       // 03 — Warehousing
+    realEstate:           '/media/residential.mp4',     // 04 — Real Estate
+    institutions:         '/media/campus.mp4',          // 05 — Institutions
+    utilities:            '/media/substation.mp4',      // 06 — Utilities
+    industrialFacilities: '/media/industrial.mp4',      // 07 — Industrial Facilities (Dedicated)
+    infrastructure:       '/media/infrastructure.mp4',  // 08 — Infrastructure (Dedicated)
   },
 
   // ── Beyond Commissioning / Accountability ────────────────
   accountability:      '/media/accountability.mp4',
   beyondCommissioning: '/media/beyond-commissioning.mp4',
+
+  // ── Company Catalog PDF ──────────────────────────────────
+  catalogPdf: '/LDS-prospectus.pdf',
 } as const
 
 export type MediaKey = typeof MEDIA

@@ -3,239 +3,392 @@
 import { useState } from 'react'
 import PageLayout from '@/components/layout/PageLayout'
 import BackNav from '@/components/navigation/BackNav'
-import { COMPANY } from '@/data/content'
+import { COMPANY, EQUIPMENT_CATEGORIES, EQUIPMENT_RANGE } from '@/data/content'
+import { MEDIA } from '@/data/media'
+import LazyVideo from '@/components/LazyVideo'
+import { PROJECT_TYPES } from '@/components/quote/QuoteModal'
 
-export default function VendorPage() {
+export default function ProductsEquipmentPage() {
   const [formSubmitted, setFormSubmitted] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
   const [formData, setFormData] = useState({
-    organisation: '',
     name: '',
-    email: '',
+    company: '',
     phone: '',
-    projectType: 'Turnkey Electrification',
-    enquiryType: 'Procurement Evaluation',
+    email: '',
+    projectType: 'Electrical Equipment Supply',
     location: '',
     requirement: '',
+    message: '',
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Simulated form submission
-    setFormSubmitted(true)
+    setErrorMessage('')
+
+    if (!formData.name.trim() || !formData.phone.trim() || !formData.email.trim() || !formData.requirement.trim()) {
+      setErrorMessage('Please fill in all required fields.')
+      return
+    }
+
+    setIsSubmitting(true)
+    try {
+      const res = await fetch('/api/quote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          source: 'Website Quote Form',
+        }),
+      })
+      const data = await res.json()
+      if (res.ok && data.success) {
+        setFormSubmitted(true)
+      } else {
+        setErrorMessage(data.error || 'Failed to submit quote request.')
+      }
+    } catch (err) {
+      setErrorMessage('Network error. Please try again or reach LDS directly.')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const mediaMap: Record<string, string> = {
+    transformers:       MEDIA.equipment.transformers,
+    switchgear:         MEDIA.equipment.switchgear,
+    powerControlCenter: MEDIA.equipment.powerControlCenter,
+    capacitorBank:      MEDIA.equipment.capacitorBank,
+    busduct:            MEDIA.equipment.busduct,
+    apfcControlPanels:  MEDIA.equipment.apfcControlPanels,
+  }
+
+  const posterMap: Record<string, string> = {
+    transformers:       '/media/posters/hero-bg.jpg',
+    switchgear:         '/media/posters/substation.jpg',
+    powerControlCenter: '/media/posters/power-control-center.jpg',
+    capacitorBank:      '/media/posters/capacitor-bank.jpg',
+    busduct:            '/media/posters/busduct.jpg',
+    apfcControlPanels:  '/media/posters/capacitor-bank.jpg',
   }
 
   return (
     <PageLayout>
-      {/* Hero section */}
+      {/* ── Hero Section ──────────────────────────────────────────────────────── */}
       <section className="section-py" style={{ background: 'var(--bg-primary)', borderBottom: '1px solid var(--line-soft)', marginTop: '72px' }}>
         <div className="site-container">
           <BackNav fallbackHref="/" label="Home" />
           <div className="section-label">
             <span className="section-label-bullet" />
-            <span className="t-label">Procurement & Evaluation</span>
+            <span className="t-label">PRODUCTS &amp; EQUIPMENT</span>
           </div>
           <h1 className="t-headline" style={{ marginBottom: '24px', fontSize: 'clamp(32px, 5vw, 64px)', lineHeight: 1.05 }}>
-            Vendor & Project
+            Electrical Equipment Built for
             <br />
-            <span style={{ color: 'var(--accent-gold)' }}>Capabilities Profile</span>
+            <span style={{ color: 'var(--accent-gold)' }}>Reliable Performance.</span>
           </h1>
           <p className="t-body" style={{ maxWidth: '680px', fontSize: 'clamp(16px, 1.2vw, 20px)', lineHeight: 1.6 }}>
-            Factual operational datasets, business scope parameters, safety practices, and compliance structures for procurement team evaluations.
+            Lukhdatar &amp; Sons supplies and installs spec-compliant power distribution equipment, transformers, switchgear, control panels, and bus duct trunking.
           </p>
         </div>
       </section>
 
-      {/* Main categories */}
+      {/* ── Equipment Cinematics Section (Stable Frame Dimensions) ─────────────── */}
       <section className="section-py" style={{ background: 'var(--bg-secondary)', borderBottom: '1px solid var(--line-soft)' }}>
         <div className="site-container">
-          <div className="two-col" style={{ alignItems: 'start' }}>
-            {/* Left side — structured evaluation sections */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-              <div className="section-label">
-                <span className="section-label-bullet" />
-                <span className="t-label">Evaluation Checklist</span>
-              </div>
-              
-              {[
-                { num: '01', title: 'Company Information', text: `Legal Name: ${COMPANY.legalName}. Established in 1997. Turnkey electrical contractor since 2007. Location: ${COMPANY.location}.` },
-                { num: '02', title: 'Business Scope', text: 'Turnkey electrical project contracting, substations and switchyards installation up to 220KV, transmission lines erection up to 400KV, and underground cable laying up to 66KV.' },
-                { num: '03', title: 'Engineering Capability', text: 'Detailed electrical load calculation, protection relay coordination mapping, schematics and SLD development.' },
-                { num: '04', title: 'Project Delivery', text: 'Integrated supply chain orchestration from approved manufacturers, field site construction, VCB erection, and cable pulling.' },
-                { num: '05', title: 'Quality Approach', text: 'Comprehensive incoming inspection of switchgears, testing on site, and compliance documentation handover.' },
-                { num: '06', title: 'Safety Approach', text: 'Strict PPE compliance on site, ground insulation audits, earth pit continuity checks, and compliance monitoring.' },
-                { num: '07', title: 'Testing & Commissioning', text: 'Pre-commissioning tests, insulation resistance checks, relay settings calibration, and load trial supervisions.' },
-                { num: '08', title: 'Maintenance Capability', text: 'Transformer oil filtration, preventative shutdown calibrations, breaker servicing, and predictive troubleshooting.' },
-                { num: '09', title: 'Project Documentation', text: 'Factual as-built schematics, manufacturer testing logs, earth resistance audit certificates, and safety clearances.' }
-              ].map((sec) => (
-                <div key={sec.num} style={{ borderBottom: '1px solid var(--line-soft)', paddingBottom: '24px' }}>
-                  <h3 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px', display: 'flex', gap: '12px' }}>
-                    <span style={{ color: 'var(--accent-gold)' }}>{sec.num}</span>
-                    <span>{sec.title}</span>
+          <div className="section-label" style={{ marginBottom: '20px' }}>
+            <span className="section-label-bullet" />
+            <span className="t-label">PRIMARY EQUIPMENT CATEGORIES</span>
+          </div>
+          <h2 className="t-headline" style={{ fontSize: 'clamp(26px, 3.2vw, 40px)', marginBottom: '36px' }}>
+            Power Distribution &amp;
+            <br />
+            <span style={{ color: 'var(--accent-gold)' }}>Control Assemblies</span>
+          </h2>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gap: '16px',
+            marginBottom: '48px',
+          }}>
+            {EQUIPMENT_RANGE.map((item) => (
+              <div
+                key={item.id}
+                style={{
+                  position: 'relative',
+                  aspectRatio: '4/5',
+                  overflow: 'hidden',
+                  background: 'var(--surface)',
+                  border: '1px solid var(--line-soft)',
+                }}
+              >
+                {/* Video adapts to frame with object-fit: cover, frame never resizes */}
+                <div style={{ position: 'absolute', inset: 0 }}>
+                  <LazyVideo
+                    src={mediaMap[item.mediaKey] || MEDIA.equipment.busduct}
+                    poster={posterMap[item.mediaKey] || '/media/posters/busduct.jpg'}
+                    autoPlay
+                    muted
+                    playsInline
+                    loop
+                  />
+                </div>
+                <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'linear-gradient(to top, rgba(17,24,32,0.92) 0%, rgba(17,24,32,0.3) 50%, transparent 100%)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-end',
+                  padding: '28px 24px',
+                }}>
+                  <div style={{ fontSize: '10px', fontWeight: 600, color: 'var(--accent-gold)', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '8px' }}>
+                    Equipment Category
+                  </div>
+                  <h3 style={{ fontSize: '20px', fontWeight: 600, color: '#FAF8F5', marginBottom: '8px' }}>
+                    {item.title}
                   </h3>
-                  <p className="t-body" style={{ fontSize: '13px', margin: 0, paddingLeft: '32px' }}>
-                    {sec.text}
+                  <p style={{ fontSize: '12.5px', color: 'rgba(250,248,245,0.72)', lineHeight: 1.5, margin: 0 }}>
+                    {item.desc}
                   </p>
                 </div>
-              ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Equipment Categories List & Quote Form (Section 24) ────────────────── */}
+      <section className="section-py" id="quote" style={{ background: 'var(--bg-primary)' }}>
+        <div className="site-container">
+          <div className="two-col" style={{ alignItems: 'start' }}>
+            {/* Left Column: Full 17 Prospectus Equipment Items */}
+            <div>
+              <div className="section-label" style={{ marginBottom: '16px' }}>
+                <span className="section-label-bullet" />
+                <span className="t-label">VERIFIED EQUIPMENT RANGE</span>
+              </div>
+              <h2 className="t-headline" style={{ fontSize: 'clamp(24px, 3vw, 38px)', marginBottom: '24px' }}>
+                Complete Switchgear,
+                <br />
+                <span style={{ color: 'var(--accent-gold)' }}>Panels &amp; Distribution</span>
+              </h2>
+              <p className="t-body" style={{ maxWidth: '480px', marginBottom: '32px' }}>
+                Manufactured and supplied to strict technical specifications. Available in standard and custom engineering configurations with full compliance documentation.
+              </p>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '10px' }}>
+                {EQUIPMENT_CATEGORIES.map((cat, idx) => (
+                  <div
+                    key={cat}
+                    style={{
+                      padding: '14px 18px',
+                      background: 'var(--bg-light)',
+                      border: '1px solid var(--line-soft)',
+                      fontSize: '13px',
+                      fontWeight: 500,
+                      color: 'var(--text-primary)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                    }}
+                  >
+                    <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: 'var(--accent-gold)', flexShrink: 0 }} />
+                    <span>{cat}</span>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            {/* Right side — Inquiry form container */}
+            {/* Right Column: Simple Indian-Business Friendly "Get a Quote" Form */}
             <div style={{ background: 'var(--bg-light)', border: '1px solid var(--line-gold)', padding: 'clamp(24px, 3.5vw, 40px)', position: 'sticky', top: '100px' }}>
               {!formSubmitted ? (
-                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   <div>
-                    <h3 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>
-                      Vendor Enquiry Form
+                    <div className="section-label" style={{ marginBottom: '6px' }}>
+                      <span className="section-label-bullet" />
+                      <span className="t-label">Direct Enquiry</span>
+                    </div>
+                    <h3 className="t-headline" style={{ fontSize: '22px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>
+                      GET A QUOTE
                     </h3>
-                    <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: 0 }}>
-                      Submit your evaluation checklist or project parameters.
+                    <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0 }}>
+                      Tell us about your electrical project and our team will get in touch.
                     </p>
                   </div>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                      Organisation *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.organisation}
-                      onChange={(e) => setFormData({ ...formData, organisation: e.target.value })}
-                      style={{ padding: '10px 14px', background: 'var(--bg-primary)', border: '1px solid var(--line)', fontSize: '13px', color: 'var(--text-primary)' }}
-                    />
-                  </div>
+                  {errorMessage && (
+                    <div style={{ background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#dc2626', padding: '10px 14px', fontSize: '12.5px' }}>
+                      {errorMessage}
+                    </div>
+                  )}
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                       <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                        Contact Name *
+                        Full Name *
                       </label>
                       <input
                         type="text"
                         required
+                        placeholder="Your Name"
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        style={{ padding: '10px 14px', background: 'var(--bg-primary)', border: '1px solid var(--line)', fontSize: '13px', color: 'var(--text-primary)', width: '100%' }}
+                        style={{ padding: '10px 12px', background: 'var(--bg-primary)', border: '1px solid var(--line)', fontSize: '13px', color: 'var(--text-primary)', width: '100%' }}
                       />
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                       <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                        Business Email *
+                        Company Name
                       </label>
                       <input
-                        type="email"
-                        required
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        style={{ padding: '10px 14px', background: 'var(--bg-primary)', border: '1px solid var(--line)', fontSize: '13px', color: 'var(--text-primary)', width: '100%' }}
+                        type="text"
+                        placeholder="Company"
+                        value={formData.company}
+                        onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                        style={{ padding: '10px 12px', background: 'var(--bg-primary)', border: '1px solid var(--line)', fontSize: '13px', color: 'var(--text-primary)', width: '100%' }}
                       />
                     </div>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                       <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                         Phone Number *
                       </label>
                       <input
-                        type="text"
+                        type="tel"
                         required
+                        placeholder="+91 Phone"
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        style={{ padding: '10px 14px', background: 'var(--bg-primary)', border: '1px solid var(--line)', fontSize: '13px', color: 'var(--text-primary)', width: '100%' }}
+                        style={{ padding: '10px 12px', background: 'var(--bg-primary)', border: '1px solid var(--line)', fontSize: '13px', color: 'var(--text-primary)', width: '100%' }}
                       />
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                       <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                        Project Location *
+                        Email *
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        placeholder="Email Address"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        style={{ padding: '10px 12px', background: 'var(--bg-primary)', border: '1px solid var(--line)', fontSize: '13px', color: 'var(--text-primary)', width: '100%' }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                      <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                        Project Type *
+                      </label>
+                      <select
+                        value={formData.projectType}
+                        onChange={(e) => setFormData({ ...formData, projectType: e.target.value })}
+                        style={{ padding: '10px 12px', background: 'var(--bg-primary)', border: '1px solid var(--line)', fontSize: '13px', color: 'var(--text-primary)', width: '100%' }}
+                      >
+                        {PROJECT_TYPES.map((type) => (
+                          <option key={type} value={type}>{type}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                      <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                        Project Location
                       </label>
                       <input
                         type="text"
-                        required
+                        placeholder="City, State"
                         value={formData.location}
                         onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                        style={{ padding: '10px 14px', background: 'var(--bg-primary)', border: '1px solid var(--line)', fontSize: '13px', color: 'var(--text-primary)', width: '100%' }}
+                        style={{ padding: '10px 12px', background: 'var(--bg-primary)', border: '1px solid var(--line)', fontSize: '13px', color: 'var(--text-primary)', width: '100%' }}
                       />
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                     <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                      Requirement Type
-                    </label>
-                    <select
-                      value={formData.projectType}
-                      onChange={(e) => setFormData({ ...formData, projectType: e.target.value })}
-                      style={{ padding: '10px 14px', background: 'var(--bg-primary)', border: '1px solid var(--line)', fontSize: '13px', color: 'var(--text-primary)', cursor: 'pointer' }}
-                    >
-                      <option>Turnkey Electrification</option>
-                      <option>Substations & Switchyards</option>
-                      <option>Transmission Lines</option>
-                      <option>Underground Cable Laying</option>
-                      <option>Industrial Electrification</option>
-                      <option>Testing & Commissioning</option>
-                      <option>Electrical Maintenance</option>
-                    </select>
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                      Enquiry Purpose
-                    </label>
-                    <select
-                      value={formData.enquiryType}
-                      onChange={(e) => setFormData({ ...formData, enquiryType: e.target.value })}
-                      style={{ padding: '10px 14px', background: 'var(--bg-primary)', border: '1px solid var(--line)', fontSize: '13px', color: 'var(--text-primary)', cursor: 'pointer' }}
-                    >
-                      <option>Procurement Evaluation</option>
-                      <option>OEM Partnership Explore</option>
-                      <option>Project Bid RFP</option>
-                      <option>Other Enquiry</option>
-                    </select>
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                      Brief Requirement Description *
+                      Requirement / Project Details *
                     </label>
                     <textarea
                       required
+                      rows={2}
+                      placeholder="e.g. 11KV Substation, PCC Panels, Cable Laying"
                       value={formData.requirement}
                       onChange={(e) => setFormData({ ...formData, requirement: e.target.value })}
-                      rows={4}
-                      style={{ padding: '10px 14px', background: 'var(--bg-primary)', border: '1px solid var(--line)', fontSize: '13px', color: 'var(--text-primary)', resize: 'vertical', fontFamily: 'inherit' }}
+                      style={{ padding: '10px 12px', background: 'var(--bg-primary)', border: '1px solid var(--line)', fontSize: '13px', color: 'var(--text-primary)', resize: 'vertical' }}
                     />
                   </div>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                     <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                      Upload Tender / Spec Document (Optional)
+                      Message (Optional)
                     </label>
-                    <input
-                      type="file"
-                      style={{ fontSize: '12px', color: 'var(--text-secondary)' }}
+                    <textarea
+                      rows={2}
+                      value={formData.message}
+                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                      placeholder="Additional project details or timeline..."
+                      style={{ padding: '10px 12px', background: 'var(--bg-primary)', border: '1px solid var(--line)', fontSize: '13px', color: 'var(--text-primary)', resize: 'vertical' }}
                     />
                   </div>
 
-                  <button type="submit" className="cta-btn cta-btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: '10px' }}>
-                    Submit Enquiry
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="cta-btn cta-btn-primary"
+                    style={{
+                      justifyContent: 'center',
+                      padding: '13px 20px',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      letterSpacing: '0.12em',
+                      textTransform: 'uppercase',
+                      cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                      opacity: isSubmitting ? 0.7 : 1,
+                    }}
+                  >
+                    {isSubmitting ? 'SENDING REQUEST...' : 'SEND REQUEST ↗'}
                   </button>
                 </form>
               ) : (
-                <div style={{ textAlign: 'center', padding: '40px 0' }}>
-                  <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(201,160,82,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                      <path d="M20 6L9 17L4 12" stroke="var(--accent-gold)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
+                <div style={{ textAlign: 'center', padding: '32px 16px' }}>
+                  <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(201, 160, 82, 0.15)', border: '1px solid var(--accent-gold)', color: 'var(--accent-gold)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px', margin: '0 auto 16px' }}>
+                    ✓
                   </div>
-                  <h3 style={{ fontSize: '20px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>
-                    Enquiry Submitted
+                  <div className="section-label" style={{ justifyContent: 'center', marginBottom: '8px' }}>
+                    <span className="section-label-bullet" />
+                    <span className="t-label">Submission Confirmed</span>
+                  </div>
+                  <h3 className="t-headline" style={{ fontSize: '22px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '12px' }}>
+                    REQUEST RECEIVED
                   </h3>
-                  <p className="t-body" style={{ fontSize: '13px', lineHeight: 1.6, marginBottom: '24px' }}>
-                    Thank you. Lukhdatar & Sons' engineering and procurement team will evaluate your specifications and follow up at <strong>{formData.email}</strong>.
+                  <p className="t-body" style={{ fontSize: '13.5px', color: 'var(--text-secondary)', lineHeight: 1.65, marginBottom: '24px' }}>
+                    Thank you. Your project enquiry has been received by LDS. Our team will review your requirement and get in touch.
                   </p>
-                  <button onClick={() => setFormSubmitted(false)} className="cta-btn">
-                    Submit Another Enquiry
+                  <button
+                    onClick={() => {
+                      setFormSubmitted(false)
+                      setFormData({
+                        name: '',
+                        company: '',
+                        phone: '',
+                        email: '',
+                        projectType: 'Electrical Equipment Supply',
+                        location: '',
+                        requirement: '',
+                        message: '',
+                      })
+                    }}
+                    className="cta-btn"
+                    style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.10em', margin: '0 auto' }}
+                  >
+                    Submit Another Requirement
                   </button>
                 </div>
               )}
