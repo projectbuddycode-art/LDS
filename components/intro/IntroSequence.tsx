@@ -104,10 +104,19 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
       }
     }, 11000)
 
+    // Escape or Space key skips intro
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' || e.key === ' ' || e.key === 'Enter') {
+        finishSequence()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+
     return () => {
       if (fallbackTimerRef.current) {
         clearTimeout(fallbackTimerRef.current)
       }
+      window.removeEventListener('keydown', handleKeyDown)
       video.removeEventListener('loadeddata', handleVideoReady)
       video.removeEventListener('canplay', handleVideoReady)
       video.removeEventListener('canplaythrough', handleVideoReady)
@@ -120,7 +129,6 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
     <div
       ref={containerRef}
       className="intro-fullscreen-overlay"
-      onClick={finishSequence}
       style={{
         position: 'fixed',
         inset: 0,
@@ -134,7 +142,6 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
         overflow: 'hidden',
         opacity: 1,
         willChange: 'opacity',
-        cursor: 'pointer',
       }}
       aria-label="LDS Cinematic Intro 101"
     >
@@ -196,6 +203,52 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
         }}
       />
 
+      {/* ── Premium Top-Right Skip Intro CTA ── */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation()
+          finishSequence()
+        }}
+        aria-label="Skip Intro"
+        className="intro-skip-btn"
+        style={{
+          position: 'absolute',
+          top: 'clamp(20px, 3.5vw, 36px)',
+          right: 'clamp(20px, 3.5vw, 36px)',
+          zIndex: 10,
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '10px 18px',
+          background: 'rgba(10, 14, 18, 0.75)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          border: '1px solid rgba(201, 160, 82, 0.45)',
+          color: '#FAF8F5',
+          fontSize: '11px',
+          fontWeight: 600,
+          letterSpacing: '0.14em',
+          textTransform: 'uppercase',
+          borderRadius: '2px',
+          cursor: 'pointer',
+          transition: 'all 250ms cubic-bezier(0.4, 0, 0.2, 1)',
+          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.40)',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.borderColor = 'var(--accent-gold)'
+          e.currentTarget.style.background = 'rgba(201, 160, 82, 0.18)'
+          e.currentTarget.style.color = 'var(--accent-gold)'
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.borderColor = 'rgba(201, 160, 82, 0.45)'
+          e.currentTarget.style.background = 'rgba(10, 14, 18, 0.75)'
+          e.currentTarget.style.color = '#FAF8F5'
+        }}
+      >
+        <span>SKIP INTRO</span>
+        <span style={{ fontSize: '13px', lineHeight: 1 }}>→</span>
+      </button>
+
       <style>{`
         .intro-fullscreen-overlay {
           width: 100vw !important;
@@ -213,6 +266,10 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
           object-position: center !important;
         }
 
+        .intro-skip-btn:active {
+          transform: scale(0.96);
+        }
+
         /* Mobile full-screen cover protection */
         @media (max-width: 768px) {
           .intro-fullscreen-overlay,
@@ -222,6 +279,12 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
             height: 100svh !important;
             object-fit: cover !important;
             object-position: center !important;
+          }
+          .intro-skip-btn {
+            top: 18px !important;
+            right: 18px !important;
+            padding: 8px 14px !important;
+            font-size: 10.5px !important;
           }
         }
       `}</style>
