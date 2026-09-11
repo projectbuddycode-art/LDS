@@ -379,7 +379,7 @@ export default function LDSChatbot() {
     }
 
     scrollEl.addEventListener('wheel', handleWheel, { passive: false })
-    scrollEl.addEventListener('touchmove', handleTouchMove, { passive: false })
+    scrollEl.addEventListener('touchmove', handleTouchMove, { passive: true })
 
     return () => {
       scrollEl.removeEventListener('wheel', handleWheel)

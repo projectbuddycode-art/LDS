@@ -26,6 +26,7 @@ import FinalCTA from '@/components/cta/FinalCTA'
 // LDS Engineering Assist chatbot & Quote Modal
 import LDSChatbot from '@/components/chatbot/LDSChatbot'
 import QuoteModal from '@/components/quote/QuoteModal'
+import SectionErrorBoundary from '@/components/ErrorBoundary'
 
 export default function LDSWebsite() {
   const [introComplete, setIntroComplete] = useState(false)
@@ -61,53 +62,83 @@ export default function LDSWebsite() {
 
         <main>
           {/* ─ 01 Hero ──────────────────── */}
-          <Hero />
+          <SectionErrorBoundary name="Hero">
+            <Hero />
+          </SectionErrorBoundary>
 
           {/* ─ 02 Founder / Leadership ─── */}
-          <LeadershipSection />
+          <SectionErrorBoundary name="Leadership">
+            <LeadershipSection />
+          </SectionErrorBoundary>
 
           {/* ─ 03 Industry Ecosystem ────── */}
-          <EcosystemSection />
+          <SectionErrorBoundary name="Ecosystem">
+            <EcosystemSection />
+          </SectionErrorBoundary>
 
           {/* ─ 04 Underground Cable ──────── */}
-          <UndergroundCableSection />
+          <SectionErrorBoundary name="Underground Cable">
+            <UndergroundCableSection />
+          </SectionErrorBoundary>
 
           {/* ─ 05 Capability ─────────────── */}
-          <CapabilitySection />
+          <SectionErrorBoundary name="Capabilities">
+            <CapabilitySection />
+          </SectionErrorBoundary>
 
           {/* ─ 06 Turnkey Electrification ── */}
-          <TurnkeySection />
+          <SectionErrorBoundary name="Turnkey Electrification">
+            <TurnkeySection />
+          </SectionErrorBoundary>
 
           {/* ─ 07 Equipment Range ─────────── */}
-          <EquipmentSection />
+          <SectionErrorBoundary name="Equipment">
+            <EquipmentSection />
+          </SectionErrorBoundary>
 
           {/* ─ 08 Transmission Lines ──────── */}
-          <TransmissionSection />
+          <SectionErrorBoundary name="Transmission">
+            <TransmissionSection />
+          </SectionErrorBoundary>
 
           {/* ─ 09 Project Portfolio ──────── */}
-          <ProjectPortfolio />
+          <SectionErrorBoundary name="Projects">
+            <ProjectPortfolio />
+          </SectionErrorBoundary>
 
           {/* ─ 10 Beyond Commissioning ────── */}
-          <BeyondCommissioning />
+          <SectionErrorBoundary name="Beyond Commissioning">
+            <BeyondCommissioning />
+          </SectionErrorBoundary>
 
           {/* ─ 11 Industries ─────────────── */}
-          <IndustriesSection />
+          <SectionErrorBoundary name="Industries">
+            <IndustriesSection />
+          </SectionErrorBoundary>
 
           {/* ─ 12 Built with Accountability ─ */}
-          <AccountabilitySection />
+          <SectionErrorBoundary name="Accountability">
+            <AccountabilitySection />
+          </SectionErrorBoundary>
 
           {/* ─ 13 Let's Build ─────────────── */}
-          <FinalCTA />
+          <SectionErrorBoundary name="Final CTA">
+            <FinalCTA />
+          </SectionErrorBoundary>
         </main>
 
         <Footer />
 
         {/* ─ LDS Engineering Assist ─────── */}
         {/* Rendered outside main so it floats above all sections */}
-        <LDSChatbot />
+        <SectionErrorBoundary name="Chatbot">
+          <LDSChatbot />
+        </SectionErrorBoundary>
 
         {/* ─ LDS Unified Quote Modal ─────── */}
-        <QuoteModal />
+        <SectionErrorBoundary name="Quote Form">
+          <QuoteModal />
+        </SectionErrorBoundary>
       </div>
     </>
   )

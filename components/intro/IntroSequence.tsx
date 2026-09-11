@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { MEDIA } from '@/data/media'
+import { prepareVideo, safePlay } from '@/lib/videoPlayback'
 
 interface IntroSequenceProps {
   onComplete: () => void
@@ -12,6 +13,8 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const isDoneRef = useRef(false)
   const fallbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const autoplayFailTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const isPlayingRef = useRef(false)
   const [isVideoPlaying, setIsVideoPlaying] = useState(false)
 
   const finishSequence = useCallback(() => {
@@ -21,6 +24,10 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
     if (fallbackTimerRef.current) {
       clearTimeout(fallbackTimerRef.current)
       fallbackTimerRef.current = null
+    }
+    if (autoplayFailTimerRef.current) {
+      clearTimeout(autoplayFailTimerRef.current)
+      autoplayFailTimerRef.current = null
     }
 
     const container = containerRef.current
@@ -42,11 +49,23 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
 
   const handleError = useCallback(() => {
     if (isDoneRef.current) return
-    console.warn('[IntroSequence] Video playback issue, proceeding smoothly to homepage')
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn('[IntroSequence] Video playback deferred, proceeding smoothly to homepage')
+    }
     finishSequence()
   }, [finishSequence])
 
   useEffect(() => {
+    // Preload Homepage Hero video in parallel while intro is running
+    if (typeof document !== 'undefined') {
+      const heroLink = document.createElement('link')
+      heroLink.rel = 'preload'
+      heroLink.as = 'video'
+      heroLink.href = MEDIA.heroVideo
+      heroLink.type = 'video/mp4'
+      document.head.appendChild(heroLink)
+    }
+
     // Respect prefers-reduced-motion
     if (typeof window !== 'undefined') {
       const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -60,44 +79,42 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
     if (!video) return
 
     // Ensure muted & playsinline attributes are strictly applied on the DOM instance
-    video.muted = true
-    video.defaultMuted = true
-    video.playsInline = true
-    video.setAttribute('playsinline', '')
-    video.setAttribute('webkit-playsinline', '')
-    video.setAttribute('muted', '')
+    prepareVideo(video)
     video.playbackRate = 1.0
 
     // Explicit React/JS playback attempt
+    const markPlaying = () => {
+      if (isPlayingRef.current) return
+      isPlayingRef.current = true
+      setIsVideoPlaying(true)
+    }
+
     const attemptPlay = async () => {
-      if (isDoneRef.current) return
-      try {
-        await video.play()
-        setIsVideoPlaying(true)
-      } catch (error) {
-        console.warn('[IntroSequence] Video autoplay deferred or prevented by browser:', error)
-        // If autoplay is deferred or restricted, fail gracefully after a short visual moment
-        setTimeout(() => {
-          if (!isDoneRef.current) {
+      if (isDoneRef.current || isPlayingRef.current) return
+      const success = await safePlay(video)
+      if (success) {
+        markPlaying()
+      } else {
+        if (autoplayFailTimerRef.current) clearTimeout(autoplayFailTimerRef.current)
+        autoplayFailTimerRef.current = setTimeout(() => {
+          if (!isDoneRef.current && !isPlayingRef.current) {
             finishSequence()
           }
         }, 1200)
       }
     }
 
-    // Attempt playback immediately
-    attemptPlay()
+    void attemptPlay()
 
-    // Also attach events to ensure playback triggers as soon as data arrives
     const handleCanPlay = () => {
-      if (!isDoneRef.current && !isVideoPlaying) {
-        attemptPlay()
+      if (!isDoneRef.current && !isPlayingRef.current) {
+        void attemptPlay()
       }
     }
 
     video.addEventListener('loadeddata', handleCanPlay)
     video.addEventListener('canplay', handleCanPlay)
-    video.addEventListener('playing', () => setIsVideoPlaying(true))
+    video.addEventListener('playing', markPlaying)
     video.addEventListener('ended', handleEnded)
     video.addEventListener('error', handleError)
 
@@ -121,13 +138,19 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
         clearTimeout(fallbackTimerRef.current)
         fallbackTimerRef.current = null
       }
+      if (autoplayFailTimerRef.current) {
+        clearTimeout(autoplayFailTimerRef.current)
+        autoplayFailTimerRef.current = null
+      }
       window.removeEventListener('keydown', handleKeyDown)
       video.removeEventListener('loadeddata', handleCanPlay)
       video.removeEventListener('canplay', handleCanPlay)
+      video.removeEventListener('playing', markPlaying)
       video.removeEventListener('ended', handleEnded)
       video.removeEventListener('error', handleError)
+      try { video.pause() } catch { /* ignore */ }
     }
-  }, [finishSequence, handleEnded, handleError, isVideoPlaying])
+  }, [finishSequence, handleEnded, handleError])
 
   return (
     <div

@@ -119,6 +119,20 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if (typeof window !== 'undefined') {
+                window.addEventListener('unhandledrejection', function(event) {
+                  var reason = event.reason;
+                  if (reason && (reason.name === 'AbortError' || reason.name === 'NotAllowedError' || (typeof reason.message === 'string' && (reason.message.indexOf('play()') !== -1 || reason.message.indexOf('interrupted') !== -1)))) {
+                    event.preventDefault();
+                  }
+                });
+              }
+            `,
+          }}
+        />
+        <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
         />

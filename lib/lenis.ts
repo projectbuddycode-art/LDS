@@ -23,6 +23,7 @@ export function useLenis() {
       smoothWheel: true,
       wheelMultiplier: 0.95,
       touchMultiplier: 1.5,
+      prevent: (node: HTMLElement) => node.closest('[data-lenis-prevent]') != null,
     })
 
     lenisInstance = lenis

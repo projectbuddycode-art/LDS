@@ -3,8 +3,15 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { MEDIA } from '@/data/media'
 import { INDUSTRIES } from '@/data/content'
+import {
+  attachSrcOnce,
+  pauseAllExcept,
+  pauseAllVideos,
+  prepareVideo,
+  safePause,
+  safePlay,
+} from '@/lib/videoPlayback'
 
-// Per-industry object-position for optimal video framing
 const OBJECT_POSITIONS: Record<string, string> = {
   manufacturing:        'center 22%',
   commercial:           'center 20%',
@@ -27,66 +34,172 @@ const POSTER_MAP: Record<string, string> = {
   infrastructure:       '/media/posters/infrastructure.jpg',
 }
 
+function neighborsOf(index: number) {
+  const set = new Set<number>([index])
+  if (index > 0) set.add(index - 1)
+  if (index < INDUSTRIES.length - 1) set.add(index + 1)
+  return set
+}
+
 export default function IndustriesSection() {
   const sectionRef = useRef<HTMLElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
   const desktopVideoRefs = useRef<(HTMLVideoElement | null)[]>([])
   const mobileVideoRefs = useRef<(HTMLVideoElement | null)[]>([])
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
-  const activeIndexRef = useRef<number>(0)
-  
-  const [isMobile, setIsMobile] = useState<boolean>(false)
-  const [mobileActiveIndex, setMobileActiveIndex] = useState<number>(0)
-  const [loadedVideos, setLoadedVideos] = useState<Record<string, boolean>>({})
+  const mobileCardRefs = useRef<(HTMLDivElement | null)[]>([])
+  const activeIndexRef = useRef(0)
+  const visualIndexRef = useRef(0)
+  const mediaTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const inViewRef = useRef(true)
 
-  // Controlled video playback helper
-  const updateVideoPlayback = useCallback((activeIdx: number) => {
-    const refs = isMobile ? mobileVideoRefs.current : desktopVideoRefs.current
+  const [isMobile, setIsMobile] = useState(false)
+  const [mobileActiveIndex, setMobileActiveIndex] = useState(0)
+  const videoRequestIdRef = useRef(0)
+
+  const refsForMode = useCallback(() => (
+    isMobile ? mobileVideoRefs.current : desktopVideoRefs.current
+  ), [isMobile])
+
+  const ensureSources = useCallback((activeIdx: number, refs: Array<HTMLVideoElement | null>) => {
+    const ready = neighborsOf(activeIdx)
     refs.forEach((vid, i) => {
       if (!vid) return
-      // Strict DOM property enforcement
-      vid.muted = true
-      vid.defaultMuted = true
-      vid.playsInline = true
-      vid.setAttribute('playsinline', '')
-      vid.setAttribute('webkit-playsinline', '')
-      vid.setAttribute('muted', '')
-
-      if (i === activeIdx) {
-        const promise = vid.play()
-        if (promise !== undefined) {
-          promise.catch(() => {})
-        }
-      } else {
-        if (!vid.paused) {
-          vid.pause()
-        }
+      prepareVideo(vid)
+      if (ready.has(i)) {
+        const key = INDUSTRIES[i].mediaKey
+        attachSrcOnce(vid, MEDIA.industries[key])
       }
     })
-  }, [isMobile])
+  }, [])
 
-  // Viewport intersection observer to play active video when section is in view
+  const playActive = useCallback((activeIdx: number, explicitReqId?: number) => {
+    const reqId = explicitReqId ?? ++videoRequestIdRef.current
+    const refs = refsForMode()
+    ensureSources(activeIdx, refs)
+
+    // Instantly hide and pause all inactive videos
+    refs.forEach((vid, i) => {
+      if (i !== activeIdx && vid) {
+        vid.style.opacity = '0'
+        safePause(vid)
+      }
+    })
+
+    const active = refs[activeIdx]
+    if (!active || !inViewRef.current) return
+
+    prepareVideo(active)
+
+    const reveal = () => {
+      if (videoRequestIdRef.current === reqId && inViewRef.current) {
+        active.style.opacity = '1'
+      }
+    }
+
+    if (active.readyState >= 2) {
+      void safePlay(active).then((started) => {
+        if (started || !active.paused) {
+          reveal()
+        }
+      })
+    } else {
+      const onReady = () => {
+        active.removeEventListener('canplay', onReady)
+        active.removeEventListener('loadeddata', onReady)
+        if (videoRequestIdRef.current === reqId && inViewRef.current) {
+          void safePlay(active).then((started) => {
+            if (started || !active.paused) {
+              reveal()
+            }
+          })
+        }
+      }
+      active.addEventListener('canplay', onReady, { once: true })
+      active.addEventListener('loadeddata', onReady, { once: true })
+      void safePlay(active)
+    }
+  }, [ensureSources, refsForMode])
+
+  const updateCardDOMStyles = useCallback((activeIdx: number) => {
+    cardRefs.current.forEach((card, i) => {
+      if (!card) return
+      const isCurrent = i === activeIdx
+      const topBar = card.querySelector('[data-active-bar]') as HTMLElement | null
+      const label = card.querySelector('[data-card-label]') as HTMLElement | null
+      const number = card.querySelector('[data-card-num]') as HTMLElement | null
+      const line = card.querySelector('[data-card-line]') as HTMLElement | null
+
+      if (topBar) topBar.style.opacity = isCurrent ? '1' : '0'
+      if (label) {
+        label.style.color = isCurrent ? '#FAF8F5' : 'rgba(250,248,245,0.70)'
+        label.style.fontWeight = isCurrent ? '600' : '500'
+      }
+      if (number) number.style.opacity = isCurrent ? '1' : '0.6'
+      if (line) {
+        line.style.width = isCurrent ? '32px' : '16px'
+        line.style.opacity = isCurrent ? '0.9' : '0.4'
+      }
+    })
+  }, [])
+
+  const commitIndustry = useCallback((index: number) => {
+    const reqId = ++videoRequestIdRef.current
+    activeIndexRef.current = index
+    visualIndexRef.current = index
+    updateCardDOMStyles(index)
+    if (inViewRef.current) {
+      playActive(index, reqId)
+    }
+  }, [playActive, updateCardDOMStyles])
+
+  const selectIndustry = useCallback((index: number) => {
+    if (index === visualIndexRef.current) return
+    visualIndexRef.current = index
+    updateCardDOMStyles(index)
+
+    if (mediaTimerRef.current) {
+      clearTimeout(mediaTimerRef.current)
+      mediaTimerRef.current = null
+    }
+
+    if (index === activeIndexRef.current) return
+
+    // Monotonic token check in debounced transition
+    const reqId = ++videoRequestIdRef.current
+    mediaTimerRef.current = setTimeout(() => {
+      if (videoRequestIdRef.current !== reqId) return
+      commitIndustry(index)
+    }, 60)
+  }, [commitIndustry, updateCardDOMStyles])
+
   useEffect(() => {
     const el = sectionRef.current
     if (!el || typeof IntersectionObserver === 'undefined') {
-      updateVideoPlayback(isMobile ? mobileActiveIndex : activeIndexRef.current)
+      inViewRef.current = true
+      playActive(activeIndexRef.current)
       return
     }
 
     const observer = new IntersectionObserver(([entry]) => {
+      inViewRef.current = entry.isIntersecting
       if (entry.isIntersecting) {
-        updateVideoPlayback(isMobile ? mobileActiveIndex : activeIndexRef.current)
+        playActive(activeIndexRef.current)
       } else {
-        const refs = isMobile ? mobileVideoRefs.current : desktopVideoRefs.current
-        refs.forEach((vid) => { if (vid && !vid.paused) vid.pause() })
+        videoRequestIdRef.current++
+        pauseAllVideos(desktopVideoRefs.current)
+        pauseAllVideos(mobileVideoRefs.current)
       }
-    }, { rootMargin: '300px 0px 300px 0px' })
+    }, { rootMargin: '160px 0px', threshold: 0.05 })
 
     observer.observe(el)
-    return () => observer.disconnect()
-  }, [isMobile, mobileActiveIndex, updateVideoPlayback])
+    const kick = window.setTimeout(() => playActive(activeIndexRef.current), 60)
+    return () => {
+      observer.disconnect()
+      clearTimeout(kick)
+    }
+  }, [playActive])
 
-  // Handle responsive breakpoint
   useEffect(() => {
     const checkMobile = () => {
       const mobile = window.innerWidth <= 768
@@ -105,33 +218,9 @@ export default function IndustriesSection() {
     }
   }, [])
 
-  // DOM active style update helper
-  const updateCardDOMStyles = useCallback((activeIdx: number) => {
-    cardRefs.current.forEach((card, i) => {
-      if (!card) return
-      const isCurrent = i === activeIdx
-      const topBar = card.querySelector('[data-active-bar]') as HTMLElement
-      const label = card.querySelector('[data-card-label]') as HTMLElement
-      const number = card.querySelector('[data-card-num]') as HTMLElement
-      const line = card.querySelector('[data-card-line]') as HTMLElement
-
-      if (topBar) topBar.style.opacity = isCurrent ? '1' : '0'
-      if (label) {
-        label.style.color = isCurrent ? '#FAF8F5' : 'rgba(250,248,245,0.70)'
-        label.style.fontWeight = isCurrent ? '600' : '500'
-      }
-      if (number) number.style.opacity = isCurrent ? '1' : '0.6'
-      if (line) {
-        line.style.width = isCurrent ? '32px' : '16px'
-        line.style.opacity = isCurrent ? '0.9' : '0.4'
-      }
-    })
-  }, [])
-
-  // Desktop GSAP Horizontal Scroll Pinning
   useEffect(() => {
     let isUnmounted = false
-    let ctx: any
+    let ctx: { revert: () => void } | undefined
     const section = sectionRef.current
     const track = trackRef.current
     if (!section || !track || isMobile) return
@@ -144,8 +233,6 @@ export default function IndustriesSection() {
       if (isUnmounted) return
 
       ctx = gsap.context(() => {
-        const numCards = INDUSTRIES.length
-
         const getDistance = () => {
           const trackWidth = track.scrollWidth
           const containerWidth = section.clientWidth
@@ -153,62 +240,24 @@ export default function IndustriesSection() {
         }
 
         const distance = getDistance()
+        if (distance <= 0) return
 
-        if (distance > 0) {
-          updateVideoPlayback(0)
-          updateCardDOMStyles(0)
+        updateCardDOMStyles(activeIndexRef.current)
+        playActive(activeIndexRef.current)
 
-          const tl = gsap.timeline({
-            scrollTrigger: {
-              trigger: section,
-              pin: true,
-              anticipatePin: 1,
-              scrub: 0.8,
-              start: 'top top',
-              end: () => `+=${distance * 1.5}`,
-              invalidateOnRefresh: true,
-              onUpdate: (self) => {
-                const progress = self.progress
-                const rawIdx = progress * (numCards - 1)
-                const activeIdx = Math.min(Math.round(rawIdx), numCards - 1)
-
-                if (activeIdx !== activeIndexRef.current) {
-                  activeIndexRef.current = activeIdx
-                  updateVideoPlayback(activeIdx)
-                  updateCardDOMStyles(activeIdx)
-                }
-              },
-            },
-          })
-
-          tl.to(track, {
-            x: -distance,
-            ease: 'none',
-          })
-
-          cardRefs.current.forEach((card, i) => {
-            if (!card) return
-            const startRatio = i / numCards
-            const peakRatio = (i + 0.5) / numCards
-            const endRatio = (i + 1) / numCards
-
-            gsap.timeline({
-              scrollTrigger: {
-                trigger: section,
-                start: 'top top',
-                end: () => `+=${distance * 1.5}`,
-                scrub: 0.8,
-              }
-            })
-            .fromTo(card, 
-              { scale: 0.94, opacity: 0.72 },
-              { scale: 1.0, opacity: 1, duration: peakRatio - startRatio, ease: 'power2.out' }
-            )
-            .to(card,
-              { scale: 0.94, opacity: 0.72, duration: endRatio - peakRatio, ease: 'power2.in' }
-            )
-          })
-        }
+        gsap.to(track, {
+          x: -distance,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: section,
+            pin: true,
+            anticipatePin: 1,
+            scrub: 0.8,
+            start: 'top top',
+            end: () => `+=${distance * 1.5}`,
+            invalidateOnRefresh: true,
+          },
+        })
       }, section)
     }
 
@@ -218,16 +267,49 @@ export default function IndustriesSection() {
       clearTimeout(timer)
       if (ctx) ctx.revert()
     }
-  }, [isMobile, updateVideoPlayback, updateCardDOMStyles])
+  }, [isMobile, playActive, updateCardDOMStyles])
 
-  // Mobile tap handler
+  useEffect(() => {
+    if (!isMobile) return
+    const cards = mobileCardRefs.current.filter(Boolean) as HTMLDivElement[]
+    if (!cards.length || typeof IntersectionObserver === 'undefined') return
+
+    const observer = new IntersectionObserver((entries) => {
+      const visible = entries
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
+      if (!visible) return
+      const index = cards.indexOf(visible.target as HTMLDivElement)
+      if (index < 0 || index === activeIndexRef.current) return
+      activeIndexRef.current = index
+      visualIndexRef.current = index
+      setMobileActiveIndex(index)
+      playActive(index)
+    }, { threshold: 0.55 })
+
+    cards.forEach((card) => observer.observe(card))
+    return () => observer.disconnect()
+  }, [isMobile, playActive])
+
+  useEffect(() => {
+    return () => {
+      if (mediaTimerRef.current) clearTimeout(mediaTimerRef.current)
+      pauseAllVideos(desktopVideoRefs.current)
+      pauseAllVideos(mobileVideoRefs.current)
+    }
+  }, [])
+
   const handleMobileCardTap = (index: number) => {
+    if (index === activeIndexRef.current) return
+    activeIndexRef.current = index
+    visualIndexRef.current = index
     setMobileActiveIndex(index)
-    updateVideoPlayback(index)
+    playActive(index)
+    mobileCardRefs.current[index]?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
   }
 
-  const handleVideoReady = (id: string) => {
-    setLoadedVideos((prev) => ({ ...prev, [id]: true }))
+  const handleDesktopPointerEnter = (index: number) => {
+    selectIndustry(index)
   }
 
   return (
@@ -242,7 +324,6 @@ export default function IndustriesSection() {
       }}
       aria-label="Industries served"
     >
-      {/* Section header */}
       <div
         data-header
         className="site-container"
@@ -268,7 +349,6 @@ export default function IndustriesSection() {
         </div>
       </div>
 
-      {/* ── Desktop: Pinned Cinematic Horizontal Scroll ── */}
       {!isMobile && (
         <div style={{ overflow: 'hidden', paddingBottom: 'clamp(40px, 5vw, 64px)' }}>
           <div
@@ -284,10 +364,8 @@ export default function IndustriesSection() {
             }}
           >
             {INDUSTRIES.map((industry, index) => {
-              const videoSrc = MEDIA.industries[industry.mediaKey]
               const objPos = OBJECT_POSITIONS[industry.mediaKey] || 'center center'
               const isInitialActive = index === 0
-              const isLoaded = loadedVideos[`desktop-${industry.id}`]
 
               return (
                 <div
@@ -295,6 +373,7 @@ export default function IndustriesSection() {
                   ref={(el) => { cardRefs.current[index] = el }}
                   data-industry-card
                   aria-label={`Industry: ${industry.label}`}
+                  onPointerEnter={() => handleDesktopPointerEnter(index)}
                   style={{
                     flexShrink: 0,
                     width: 'clamp(280px, 26vw, 380px)',
@@ -303,13 +382,12 @@ export default function IndustriesSection() {
                     overflow: 'hidden',
                     background: 'var(--surface)',
                     transformOrigin: 'bottom center',
-                    willChange: 'transform, opacity',
-                    cursor: 'default',
+                    cursor: 'pointer',
                     borderBottom: '2px solid transparent',
+                    contain: 'layout paint',
                   }}
                 >
-                  {/* Video wrapper */}
-                  <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
+                  <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
                     {POSTER_MAP[industry.mediaKey] && (
                       <img
                         src={POSTER_MAP[industry.mediaKey]}
@@ -331,21 +409,18 @@ export default function IndustriesSection() {
                     )}
                     <video
                       ref={(el) => {
-                        if (el) {
-                          el.muted = true
-                          el.defaultMuted = true
-                          el.playsInline = true
-                        }
+                        if (el) prepareVideo(el)
                         desktopVideoRefs.current[index] = el
                       }}
-                      src={videoSrc}
                       poster={POSTER_MAP[industry.mediaKey]}
                       muted
                       playsInline
                       loop
-                      preload="metadata"
-                      onPlaying={() => handleVideoReady(`desktop-${industry.id}`)}
-                      onLoadedData={() => handleVideoReady(`desktop-${industry.id}`)}
+                      preload="none"
+                      onError={() => {
+                        const vid = desktopVideoRefs.current[index]
+                        if (vid) vid.style.opacity = '0'
+                      }}
                       style={{
                         position: 'relative',
                         zIndex: 2,
@@ -353,16 +428,16 @@ export default function IndustriesSection() {
                         height: '100%',
                         objectFit: 'cover',
                         objectPosition: objPos,
-                        opacity: isLoaded ? 1 : 0,
+                        opacity: 0,
                         transition: 'opacity 400ms cubic-bezier(0.4, 0, 0.2, 1)',
                         backgroundColor: 'transparent',
                         display: 'block',
+                        pointerEvents: 'none',
                       }}
                       aria-label={`Video showing ${industry.label} electrification`}
                     />
                   </div>
 
-                  {/* Gradient overlays */}
                   <div
                     style={{
                       position: 'absolute',
@@ -373,7 +448,6 @@ export default function IndustriesSection() {
                     }}
                   />
 
-                  {/* Active top gold bar */}
                   <div
                     data-active-bar
                     style={{
@@ -389,7 +463,6 @@ export default function IndustriesSection() {
                     }}
                   />
 
-                  {/* Content overlay */}
                   <div
                     style={{
                       position: 'absolute',
@@ -432,7 +505,7 @@ export default function IndustriesSection() {
                         fontWeight: isInitialActive ? 600 : 500,
                         color: isInitialActive ? '#FAF8F5' : 'rgba(250,248,245,0.70)',
                         letterSpacing: '-0.01em',
-                        transition: 'color 300ms ease, font-weight 300ms ease',
+                        transition: 'color 300ms ease',
                         lineHeight: 1.2,
                       }}
                     >
@@ -446,7 +519,6 @@ export default function IndustriesSection() {
         </div>
       )}
 
-      {/* ── Mobile: Native Smooth-Snapping Horizontal Carousel ── */}
       {isMobile && (
         <div style={{ paddingBottom: '48px' }}>
           <div
@@ -465,14 +537,13 @@ export default function IndustriesSection() {
             }}
           >
             {INDUSTRIES.map((industry, index) => {
-              const videoSrc = MEDIA.industries[industry.mediaKey]
               const objPos = OBJECT_POSITIONS[industry.mediaKey] || 'center center'
               const isActive = index === mobileActiveIndex
-              const isLoaded = loadedVideos[`mobile-${industry.id}`]
 
               return (
                 <div
                   key={industry.id}
+                  ref={(el) => { mobileCardRefs.current[index] = el }}
                   onClick={() => handleMobileCardTap(index)}
                   aria-label={`Industry: ${industry.label}`}
                   style={{
@@ -486,10 +557,10 @@ export default function IndustriesSection() {
                     background: 'var(--surface)',
                     border: isActive ? '1px solid rgba(201,160,82,0.45)' : '1px solid var(--line-soft)',
                     transition: 'border-color 300ms ease',
+                    contain: 'layout paint',
                   }}
                 >
-                  {/* Video wrapper */}
-                  <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
+                  <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
                     {POSTER_MAP[industry.mediaKey] && (
                       <img
                         src={POSTER_MAP[industry.mediaKey]}
@@ -511,21 +582,18 @@ export default function IndustriesSection() {
                     )}
                     <video
                       ref={(el) => {
-                        if (el) {
-                          el.muted = true
-                          el.defaultMuted = true
-                          el.playsInline = true
-                        }
+                        if (el) prepareVideo(el)
                         mobileVideoRefs.current[index] = el
                       }}
-                      src={videoSrc}
                       poster={POSTER_MAP[industry.mediaKey]}
                       muted
                       playsInline
                       loop
-                      preload="metadata"
-                      onPlaying={() => handleVideoReady(`mobile-${industry.id}`)}
-                      onLoadedData={() => handleVideoReady(`mobile-${industry.id}`)}
+                      preload="none"
+                      onError={() => {
+                        const vid = mobileVideoRefs.current[index]
+                        if (vid) vid.style.opacity = '0'
+                      }}
                       style={{
                         position: 'relative',
                         zIndex: 2,
@@ -533,16 +601,16 @@ export default function IndustriesSection() {
                         height: '100%',
                         objectFit: 'cover',
                         objectPosition: objPos,
-                        opacity: isLoaded ? 1 : 0,
+                        opacity: 0,
                         transition: 'opacity 400ms cubic-bezier(0.4, 0, 0.2, 1)',
                         backgroundColor: 'transparent',
                         display: 'block',
+                        pointerEvents: 'none',
                       }}
                       aria-label={`Video showing ${industry.label} electrification`}
                     />
                   </div>
 
-                  {/* Gradient overlays */}
                   <div
                     style={{
                       position: 'absolute',
@@ -553,7 +621,6 @@ export default function IndustriesSection() {
                     }}
                   />
 
-                  {/* Active top gold bar */}
                   {isActive && (
                     <div
                       style={{
@@ -568,7 +635,6 @@ export default function IndustriesSection() {
                     />
                   )}
 
-                  {/* Content overlay */}
                   <div
                     style={{
                       position: 'absolute',
@@ -616,7 +682,6 @@ export default function IndustriesSection() {
             })}
           </div>
 
-          {/* Mobile pagination indicator dots */}
           <div
             style={{
               display: 'flex',
@@ -626,14 +691,20 @@ export default function IndustriesSection() {
             }}
           >
             {INDUSTRIES.map((_, i) => (
-              <div
+              <button
                 key={i}
+                type="button"
+                aria-label={`Show ${INDUSTRIES[i].label}`}
+                onClick={() => handleMobileCardTap(i)}
                 style={{
                   width: i === mobileActiveIndex ? '20px' : '6px',
                   height: '3px',
                   borderRadius: '2px',
+                  padding: 0,
+                  border: 'none',
                   background: i === mobileActiveIndex ? 'var(--accent-gold)' : 'var(--line)',
-                  transition: 'all 250ms ease',
+                  transition: 'width 250ms ease, background-color 250ms ease',
+                  cursor: 'pointer',
                 }}
               />
             ))}
@@ -641,7 +712,6 @@ export default function IndustriesSection() {
         </div>
       )}
 
-      {/* Scoped styles */}
       <style>{`
         #industries-header {
           display: grid;

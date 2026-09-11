@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useRef, useState, memo, useCallback } from 'react'
+import { useEffect, useRef, memo, useCallback, useState } from 'react'
+import { prepareVideo, releaseVideo, safePause, safePlay } from '@/lib/videoPlayback'
 
 export interface LazyVideoProps extends React.VideoHTMLAttributes<HTMLVideoElement> {
   src: string
@@ -26,130 +27,141 @@ function LazyVideo({
 }: LazyVideoProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const videoRef = useRef<HTMLVideoElement | null>(null)
-  const playDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [hasError, setHasError] = useState(false)
+  const intersectingRef = useRef(preloadImmediate)
+  const hasErrorRef = useRef(false)
+  const isRevealedRef = useRef(false)
+  const isUnmountedRef = useRef(false)
+  const [mediaAttached, setMediaAttached] = useState(preloadImmediate)
 
-  // Reset states if src changes
+  const revealVideo = useCallback(() => {
+    if (isUnmountedRef.current || isRevealedRef.current) return
+    const video = videoRef.current
+    if (!video || video.paused || hasErrorRef.current) return
+    isRevealedRef.current = true
+    video.style.opacity = '1'
+  }, [])
+
+  const tryPlay = useCallback(() => {
+    if (isUnmountedRef.current || hasErrorRef.current) return
+    const video = videoRef.current
+    if (!video) return
+    if (!intersectingRef.current && !preloadImmediate) return
+
+    prepareVideo(video)
+    void safePlay(video).then((started) => {
+      if (started && !isUnmountedRef.current) {
+        revealVideo()
+      }
+    })
+  }, [preloadImmediate, revealVideo])
+
   useEffect(() => {
-    setIsPlaying(false)
-    setHasError(false)
+    isUnmountedRef.current = false
+    return () => {
+      isUnmountedRef.current = true
+    }
+  }, [])
+
+  useEffect(() => {
+    hasErrorRef.current = false
+    isRevealedRef.current = false
+    const video = videoRef.current
+    if (video) {
+      video.style.opacity = '0'
+      prepareVideo(video)
+    }
   }, [src])
 
-  const safePlay = useCallback(() => {
-    const video = videoRef.current
-    if (!video || hasError) return
-
-    // Enforce mobile-safe DOM parameters
-    video.muted = true
-    video.defaultMuted = true
-    video.playsInline = true
-
-    const playPromise = video.play()
-    if (playPromise !== undefined) {
-      playPromise
-        .then(() => {
-          setIsPlaying(true)
-        })
-        .catch((err) => {
-          if (process.env.NODE_ENV !== 'production') {
-            console.warn('[LDS Video Playback Info]', { src, message: err?.message })
-          }
-        })
-    }
-  }, [src, hasError])
-
   useEffect(() => {
-    if (hasError) return
     const video = videoRef.current
     const container = containerRef.current
-    if (!video) return
+    if (!video || hasErrorRef.current) return
 
-    // Explicitly configure DOM instance properties
-    video.muted = true
-    video.defaultMuted = true
-    video.playsInline = true
-    video.setAttribute('playsinline', '')
-    video.setAttribute('webkit-playsinline', '')
-    video.setAttribute('muted', '')
+    prepareVideo(video)
 
-    // For hero video or immediate preload, trigger playback immediately
     if (preloadImmediate) {
-      safePlay()
-      return
+      intersectingRef.current = true
+      setMediaAttached(true)
+      tryPlay()
+      return () => {
+        releaseVideo(video)
+      }
     }
 
     if (typeof IntersectionObserver === 'undefined' || !container) {
-      safePlay()
-      return
+      intersectingRef.current = true
+      setMediaAttached(true)
+      tryPlay()
+      return () => {
+        releaseVideo(video)
+      }
     }
 
-    // Proactive IntersectionObserver (350px preload buffer)
     const observer = new IntersectionObserver(
       ([entry]) => {
+        if (isUnmountedRef.current) return
+        intersectingRef.current = entry.isIntersecting
         if (entry.isIntersecting) {
-          if (playDebounceRef.current) clearTimeout(playDebounceRef.current)
-          playDebounceRef.current = setTimeout(() => {
-            if (video && entry.isIntersecting) {
-              safePlay()
-            }
-          }, 50)
+          setMediaAttached(true)
+          tryPlay()
         } else {
-          if (playDebounceRef.current) {
-            clearTimeout(playDebounceRef.current)
-            playDebounceRef.current = null
-          }
-          if (video && !video.paused) {
-            video.pause()
-          }
+          safePause(video)
         }
       },
-      { rootMargin: '350px 0px 350px 0px', threshold: 0.05 }
+      { rootMargin: '180px 0px', threshold: 0.1 }
     )
 
     observer.observe(container)
 
     return () => {
-      if (playDebounceRef.current) {
-        clearTimeout(playDebounceRef.current)
-        playDebounceRef.current = null
-      }
       observer.disconnect()
+      releaseVideo(video)
     }
-  }, [src, preloadImmediate, hasError, safePlay])
+  }, [src, preloadImmediate, tryPlay])
+
+  useEffect(() => {
+    if (mediaAttached) {
+      tryPlay()
+    }
+  }, [mediaAttached, tryPlay, src])
 
   const handleVideoPlaying = (e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
-    setIsPlaying(true)
+    revealVideo()
     if (onPlaying) onPlaying(e)
   }
 
   const handleCanPlay = (e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
-    safePlay()
+    if (intersectingRef.current || preloadImmediate) {
+      tryPlay()
+    }
     if (onCanPlay) onCanPlay(e)
   }
 
   const handleLoadedData = (e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
-    if (preloadImmediate) {
-      safePlay()
+    if (intersectingRef.current || preloadImmediate) {
+      tryPlay()
     }
     if (onLoadedData) onLoadedData(e)
   }
 
   const handleVideoError = (e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
-    setHasError(true)
-    setIsPlaying(false)
+    hasErrorRef.current = true
     const video = videoRef.current
+    if (video) {
+      video.style.opacity = '0'
+    }
     if (process.env.NODE_ENV !== 'production') {
-      console.warn('[LDS Video Error Handler]', {
+      console.warn('[LDS Video Error Safeguard] Retaining static poster:', {
         src,
         poster,
-        readyState: video?.readyState,
-        networkState: video?.networkState,
-        error: video?.error,
       })
     }
     if (onError) onError(e)
+  }
+
+  // Safe handler for non-fatal media lifecycle events
+  const handleNoopMediaEvent = () => {
+    // Keep playback and poster fallback stable
   }
 
   return (
@@ -167,7 +179,7 @@ function LazyVideo({
       }}
       className={className}
     >
-      {/* ── 1. Poster Layer (Immediately visible, guarantees 0 layout shift or blank frame) ── */}
+      {/* ── Instant Static Poster Fallback (Rendered immediately, never blocks page) ── */}
       {poster && (
         <img
           src={poster}
@@ -179,8 +191,8 @@ function LazyVideo({
             inset: 0,
             width: '100%',
             height: '100%',
-            objectFit: (style?.objectFit as any) || 'cover',
-            objectPosition: (style?.objectPosition as any) || 'center center',
+            objectFit: (style?.objectFit as React.CSSProperties['objectFit']) || 'cover',
+            objectPosition: (style?.objectPosition as string) || 'center center',
             display: 'block',
             zIndex: 1,
             pointerEvents: 'none',
@@ -188,48 +200,49 @@ function LazyVideo({
         />
       )}
 
-      {/* ── 2. Cinematic Video Layer (Crossfades seamlessly over poster when playing) ── */}
-      {!hasError && (
-        <video
-          ref={(el) => {
-            if (el) {
-              el.muted = true
-              el.defaultMuted = true
-              el.playsInline = true
-            }
-            videoRef.current = el
-          }}
-          src={src}
-          poster={poster}
-          autoPlay={preloadImmediate}
-          muted
-          playsInline
-          loop
-          preload={preloadImmediate ? 'auto' : 'metadata'}
-          onPlaying={handleVideoPlaying}
-          onCanPlay={handleCanPlay}
-          onLoadedData={handleLoadedData}
-          onError={handleVideoError}
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: style?.objectFit || 'cover',
-            objectPosition: style?.objectPosition || 'center center',
-            display: 'block',
-            backgroundColor: 'transparent',
-            zIndex: 2,
-            opacity: isPlaying ? 1 : 0,
-            transition: 'opacity 400ms cubic-bezier(0.4, 0, 0.2, 1)',
-            ...style,
-          }}
-          {...props}
-        />
-      )}
+      {/* ── Hardened Cinematic Video Element ── */}
+      <video
+        ref={(el) => {
+          if (el) prepareVideo(el)
+          videoRef.current = el
+        }}
+        src={mediaAttached ? src : undefined}
+        poster={poster}
+        autoPlay
+        muted
+        playsInline
+        loop
+        preload={preloadImmediate ? 'auto' : 'metadata'}
+        onPlaying={handleVideoPlaying}
+        onCanPlay={handleCanPlay}
+        onLoadedData={handleLoadedData}
+        onError={handleVideoError}
+        onWaiting={handleNoopMediaEvent}
+        onStalled={handleNoopMediaEvent}
+        onSuspend={handleNoopMediaEvent}
+        onAbort={handleNoopMediaEvent}
+        onEmptied={handleNoopMediaEvent}
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: style?.objectFit || 'cover',
+          objectPosition: style?.objectPosition || 'center center',
+          display: 'block',
+          backgroundColor: 'transparent',
+          zIndex: 2,
+          opacity: 0,
+          transition: 'opacity 400ms cubic-bezier(0.4, 0, 0.2, 1)',
+          pointerEvents: 'none',
+          ...style,
+        }}
+        {...props}
+      />
     </div>
   )
 }
 
 export default memo(LazyVideo)
+
