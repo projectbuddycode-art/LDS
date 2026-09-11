@@ -132,7 +132,7 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
       style={{
         position: 'fixed',
         inset: 0,
-        width: '100vw',
+        width: '100%',
         height: '100dvh',
         zIndex: 99999,
         background: '#0A0E12',
@@ -154,7 +154,7 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
         style={{
           position: 'absolute',
           inset: 0,
-          width: '100vw',
+          width: '100%',
           height: '100dvh',
           objectFit: 'cover',
           objectPosition: 'center',
@@ -164,7 +164,7 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
         }}
       />
 
-      {/* ── True Full-Screen INTRO 101 Video — 100vw × 100dvh ── */}
+      {/* ── True Full-Screen INTRO 101 Video — 100% × 100dvh ── */}
       <video
         ref={videoRef}
         src={MEDIA.introVideo}
@@ -193,7 +193,7 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
         style={{
           position: 'absolute',
           inset: 0,
-          width: '100vw',
+          width: '100%',
           height: '100dvh',
           objectFit: 'cover',
           objectPosition: 'center',
@@ -251,14 +251,14 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
 
       <style>{`
         .intro-fullscreen-overlay {
-          width: 100vw !important;
+          width: 100% !important;
           height: 100dvh !important;
           height: 100svh !important;
           height: 100vh !important;
         }
 
         .intro-101-video {
-          width: 100vw !important;
+          width: 100% !important;
           height: 100dvh !important;
           height: 100svh !important;
           height: 100vh !important;
@@ -274,7 +274,7 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
         @media (max-width: 768px) {
           .intro-fullscreen-overlay,
           .intro-101-video {
-            width: 100vw !important;
+            width: 100% !important;
             height: 100dvh !important;
             height: 100svh !important;
             object-fit: cover !important;

@@ -112,23 +112,18 @@ export default function CapabilitySection() {
           </div>
         </div>
 
-        {/* Stats grid — 5 columns, sophisticated */}
+        {/* Stats grid — 5 columns desktop, 3 tablet, 2 mobile, 1 small mobile */}
         <div
           data-stats-grid
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(5, 1fr)',
-            border: '1px solid var(--line)',
-            marginBottom: 'clamp(40px, 5vw, 64px)',
-          }}
+          className="capability-stats-grid"
         >
           {CAPABILITY_STATS.map((stat, i) => (
             <div
               key={stat.value}
               data-stat-cell
+              className="capability-stat-item"
               style={{
-                padding: 'clamp(22px, 2.5vw, 36px) clamp(16px, 2vw, 28px)',
-                borderRight: i < CAPABILITY_STATS.length - 1 ? '1px solid var(--line)' : 'none',
+                padding: 'clamp(20px, 2.5vw, 36px) clamp(16px, 2vw, 28px)',
                 position: 'relative',
               }}
             >
@@ -147,10 +142,10 @@ export default function CapabilitySection() {
                 fontSize: 'clamp(22px, 2.4vw, 34px)',
                 fontWeight: 700,
                 letterSpacing: '-0.02em',
-                color: i >= 2 ? 'var(--text-primary)' : 'var(--text-primary)',
+                color: 'var(--text-primary)',
                 lineHeight: 1,
                 marginBottom: '8px',
-                marginTop: '14px',
+                marginTop: '12px',
               }}>
                 {stat.value}
               </div>
@@ -177,11 +172,23 @@ export default function CapabilitySection() {
           ))}
         </div>
 
-
       </div>
 
       {/* Responsive */}
       <style>{`
+        .capability-stats-grid {
+          display: grid;
+          grid-template-columns: repeat(5, 1fr);
+          border: 1px solid var(--line);
+          margin-bottom: clamp(40px, 5vw, 64px);
+        }
+        .capability-stat-item {
+          border-right: 1px solid var(--line);
+          border-bottom: 1px solid var(--line);
+        }
+        .capability-stat-item:nth-child(5n) {
+          border-right: none;
+        }
         [data-stat-cell] {
           transition: background-color 300ms ease, transform 300ms ease;
         }
@@ -195,13 +202,37 @@ export default function CapabilitySection() {
           }
         }
         @media (max-width: 1024px) {
-          #capabilities [data-stats-grid] {
+          .capability-stats-grid {
             grid-template-columns: repeat(3, 1fr) !important;
+          }
+          .capability-stat-item:nth-child(5n) {
+            border-right: 1px solid var(--line) !important;
+          }
+          .capability-stat-item:nth-child(3n) {
+            border-right: none !important;
           }
         }
         @media (max-width: 640px) {
-          #capabilities [data-stats-grid] {
+          .capability-stats-grid {
             grid-template-columns: repeat(2, 1fr) !important;
+          }
+          .capability-stat-item:nth-child(3n) {
+            border-right: 1px solid var(--line) !important;
+          }
+          .capability-stat-item:nth-child(2n) {
+            border-right: none !important;
+          }
+          .capability-stat-item:last-child {
+            grid-column: span 2;
+          }
+        }
+        @media (max-width: 420px) {
+          .capability-stats-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .capability-stat-item {
+            border-right: none !important;
+            grid-column: auto !important;
           }
         }
       `}</style>

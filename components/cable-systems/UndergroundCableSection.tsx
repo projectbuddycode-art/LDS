@@ -51,7 +51,7 @@ export default function UndergroundCableSection() {
   return (
     <section
       ref={sectionRef}
-      id="capabilities"
+      id="cable-systems"
       className="section-py"
       style={{ background: 'var(--bg-primary)', borderTop: '1px solid var(--line-soft)' }}
       aria-label="Underground cable systems"
@@ -67,13 +67,12 @@ export default function UndergroundCableSection() {
             </div>
 
             <h2 data-reveal className="t-headline" style={{ marginBottom: '24px' }}>
-              Power beneath
-              <br />
+              Power beneath{' '}
               <span style={{ color: 'var(--accent-gold)' }}>the surface.</span>
             </h2>
 
             <p data-reveal className="t-body" style={{ maxWidth: '440px', marginBottom: '36px' }}>
-              Lukhdatar & Sons engineers, supplies, lays, tests, and maintains high-voltage underground cable networks up to 66KV. Our teams manage route surveying, trench excavation, bedding, duct installation, certified jointing, and routine maintenance across commercial, housing, industrial, and public sector developments.
+              Lukhdatar &amp; Sons engineers, supplies, lays, tests, and maintains high-voltage underground cable networks up to 66KV. Our teams manage route surveying, trench excavation, bedding, duct installation, certified jointing, and routine maintenance across commercial, housing, industrial, and public sector developments.
             </p>
 
             <div data-reveal style={{

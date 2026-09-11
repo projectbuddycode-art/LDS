@@ -14,13 +14,12 @@ export default function QualitySafetyPage() {
             <span className="section-label-bullet" />
             <span className="t-label">Safety & Quality Protocols</span>
           </div>
-          <h1 className="t-headline" style={{ marginBottom: '24px', fontSize: 'clamp(32px, 5vw, 64px)', lineHeight: 1.05 }}>
-            Quality & Safety
-            <br />
+          <h1 className="t-headline" style={{ marginBottom: '24px', fontSize: 'clamp(32px, 5vw, 64px)', lineHeight: 1.05, textWrap: 'balance' }}>
+            Quality &amp; Safety{' '}
             <span style={{ color: 'var(--accent-gold)' }}>Approach Protocols</span>
           </h1>
           <p className="t-body" style={{ maxWidth: '680px', fontSize: 'clamp(16px, 1.2vw, 20px)', lineHeight: 1.6 }}>
-            Lukhdatar & Sons operates under strict quality and safety compliance criteria. Every installation is tested, checked, and verified for grid safety and technical specifications compliance.
+            Lukhdatar &amp; Sons operates under strict quality and safety compliance criteria. Every installation is tested, checked, and verified for grid safety and technical specifications compliance.
           </p>
         </div>
       </section>
@@ -32,13 +31,12 @@ export default function QualitySafetyPage() {
             <span className="section-label-bullet" />
             <span className="t-label">Execution Principles</span>
           </div>
-          <h2 className="t-headline" style={{ fontSize: 'clamp(24px, 3.5vw, 40px)', marginBottom: '40px' }}>
-            Lifecycle Quality
-            <br />
+          <h2 className="t-headline" style={{ fontSize: 'clamp(24px, 3.5vw, 40px)', marginBottom: '40px', textWrap: 'balance' }}>
+            Lifecycle Quality{' '}
             <span style={{ color: 'var(--accent-gold)' }}>Management</span>
           </h2>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2px', background: 'var(--line)', border: '1px solid var(--line)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 260px), 1fr))', gap: '2px', background: 'var(--line)', border: '1px solid var(--line)' }}>
             {[
               { title: 'Planning', desc: 'Sourcing components from verified, client-approved manufacturer supply chains with documented specifications.' },
               { title: 'Engineering Review', desc: 'Validating electrical load diagrams, wiring routing constraints, and substation clearance distances.' },
@@ -70,17 +68,16 @@ export default function QualitySafetyPage() {
                 <span className="section-label-bullet" />
                 <span className="t-label">Safety Principles</span>
               </div>
-              <h2 className="t-headline" style={{ fontSize: 'clamp(24px, 3.5vw, 40px)', marginBottom: '24px' }}>
-                On-Ground Safety
-                <br />
+              <h2 className="t-headline" style={{ fontSize: 'clamp(24px, 3.5vw, 40px)', marginBottom: '24px', textWrap: 'balance' }}>
+                On-Ground Safety{' '}
                 <span style={{ color: 'var(--accent-gold)' }}>Mandates</span>
               </h2>
               <p className="t-body" style={{ maxWidth: '480px' }}>
-                Electrical infrastructure works carry high operational risk. Lukhdatar & Sons enforces strict field safety protocols to safeguard personnel and equipment assets.
+                Electrical infrastructure works carry high operational risk. Lukhdatar &amp; Sons enforces strict field safety protocols to safeguard personnel and equipment assets.
               </p>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px', borderLeft: '1px solid var(--line-soft)', paddingLeft: 'clamp(20px, 3vw, 48px)' }}>
+            <div className="col-border-responsive" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px', borderLeft: '1px solid var(--line-soft)', paddingLeft: 'clamp(20px, 3vw, 48px)' }}>
               {[
                 { title: 'Mandatory PPE Compliance', desc: 'All personnel wear certified protective helmets, insulating gloves, high-visibility jackets, and electrical safety footwear.' },
                 { title: 'Trench & Laying Protections', desc: 'Cable trench barricading, warning tapes placement, and structural support frames during heavy digging.' },

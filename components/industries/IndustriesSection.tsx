@@ -243,9 +243,8 @@ export default function IndustriesSection() {
           gap: 'clamp(24px, 4vw, 64px)',
           alignItems: 'end',
         }}>
-          <h2 className="t-headline">
-            POWERING EVERY
-            <br />
+          <h2 className="t-headline" style={{ textWrap: 'balance' }}>
+            POWERING EVERY{' '}
             <span style={{ color: 'var(--accent-gold)' }}>SECTOR.</span>
           </h2>
           <p className="t-body" style={{ maxWidth: '440px' }}>

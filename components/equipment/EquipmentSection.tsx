@@ -80,9 +80,8 @@ export default function EquipmentSection() {
             <span className="section-label-bullet" />
             <span className="t-label">07 — Products &amp; Equipment</span>
           </div>
-          <h2 data-reveal className="t-headline" style={{ marginBottom: '16px' }}>
-            Electrical Equipment Built for
-            <br />
+          <h2 data-reveal className="t-headline" style={{ marginBottom: '16px', textWrap: 'balance' }}>
+            Electrical Equipment Built for{' '}
             <span style={{ color: 'var(--accent-gold)' }}>Reliable Performance.</span>
           </h2>
           <p data-reveal className="t-body" style={{ maxWidth: '440px' }}>
@@ -94,7 +93,7 @@ export default function EquipmentSection() {
         {/* Equipment video cards (6 categories mapped to cinematics) */}
         <div id="equipment-grid" style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
           gap: '12px',
           marginBottom: 'clamp(40px, 5vw, 64px)'
         }}>
@@ -115,7 +114,7 @@ export default function EquipmentSection() {
                 background: 'linear-gradient(to top, rgba(10,14,18,0.85) 0%, rgba(10,14,18,0.2) 40%, transparent 70%)',
                 zIndex: 2,
               }} />
-              <div style={{ position: 'absolute', bottom: '24px', left: '24px', right: '24px', zIndex: 3 }}>
+              <div className="equipment-card-content" style={{ position: 'absolute', bottom: '24px', left: '24px', right: '24px', zIndex: 3 }}>
                 <div className="t-label" style={{ color: 'var(--accent-gold)', marginBottom: '6px' }}>Equipment Category</div>
                 <div style={{ fontSize: 'clamp(16px, 1.3vw, 19px)', fontWeight: 600, color: '#FAF8F5', letterSpacing: '-0.01em', marginBottom: '4px' }}>
                   {item.title}
@@ -133,12 +132,13 @@ export default function EquipmentSection() {
           <div style={{
             display: 'flex', alignItems: 'center', gap: '16px',
             marginBottom: '24px', borderBottom: '1px solid var(--line)', paddingBottom: '16px',
+            flexWrap: 'wrap',
           }}>
             <span className="t-label" style={{ color: 'var(--text-muted)' }}>Complete Equipment &amp; Panel Range</span>
-            <div style={{ flex: 1, height: '1px', background: 'var(--line-soft)' }} />
+            <div style={{ flex: 1, minWidth: '40px', height: '1px', background: 'var(--line-soft)' }} />
           </div>
           <div style={{
-            display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+            display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 150px), 1fr))',
             border: '1px solid var(--line)',
           }}>
             {EQUIPMENT_CATEGORIES.map((cat) => (
@@ -168,9 +168,14 @@ export default function EquipmentSection() {
         .equipment-card:hover .equipment-card-media {
           transform: scale(1.03);
         }
-        @media (max-width: 768px) {
+        @media (max-width: 540px) {
           #equipment-grid {
             grid-template-columns: 1fr !important;
+          }
+          .equipment-card-content {
+            bottom: 16px !important;
+            left: 16px !important;
+            right: 16px !important;
           }
         }
       `}</style>

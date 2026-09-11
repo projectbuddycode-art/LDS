@@ -55,10 +55,11 @@ export default function FinalCTA() {
         </div>
 
         <h2 data-reveal style={{
-          fontSize: 'clamp(42px, 6vw, 96px)', fontWeight: 600,
-          letterSpacing: '-0.025em', lineHeight: 0.92,
+          fontSize: 'clamp(32px, 5.5vw, 84px)', fontWeight: 600,
+          letterSpacing: '-0.025em', lineHeight: 1.05,
           color: 'var(--text-primary)', marginBottom: 'clamp(24px, 3vw, 40px)',
           maxWidth: '720px',
+          textWrap: 'balance',
         }}>
           Ready for the next{' '}
           <span style={{ color: 'var(--accent-gold)' }}>requirement?</span>
@@ -70,26 +71,26 @@ export default function FinalCTA() {
 
         <div data-reveal style={{ width: '100%', height: '1px', background: 'var(--line-soft)', marginBottom: 'clamp(32px, 4vw, 48px)' }} />
 
-        <div data-reveal style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, auto))', gap: '12px', maxWidth: '720px' }}>
+        <div data-reveal style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))', gap: '12px', maxWidth: '720px' }}>
           <button
             onClick={() => openQuoteModal()}
             className="cta-btn cta-btn-primary"
-            style={{ justifyContent: 'space-between', cursor: 'pointer', fontFamily: 'inherit' }}
+            style={{ justifyContent: 'space-between', cursor: 'pointer', fontFamily: 'inherit', minHeight: '48px' }}
           >
             Get a Quote <span className="cta-arrow">↗</span>
           </button>
           <button
             onClick={() => openQuoteModal('Electrical Equipment Supply')}
             className="cta-btn"
-            style={{ justifyContent: 'space-between', cursor: 'pointer', fontFamily: 'inherit' }}
+            style={{ justifyContent: 'space-between', cursor: 'pointer', fontFamily: 'inherit', minHeight: '48px' }}
           >
             Request Equipment <span className="cta-arrow">↗</span>
           </button>
-          <a href="/capabilities" className="cta-btn" style={{ justifyContent: 'space-between' }}>
+          <a href="/capabilities" className="cta-btn" style={{ justifyContent: 'space-between', minHeight: '48px' }}>
             Our Services <span className="cta-arrow">↗</span>
           </a>
-          <a href="/insights" className="cta-btn" style={{ justifyContent: 'space-between' }}>
-            Projects & Industries <span className="cta-arrow">↗</span>
+          <a href="/insights" className="cta-btn" style={{ justifyContent: 'space-between', minHeight: '48px' }}>
+            Projects &amp; Industries <span className="cta-arrow">↗</span>
           </a>
         </div>
 

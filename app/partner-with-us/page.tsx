@@ -17,9 +17,8 @@ export default function ClientsPartnershipsPage() {
             <span className="section-label-bullet" />
             <span className="t-label">OUR CLIENTS &amp; RELATIONSHIPS</span>
           </div>
-          <h1 className="t-headline" style={{ marginBottom: '24px', fontSize: 'clamp(32px, 5vw, 64px)', lineHeight: 1.05 }}>
-            Trusted Relationships
-            <br />
+          <h1 className="t-headline" style={{ marginBottom: '24px', fontSize: 'clamp(32px, 5vw, 64px)', lineHeight: 1.05, textWrap: 'balance' }}>
+            Trusted Relationships{' '}
             <span style={{ color: 'var(--accent-gold)' }}>Across the Electrical Industry.</span>
           </h1>
           <p className="t-body" style={{ maxWidth: '680px', fontSize: 'clamp(16px, 1.2vw, 20px)', lineHeight: 1.6 }}>
@@ -35,13 +34,12 @@ export default function ClientsPartnershipsPage() {
             <span className="section-label-bullet" />
             <span className="t-label">PROSPECTUS-VERIFIED CREDENTIALS</span>
           </div>
-          <h2 className="t-headline" style={{ fontSize: 'clamp(26px, 3.2vw, 40px)', marginBottom: '36px' }}>
-            Authorizations, System House &amp;
-            <br />
+          <h2 className="t-headline" style={{ fontSize: 'clamp(26px, 3.2vw, 40px)', marginBottom: '36px', textWrap: 'balance' }}>
+            Authorizations, System House &amp;{' '}
             <span style={{ color: 'var(--accent-gold)' }}>Joint Venture Partnerships</span>
           </h2>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '20px' }}>
             {VERIFIED_RELATIONSHIPS.map((rel, idx) => (
               <div
                 key={idx}
@@ -74,16 +72,15 @@ export default function ClientsPartnershipsPage() {
             <span className="section-label-bullet" />
             <span className="t-label">BRANDS &amp; INDUSTRY RELATIONSHIPS</span>
           </div>
-          <h2 className="t-headline" style={{ fontSize: 'clamp(24px, 3vw, 38px)', marginBottom: '16px' }}>
-            Integrated Brands
-            <br />
+          <h2 className="t-headline" style={{ fontSize: 'clamp(24px, 3vw, 38px)', marginBottom: '16px', textWrap: 'balance' }}>
+            Integrated Brands{' '}
             <span style={{ color: 'var(--accent-gold)' }}>&amp; Components</span>
           </h2>
           <p className="t-body" style={{ maxWidth: '640px', marginBottom: '36px' }}>
             LDS procures, configures, and installs high-grade switchgear, cables, transformers, and distribution components from leading approved electrical manufacturers:
           </p>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 130px), 1fr))', gap: '16px' }}>
             {ECOSYSTEM_LOGOS.map((brand) => (
               <div
                 key={brand.name}

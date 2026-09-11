@@ -83,9 +83,8 @@ export default function ProductsEquipmentPage() {
             <span className="section-label-bullet" />
             <span className="t-label">PRODUCTS &amp; EQUIPMENT</span>
           </div>
-          <h1 className="t-headline" style={{ marginBottom: '24px', fontSize: 'clamp(32px, 5vw, 64px)', lineHeight: 1.05 }}>
-            Electrical Equipment Built for
-            <br />
+          <h1 className="t-headline" style={{ marginBottom: '24px', fontSize: 'clamp(32px, 5vw, 64px)', lineHeight: 1.05, textWrap: 'balance' }}>
+            Electrical Equipment Built for{' '}
             <span style={{ color: 'var(--accent-gold)' }}>Reliable Performance.</span>
           </h1>
           <p className="t-body" style={{ maxWidth: '680px', fontSize: 'clamp(16px, 1.2vw, 20px)', lineHeight: 1.6 }}>
@@ -101,15 +100,14 @@ export default function ProductsEquipmentPage() {
             <span className="section-label-bullet" />
             <span className="t-label">PRIMARY EQUIPMENT CATEGORIES</span>
           </div>
-          <h2 className="t-headline" style={{ fontSize: 'clamp(26px, 3.2vw, 40px)', marginBottom: '36px' }}>
-            Power Distribution &amp;
-            <br />
+          <h2 className="t-headline" style={{ fontSize: 'clamp(26px, 3.2vw, 40px)', marginBottom: '36px', textWrap: 'balance' }}>
+            Power Distribution &amp;{' '}
             <span style={{ color: 'var(--accent-gold)' }}>Control Assemblies</span>
           </h2>
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
             gap: '16px',
             marginBottom: '48px',
           }}>
@@ -170,16 +168,15 @@ export default function ProductsEquipmentPage() {
                 <span className="section-label-bullet" />
                 <span className="t-label">VERIFIED EQUIPMENT RANGE</span>
               </div>
-              <h2 className="t-headline" style={{ fontSize: 'clamp(24px, 3vw, 38px)', marginBottom: '24px' }}>
-                Complete Switchgear,
-                <br />
+              <h2 className="t-headline" style={{ fontSize: 'clamp(24px, 3vw, 38px)', marginBottom: '24px', textWrap: 'balance' }}>
+                Complete Switchgear,{' '}
                 <span style={{ color: 'var(--accent-gold)' }}>Panels &amp; Distribution</span>
               </h2>
               <p className="t-body" style={{ maxWidth: '480px', marginBottom: '32px' }}>
                 Manufactured and supplied to strict technical specifications. Available in standard and custom engineering configurations with full compliance documentation.
               </p>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '10px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '10px' }}>
                 {EQUIPMENT_CATEGORIES.map((cat, idx) => (
                   <div
                     key={cat}
@@ -203,7 +200,7 @@ export default function ProductsEquipmentPage() {
             </div>
 
             {/* Right Column: Simple Indian-Business Friendly "Get a Quote" Form */}
-            <div style={{ background: 'var(--bg-light)', border: '1px solid var(--line-gold)', padding: 'clamp(24px, 3.5vw, 40px)', position: 'sticky', top: '100px' }}>
+            <div className="vendor-quote-card" style={{ background: 'var(--bg-light)', border: '1px solid var(--line-gold)', padding: 'clamp(24px, 3.5vw, 40px)', position: 'sticky', top: '100px' }}>
               {!formSubmitted ? (
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   <div>
@@ -225,7 +222,7 @@ export default function ProductsEquipmentPage() {
                     </div>
                   )}
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                  <div className="vendor-form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                       <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                         Full Name *
@@ -236,7 +233,7 @@ export default function ProductsEquipmentPage() {
                         placeholder="Your Name"
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        style={{ padding: '10px 12px', background: 'var(--bg-primary)', border: '1px solid var(--line)', fontSize: '13px', color: 'var(--text-primary)', width: '100%' }}
+                        style={{ padding: '10px 12px', background: 'var(--bg-primary)', border: '1px solid var(--line)', fontSize: '13px', color: 'var(--text-primary)', width: '100%', minHeight: '44px' }}
                       />
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
@@ -248,12 +245,12 @@ export default function ProductsEquipmentPage() {
                         placeholder="Company"
                         value={formData.company}
                         onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                        style={{ padding: '10px 12px', background: 'var(--bg-primary)', border: '1px solid var(--line)', fontSize: '13px', color: 'var(--text-primary)', width: '100%' }}
+                        style={{ padding: '10px 12px', background: 'var(--bg-primary)', border: '1px solid var(--line)', fontSize: '13px', color: 'var(--text-primary)', width: '100%', minHeight: '44px' }}
                       />
                     </div>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                  <div className="vendor-form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                       <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                         Phone Number *
@@ -264,7 +261,7 @@ export default function ProductsEquipmentPage() {
                         placeholder="+91 Phone"
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        style={{ padding: '10px 12px', background: 'var(--bg-primary)', border: '1px solid var(--line)', fontSize: '13px', color: 'var(--text-primary)', width: '100%' }}
+                        style={{ padding: '10px 12px', background: 'var(--bg-primary)', border: '1px solid var(--line)', fontSize: '13px', color: 'var(--text-primary)', width: '100%', minHeight: '44px' }}
                       />
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
@@ -277,12 +274,12 @@ export default function ProductsEquipmentPage() {
                         placeholder="Email Address"
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        style={{ padding: '10px 12px', background: 'var(--bg-primary)', border: '1px solid var(--line)', fontSize: '13px', color: 'var(--text-primary)', width: '100%' }}
+                        style={{ padding: '10px 12px', background: 'var(--bg-primary)', border: '1px solid var(--line)', fontSize: '13px', color: 'var(--text-primary)', width: '100%', minHeight: '44px' }}
                       />
                     </div>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                  <div className="vendor-form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                       <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                         Project Type *
@@ -290,7 +287,7 @@ export default function ProductsEquipmentPage() {
                       <select
                         value={formData.projectType}
                         onChange={(e) => setFormData({ ...formData, projectType: e.target.value })}
-                        style={{ padding: '10px 12px', background: 'var(--bg-primary)', border: '1px solid var(--line)', fontSize: '13px', color: 'var(--text-primary)', width: '100%' }}
+                        style={{ padding: '10px 12px', background: 'var(--bg-primary)', border: '1px solid var(--line)', fontSize: '13px', color: 'var(--text-primary)', width: '100%', minHeight: '44px' }}
                       >
                         {PROJECT_TYPES.map((type) => (
                           <option key={type} value={type}>{type}</option>
@@ -306,7 +303,7 @@ export default function ProductsEquipmentPage() {
                         placeholder="City, State"
                         value={formData.location}
                         onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                        style={{ padding: '10px 12px', background: 'var(--bg-primary)', border: '1px solid var(--line)', fontSize: '13px', color: 'var(--text-primary)', width: '100%' }}
+                        style={{ padding: '10px 12px', background: 'var(--bg-primary)', border: '1px solid var(--line)', fontSize: '13px', color: 'var(--text-primary)', width: '100%', minHeight: '44px' }}
                       />
                     </div>
                   </div>
@@ -351,6 +348,7 @@ export default function ProductsEquipmentPage() {
                       textTransform: 'uppercase',
                       cursor: isSubmitting ? 'not-allowed' : 'pointer',
                       opacity: isSubmitting ? 0.7 : 1,
+                      minHeight: '44px',
                     }}
                   >
                     {isSubmitting ? 'SENDING REQUEST...' : 'SEND REQUEST ↗'}
@@ -396,6 +394,26 @@ export default function ProductsEquipmentPage() {
           </div>
         </div>
       </section>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .vendor-quote-card {
+            position: static !important;
+            margin-top: 32px;
+          }
+        }
+        @media (max-width: 640px) {
+          .vendor-form-row {
+            grid-template-columns: 1fr !important;
+            gap: 10px !important;
+          }
+          .vendor-quote-card input,
+          .vendor-quote-card select,
+          .vendor-quote-card textarea {
+            font-size: 16px !important; /* Prevents iOS auto-zoom */
+          }
+        }
+      `}</style>
     </PageLayout>
   )
 }

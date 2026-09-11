@@ -194,7 +194,11 @@ export default function Header() {
               cursor: 'pointer',
               display: 'flex',
               flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
               gap: '5px',
+              width: '44px',
+              height: '44px',
               padding: '8px',
             }}
           >
@@ -227,7 +231,11 @@ export default function Header() {
             padding: '24px var(--container-px) 32px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '20px',
+            gap: '18px',
+            maxHeight: 'calc(100dvh - 72px)',
+            overflowY: 'auto',
+            WebkitOverflowScrolling: 'touch',
+            boxShadow: '0 12px 32px rgba(0,0,0,0.15)',
           }}
         >
           {NAV_LINKS.map((link) => (
@@ -236,12 +244,12 @@ export default function Header() {
               href={link.href}
               onClick={() => setMenuOpen(false)}
               style={{
-                fontSize: '16px',
+                fontSize: '15px',
                 fontWeight: 500,
                 color: 'var(--text-primary)',
                 textDecoration: 'none',
                 borderBottom: '1px solid var(--line-soft)',
-                paddingBottom: '20px',
+                paddingBottom: '16px',
               }}
             >
               {link.label}
@@ -269,6 +277,8 @@ export default function Header() {
               justifyContent: 'center',
               gap: '8px',
               transition: 'all 250ms ease',
+              marginTop: '8px',
+              minHeight: '44px',
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.background = 'var(--accent-gold)'

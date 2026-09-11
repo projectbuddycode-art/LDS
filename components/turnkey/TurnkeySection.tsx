@@ -191,6 +191,7 @@ export default function TurnkeySection() {
 
           <div
             data-stages-row
+            className="turnkey-stages-grid"
             style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(7, 1fr)',
@@ -202,9 +203,9 @@ export default function TurnkeySection() {
               <div
                 key={stage.number}
                 data-stage
+                className="turnkey-stage-item"
                 style={{
-                  padding: 'clamp(28px, 3vw, 40px) clamp(12px, 1.5vw, 20px) clamp(20px, 2.5vw, 32px)',
-                  borderLeft: i > 0 ? '1px solid var(--line-soft)' : 'none',
+                  padding: 'clamp(24px, 3vw, 40px) clamp(12px, 1.5vw, 20px) clamp(20px, 2.5vw, 32px)',
                   position: 'relative',
                   background: 'var(--bg-primary)',
                 }}
@@ -290,7 +291,7 @@ export default function TurnkeySection() {
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 260px), 1fr))',
             border: '1px solid var(--line)',
           }}>
             {CAPABILITY_GROUPS.map((group) => (
@@ -381,10 +382,17 @@ export default function TurnkeySection() {
 
       {/* Responsive */}
       <style>{`
-        [data-stage] {
+        .turnkey-stages-grid {
+          border: 1px solid var(--line);
+        }
+        .turnkey-stage-item {
+          border-right: 1px solid var(--line-soft);
           transition: background-color 300ms ease, transform 300ms ease;
         }
-        [data-stage]:hover {
+        .turnkey-stage-item:last-child {
+          border-right: none;
+        }
+        .turnkey-stage-item:hover {
           background-color: rgba(201, 160, 82, 0.03);
         }
         @media (max-width: 768px) {
@@ -397,13 +405,40 @@ export default function TurnkeySection() {
           }
         }
         @media (max-width: 1024px) {
-          [data-stages-row] {
+          [data-connector-line] {
+            display: none !important;
+          }
+          .turnkey-stages-grid {
             grid-template-columns: repeat(4, 1fr) !important;
+          }
+          .turnkey-stage-item {
+            border-bottom: 1px solid var(--line-soft);
+          }
+          .turnkey-stage-item:nth-child(4n) {
+            border-right: none !important;
           }
         }
         @media (max-width: 640px) {
-          [data-stages-row] {
+          .turnkey-stages-grid {
             grid-template-columns: repeat(2, 1fr) !important;
+          }
+          .turnkey-stage-item:nth-child(4n) {
+            border-right: 1px solid var(--line-soft) !important;
+          }
+          .turnkey-stage-item:nth-child(2n) {
+            border-right: none !important;
+          }
+          .turnkey-stage-item:last-child {
+            grid-column: span 2;
+          }
+        }
+        @media (max-width: 420px) {
+          .turnkey-stages-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .turnkey-stage-item {
+            border-right: none !important;
+            grid-column: auto !important;
           }
         }
       `}</style>

@@ -111,7 +111,7 @@ export default function LeadershipSection() {
         </div>
 
         {/* Main grid: portraits LEFT, story RIGHT */}
-        <div style={{
+        <div className="leadership-main-grid" style={{
           display: 'grid',
           gridTemplateColumns: 'clamp(240px, 28%, 380px) 1fr',
           gap: 'clamp(40px, 6vw, 88px)',
@@ -119,7 +119,7 @@ export default function LeadershipSection() {
         }}>
 
           {/* ── LEFT: Portrait column ─────────────────── */}
-          <div data-portraits style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+          <div data-portraits className="leadership-portraits-col" style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
 
             {/* Founder portrait */}
             <div>
@@ -212,7 +212,7 @@ export default function LeadershipSection() {
 
             <p data-reveal className="t-body" style={{ maxWidth: '540px', marginBottom: '44px' }}>
               From a Kolkata electrical supply business to a full-service turnkey contractor — the
-              evolution of Lukhdatar & Sons reflects a deliberate accumulation of technical knowledge,
+              evolution of Lukhdatar &amp; Sons reflects a deliberate accumulation of technical knowledge,
               field experience and delivery capability.
             </p>
 
@@ -235,10 +235,11 @@ export default function LeadershipSection() {
                 <div
                   key={item.year}
                   data-reveal
+                  className="founder-story-row"
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: '72px 1fr',
-                    gap: '20px',
+                    gridTemplateColumns: '64px 1fr',
+                    gap: '16px',
                     padding: '18px 0',
                     borderBottom: '1px solid var(--line-soft)',
                   }}
@@ -317,15 +318,10 @@ export default function LeadershipSection() {
             </div>
 
             {/* Capability highlights */}
-            <div data-reveal style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              border: '1px solid var(--line)',
-            }}>
+            <div data-reveal className="leadership-stats-grid">
               {CAPABILITY_HIGHLIGHTS.map((stat, i) => (
-                <div key={stat.value} style={{
+                <div key={stat.value} className="leadership-stat-cell" style={{
                   padding: '18px 16px',
-                  borderRight: i < CAPABILITY_HIGHLIGHTS.length - 1 ? '1px solid var(--line)' : 'none',
                 }}>
                   <div style={{
                     fontSize: 'clamp(20px, 2.2vw, 28px)',
@@ -362,10 +358,42 @@ export default function LeadershipSection() {
         .leadership-portrait-card:hover {
           transform: translateY(-3px);
         }
-        @media (max-width: 768px) {
-          #company .site-container > div:nth-child(2) {
+        .leadership-stats-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          border: 1px solid var(--line);
+        }
+        .leadership-stat-cell {
+          border-right: 1px solid var(--line);
+        }
+        .leadership-stat-cell:last-child {
+          border-right: none;
+        }
+        @media (max-width: 900px) {
+          .leadership-main-grid {
             grid-template-columns: 1fr !important;
-            gap: 32px !important;
+            gap: 36px !important;
+          }
+          .leadership-portraits-col {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 16px !important;
+          }
+        }
+        @media (max-width: 540px) {
+          .leadership-portraits-col {
+            grid-template-columns: 1fr !important;
+            gap: 24px !important;
+          }
+          .leadership-stats-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .leadership-stat-cell {
+            border-right: none !important;
+            border-bottom: 1px solid var(--line);
+          }
+          .leadership-stat-cell:last-child {
+            border-bottom: none;
           }
         }
       `}</style>

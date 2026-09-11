@@ -133,17 +133,17 @@ export default async function CapabilityDetailPage({ params }: PageProps) {
             <h2 style={{ fontSize: '13px', fontWeight: 600, color: 'var(--accent-gold)', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '24px' }}>
               Technical Parameters Matrix
             </h2>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', border: '1px solid var(--line)', background: 'var(--bg-light)' }}>
+            <div id="capability-spec-table" style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', border: '1px solid var(--line)', background: 'var(--bg-light)' }}>
               {capability.specs.map((spec, idx) => {
                 const parts = spec.split(':')
                 const label = parts[0]
                 const value = parts[1] || spec
                 return (
-                  <div key={idx} style={{ display: 'contents' }}>
-                    <div style={{ padding: '16px 20px', borderRight: '1px solid var(--line-soft)', borderBottom: '1px solid var(--line-soft)', fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                  <div key={idx} className="spec-row" style={{ display: 'contents' }}>
+                    <div className="spec-label" style={{ padding: '16px 20px', borderRight: '1px solid var(--line-soft)', borderBottom: '1px solid var(--line-soft)', fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)' }}>
                       {label}
                     </div>
-                    <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--line-soft)', fontSize: '13px', color: 'var(--text-secondary)' }}>
+                    <div className="spec-val" style={{ padding: '16px 20px', borderBottom: '1px solid var(--line-soft)', fontSize: '13px', color: 'var(--text-secondary)' }}>
                       {value}
                     </div>
                   </div>
@@ -154,7 +154,7 @@ export default async function CapabilityDetailPage({ params }: PageProps) {
 
           {/* CTA Section */}
           <div style={{ marginTop: '64px', textAlign: 'center', borderTop: '1px solid var(--line)', paddingTop: '48px' }}>
-            <h3 style={{ fontSize: '20px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '16px' }}>
+            <h3 style={{ fontSize: '20px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '16px', textWrap: 'balance' }}>
               Discuss your electrical project requirements with our engineering team.
             </h3>
             <Link href={capability.ctaHref} className="cta-btn cta-btn-primary">
@@ -164,6 +164,30 @@ export default async function CapabilityDetailPage({ params }: PageProps) {
 
         </div>
       </section>
+
+      <style>{`
+        @media (max-width: 640px) {
+          #capability-spec-table {
+            display: flex !important;
+            flex-direction: column !important;
+          }
+          .spec-row {
+            display: flex !important;
+            flex-direction: column !important;
+            border-bottom: 1px solid var(--line-soft);
+          }
+          .spec-label {
+            border-right: none !important;
+            border-bottom: none !important;
+            padding: 12px 16px 4px !important;
+            color: var(--accent-gold) !important;
+          }
+          .spec-val {
+            border-bottom: none !important;
+            padding: 0 16px 12px !important;
+          }
+        }
+      `}</style>
     </PageLayout>
   )
 }

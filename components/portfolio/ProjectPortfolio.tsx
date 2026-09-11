@@ -94,14 +94,13 @@ export default function ProjectPortfolio() {
               <span className="section-label-bullet" />
               <span className="t-label">09 — Project Portfolio</span>
             </div>
-            <h2 data-reveal className="t-headline">
-              Delivered
-              <br />
+            <h2 data-reveal className="t-headline" style={{ textWrap: 'balance' }}>
+              Delivered{' '}
               <span style={{ color: 'var(--accent-gold)' }}>across sectors.</span>
             </h2>
           </div>
           <p data-reveal className="t-body" style={{ maxWidth: '380px' }}>
-            Lukhdatar & Sons has delivered complete electrical infrastructure for hospitality, healthcare,
+            Lukhdatar &amp; Sons has delivered complete electrical infrastructure for hospitality, healthcare,
             residential, commercial and industrial clients across India.
           </p>
         </div>

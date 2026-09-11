@@ -633,10 +633,11 @@ export default function LDSChatbot() {
     <>
       {/* Floating trigger button */}
       <div
+        className="ask-lds-trigger-container"
         style={{
           position: 'fixed',
-          bottom: '28px',
-          right: '28px',
+          bottom: 'calc(24px + env(safe-area-inset-bottom, 0px))',
+          right: 'calc(24px + env(safe-area-inset-right, 0px))',
           zIndex: 9000,
         }}
       >
@@ -665,10 +666,10 @@ export default function LDSChatbot() {
           className="lds-chat-modal"
           style={{
             position: 'fixed',
-            bottom: '88px',
-            right: '28px',
+            bottom: 'calc(84px + env(safe-area-inset-bottom, 0px))',
+            right: 'calc(24px + env(safe-area-inset-right, 0px))',
             width: 'min(440px, calc(100vw - 36px))',
-            height: 'min(590px, calc(100vh - 120px))',
+            height: 'min(590px, calc(100dvh - 120px))',
             background: '#121820',
             border: '1px solid rgba(201, 160, 82, 0.28)',
             borderTop: '2px solid var(--accent-gold)',
@@ -982,17 +983,20 @@ export default function LDSChatbot() {
           0%, 100% { opacity: 1; transform: scale(1); }
           50% { opacity: 0.4; transform: scale(0.85); }
         }
-        .typing-dot {
-          width: 5px;
-          height: 5px;
-          background: var(--accent-gold);
-          border-radius: 50%;
-          display: inline-block;
-          animation: typing-blink 1.2s infinite ease-in-out;
-        }
-        @keyframes typing-blink {
-          0%, 80%, 100% { transform: scale(0.6); opacity: 0.3; }
-          40% { transform: scale(1); opacity: 1; }
+        @media (max-width: 480px) {
+          .ask-lds-trigger-btn {
+            padding: 10px 16px;
+            font-size: 11px;
+            gap: 8px;
+          }
+          .lds-chat-modal {
+            right: 16px !important;
+            left: 16px !important;
+            width: auto !important;
+            max-width: calc(100vw - 32px) !important;
+            bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
+            height: calc(100dvh - 96px) !important;
+          }
         }
       `}</style>
     </>

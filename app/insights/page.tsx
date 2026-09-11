@@ -56,9 +56,8 @@ export default function ProjectsIndustriesPage() {
             <span className="section-label-bullet" />
             <span className="t-label">PROJECTS &amp; INDUSTRIES</span>
           </div>
-          <h1 className="t-headline" style={{ marginBottom: '24px', fontSize: 'clamp(36px, 5vw, 72px)', lineHeight: 1.05 }}>
-            Projects &amp;
-            <br />
+          <h1 className="t-headline" style={{ marginBottom: '24px', fontSize: 'clamp(36px, 5vw, 72px)', lineHeight: 1.05, textWrap: 'balance' }}>
+            Projects &amp;{' '}
             <span style={{ color: 'var(--accent-gold)' }}>Industries Served</span>
           </h1>
           <p className="t-body" style={{ maxWidth: '680px', fontSize: 'clamp(16px, 1.2vw, 20px)', lineHeight: 1.6 }}>
@@ -74,15 +73,14 @@ export default function ProjectsIndustriesPage() {
             <span className="section-label-bullet" />
             <span className="t-label">DELIVERED PROJECTS</span>
           </div>
-          <h2 className="t-headline" style={{ fontSize: 'clamp(28px, 3.5vw, 44px)', marginBottom: '36px' }}>
-            Featured Project
-            <br />
+          <h2 className="t-headline" style={{ fontSize: 'clamp(28px, 3.5vw, 44px)', marginBottom: '36px', textWrap: 'balance' }}>
+            Featured Project{' '}
             <span style={{ color: 'var(--accent-gold)' }}>Execution Experience</span>
           </h2>
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))',
             gap: '16px',
             marginBottom: '40px',
           }}>
@@ -135,9 +133,8 @@ export default function ProjectsIndustriesPage() {
             <span className="section-label-bullet" />
             <span className="t-label">INDUSTRIES</span>
           </div>
-          <h2 className="t-headline" style={{ fontSize: 'clamp(28px, 3.5vw, 44px)', marginBottom: '16px' }}>
-            POWERING EVERY
-            <br />
+          <h2 className="t-headline" style={{ fontSize: 'clamp(28px, 3.5vw, 44px)', marginBottom: '16px', textWrap: 'balance' }}>
+            POWERING EVERY{' '}
             <span style={{ color: 'var(--accent-gold)' }}>SECTOR.</span>
           </h2>
           <p className="t-body" style={{ maxWidth: '540px', marginBottom: '40px' }}>
@@ -146,7 +143,7 @@ export default function ProjectsIndustriesPage() {
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 260px), 1fr))',
             gap: '16px',
           }}>
             {INDUSTRIES.map((ind, idx) => (

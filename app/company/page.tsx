@@ -16,7 +16,7 @@ export default function CompanyPage() {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
               gap: 'clamp(32px, 5vw, 64px)',
               alignItems: 'end',
               justifyContent: 'space-between',
@@ -28,9 +28,8 @@ export default function CompanyPage() {
                 <span className="section-label-bullet" />
                 <span className="t-label">ABOUT US</span>
               </div>
-              <h1 className="t-headline" style={{ marginBottom: '24px', fontSize: 'clamp(36px, 5vw, 72px)', lineHeight: 1.05 }}>
-                Electrical Solutions
-                <br />
+              <h1 className="t-headline" style={{ marginBottom: '24px', fontSize: 'clamp(36px, 5vw, 72px)', lineHeight: 1.05, textWrap: 'balance' }}>
+                Electrical Solutions{' '}
                 <span style={{ color: 'var(--accent-gold)' }}>Built on Experience.</span>
               </h1>
               <p className="t-body" style={{ fontSize: 'clamp(16px, 1.2vw, 20px)', lineHeight: 1.6, margin: 0 }}>
@@ -119,9 +118,8 @@ export default function CompanyPage() {
                 <span className="section-label-bullet" />
                 <span className="t-label">01 — WHO WE ARE</span>
               </div>
-              <h2 className="t-headline" style={{ fontSize: 'clamp(28px, 3.5vw, 44px)', marginBottom: '24px' }}>
-                Our Journey
-                <br />
+              <h2 className="t-headline" style={{ fontSize: 'clamp(28px, 3.5vw, 44px)', marginBottom: '24px', textWrap: 'balance' }}>
+                Our Journey{' '}
                 <span style={{ color: 'var(--accent-gold)' }}>&amp; Milestones</span>
               </h2>
               <p className="t-body" style={{ maxWidth: '480px', marginBottom: '24px', lineHeight: 1.7 }}>
@@ -132,7 +130,7 @@ export default function CompanyPage() {
               </p>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '36px', borderLeft: '1px solid var(--line-soft)', paddingLeft: 'clamp(20px, 3vw, 48px)' }}>
+            <div className="col-border-responsive" style={{ display: 'flex', flexDirection: 'column', gap: '36px', borderLeft: '1px solid var(--line-soft)', paddingLeft: 'clamp(20px, 3vw, 48px)' }}>
               {TIMELINE.map((item) => (
                 <div key={item.year} style={{ position: 'relative' }}>
                   <div style={{ fontSize: 'clamp(22px, 2vw, 32px)', fontWeight: 700, color: 'var(--accent-gold)', marginBottom: '6px' }}>
@@ -158,13 +156,12 @@ export default function CompanyPage() {
             <span className="section-label-bullet" />
             <span className="t-label">02 — WHAT WE DO</span>
           </div>
-          <h2 className="t-headline" style={{ fontSize: 'clamp(28px, 3.5vw, 44px)', marginBottom: '36px' }}>
-            Complete Electrical
-            <br />
+          <h2 className="t-headline" style={{ fontSize: 'clamp(28px, 3.5vw, 44px)', marginBottom: '36px', textWrap: 'balance' }}>
+            Complete Electrical{' '}
             <span style={{ color: 'var(--accent-gold)' }}>Scope of Work</span>
           </h2>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2px', background: 'var(--line)', border: '1px solid var(--line)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 260px), 1fr))', gap: '2px', background: 'var(--line)', border: '1px solid var(--line)' }}>
             {[
               {
                 title: 'Turnkey Project Execution',
@@ -221,9 +218,8 @@ export default function CompanyPage() {
                 <span className="section-label-bullet" />
                 <span className="t-label">03 — WHERE WE WORK</span>
               </div>
-              <h2 className="t-headline" style={{ fontSize: 'clamp(28px, 3.5vw, 44px)', marginBottom: '24px' }}>
-                Government &amp; Private
-                <br />
+              <h2 className="t-headline" style={{ fontSize: 'clamp(28px, 3.5vw, 44px)', marginBottom: '24px', textWrap: 'balance' }}>
+                Government &amp; Private{' '}
                 <span style={{ color: 'var(--accent-gold)' }}>Sector Projects</span>
               </h2>
               <p className="t-body" style={{ maxWidth: '480px', marginBottom: '24px', lineHeight: 1.7 }}>
@@ -236,7 +232,7 @@ export default function CompanyPage() {
                 <span className="section-label-bullet" />
                 <span className="t-label">Sector Specializations</span>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '16px' }}>
                 {[
                   { sector: 'Government & Public Projects', examples: 'State legislative complexes, public infrastructure, and administrative campuses.' },
                   { sector: 'Healthcare & Medical Colleges', examples: 'Medical colleges, hospital wards, research laboratories, and emergency AMF synchronization.' },
@@ -267,13 +263,12 @@ export default function CompanyPage() {
             <span className="section-label-bullet" />
             <span className="t-label">04 — HOW WE WORK</span>
           </div>
-          <h2 className="t-headline" style={{ fontSize: 'clamp(28px, 3.5vw, 44px)', marginBottom: '36px' }}>
-            Structured Execution from
-            <br />
+          <h2 className="t-headline" style={{ fontSize: 'clamp(28px, 3.5vw, 44px)', marginBottom: '36px', textWrap: 'balance' }}>
+            Structured Execution from{' '}
             <span style={{ color: 'var(--accent-gold)' }}>Design to Handover</span>
           </h2>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '20px' }}>
             {[
               { step: '01', title: 'Design & Engineering', desc: 'Single-line diagrams, load calculation reviews, and technical layout planning.' },
               { step: '02', title: 'Equipment Procurement', desc: 'Spec-compliant transformers, switchgear, panels, and cables from verified supply chains.' },
@@ -304,13 +299,12 @@ export default function CompanyPage() {
             <span className="section-label-bullet" />
             <span className="t-label">05 — WHY CLIENTS CHOOSE LDS</span>
           </div>
-          <h2 className="t-headline" style={{ fontSize: 'clamp(28px, 3.5vw, 44px)', marginBottom: '36px' }}>
-            Experience, Capability &amp;
-            <br />
+          <h2 className="t-headline" style={{ fontSize: 'clamp(28px, 3.5vw, 44px)', marginBottom: '36px', textWrap: 'balance' }}>
+            Experience, Capability &amp;{' '}
             <span style={{ color: 'var(--accent-gold)' }}>Single-Point Accountability</span>
           </h2>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '20px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 250px), 1fr))', gap: '20px' }}>
             {[
               {
                 title: 'Established Industry Experience',
@@ -358,13 +352,12 @@ export default function CompanyPage() {
             <span className="section-label-bullet" />
             <span className="t-label">06 — LEADERSHIP</span>
           </div>
-          <h2 className="t-headline" style={{ fontSize: 'clamp(28px, 3.5vw, 44px)', marginBottom: '40px' }}>
-            Leadership Behind
-            <br />
+          <h2 className="t-headline" style={{ fontSize: 'clamp(28px, 3.5vw, 44px)', marginBottom: '40px', textWrap: 'balance' }}>
+            Leadership Behind{' '}
             <span style={{ color: 'var(--accent-gold)' }}>Lukhdatar &amp; Sons</span>
           </h2>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '32px' }}>
             {LEADERSHIP.map((leader) => (
               <div key={leader.id} style={{ display: 'flex', flexDirection: 'column', gap: '20px', border: '1px solid var(--line-soft)', padding: '24px', background: 'var(--bg-light)' }}>
                 <div style={{ position: 'relative', width: '100%', aspectRatio: '4/3', overflow: 'hidden', background: 'var(--surface)' }}>

@@ -137,13 +137,12 @@ export default function EcosystemSection() {
           style={{
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
-            gap: 'clamp(32px, 5vw, 80px)',
+            gap: 'clamp(24px, 4vw, 64px)',
             alignItems: 'end',
           }}
         >
-          <h2 data-reveal className="t-headline">
-            Trusted Relationships
-            <br />
+          <h2 data-reveal className="t-headline" style={{ maxWidth: '540px' }}>
+            Trusted Relationships{' '}
             <span style={{ color: 'var(--accent-gold)' }}>Across the Electrical Industry.</span>
           </h2>
           <div>
@@ -173,6 +172,7 @@ export default function EcosystemSection() {
                   padding: '12px 20px',
                   border: '1px solid var(--line)',
                   transition: 'all 300ms ease',
+                  minHeight: '44px',
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.borderColor = 'var(--accent-gold)'

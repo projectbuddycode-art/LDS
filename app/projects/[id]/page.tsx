@@ -60,7 +60,7 @@ export default async function ProjectCaseStudyPage({ params }: PageProps) {
         <div className="site-container">
           
           {/* Metadata Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '32px', marginBottom: '48px', borderBottom: '1px solid var(--line)', paddingBottom: '32px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '32px', marginBottom: '48px', borderBottom: '1px solid var(--line)', paddingBottom: '32px' }}>
             <div>
               <div style={{ fontSize: '10px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '6px' }}>
                 Client / Project Name
@@ -92,11 +92,10 @@ export default async function ProjectCaseStudyPage({ params }: PageProps) {
             <div>
               <div className="section-label">
                 <span className="section-label-bullet" />
-                <span className="t-label">01 — Engineering & Execution</span>
+                <span className="t-label">01 — Engineering &amp; Execution</span>
               </div>
-              <h2 className="t-headline" style={{ fontSize: 'clamp(20px, 2.5vw, 32px)', marginBottom: '24px' }}>
-                On-Ground
-                <br />
+              <h2 className="t-headline" style={{ fontSize: 'clamp(20px, 2.5vw, 32px)', marginBottom: '24px', textWrap: 'balance' }}>
+                On-Ground{' '}
                 <span style={{ color: 'var(--accent-gold)' }}>Technical Erection</span>
               </h2>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -110,14 +109,13 @@ export default async function ProjectCaseStudyPage({ params }: PageProps) {
             </div>
 
             {/* Right column — Testing & Commissioning */}
-            <div>
+            <div className="col-border-responsive" style={{ borderLeft: '1px solid var(--line-soft)', paddingLeft: 'clamp(20px, 3vw, 48px)' }}>
               <div className="section-label">
                 <span className="section-label-bullet" />
-                <span className="t-label">02 — Testing & Commissioning</span>
+                <span className="t-label">02 — Testing &amp; Commissioning</span>
               </div>
-              <h2 className="t-headline" style={{ fontSize: 'clamp(20px, 2.5vw, 32px)', marginBottom: '24px' }}>
-                Clearances &
-                <br />
+              <h2 className="t-headline" style={{ fontSize: 'clamp(20px, 2.5vw, 32px)', marginBottom: '24px', textWrap: 'balance' }}>
+                Clearances &amp;{' '}
                 <span style={{ color: 'var(--accent-gold)' }}>Energisation</span>
               </h2>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -137,9 +135,8 @@ export default async function ProjectCaseStudyPage({ params }: PageProps) {
               <span className="section-label-bullet" />
               <span className="t-label">Project Outcome</span>
             </div>
-            <h2 className="t-headline" style={{ fontSize: 'clamp(24px, 3.5vw, 36px)', marginBottom: '20px' }}>
-              Execution
-              <br />
+            <h2 className="t-headline" style={{ fontSize: 'clamp(24px, 3.5vw, 36px)', marginBottom: '20px', textWrap: 'balance' }}>
+              Execution{' '}
               <span style={{ color: 'var(--accent-gold)' }}>Results</span>
             </h2>
             <p className="t-body" style={{ fontSize: '15px', lineHeight: 1.75 }}>

@@ -108,9 +108,8 @@ export default function BeyondCommissioning() {
               <span className="t-label">10 — Beyond Commissioning</span>
             </div>
 
-            <h2 className="t-headline" style={{ marginBottom: '20px' }}>
-              Beyond
-              <br />
+            <h2 className="t-headline" style={{ marginBottom: '20px', textWrap: 'balance' }}>
+              Beyond{' '}
               <span style={{ color: 'var(--accent-gold)' }}>commissioning.</span>
             </h2>
 

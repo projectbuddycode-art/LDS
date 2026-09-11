@@ -63,6 +63,8 @@ export default function Footer() {
                     textDecoration: 'none',
                     transition: 'opacity 250ms ease',
                     display: 'block',
+                    wordBreak: 'break-all',
+                    overflowWrap: 'anywhere',
                   }}
                   onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.7')}
                   onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
@@ -77,6 +79,8 @@ export default function Footer() {
                     transition: 'opacity 250ms ease',
                     display: 'block',
                     marginTop: '2px',
+                    wordBreak: 'break-all',
+                    overflowWrap: 'anywhere',
                   }}
                   onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.7')}
                   onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}

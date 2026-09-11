@@ -65,9 +65,8 @@ export default function AccountabilitySection() {
               <span className="t-label">12 — Built with Accountability</span>
             </div>
 
-            <h2 className="t-headline" style={{ marginBottom: '20px' }}>
-              Built with
-              <br />
+            <h2 className="t-headline" style={{ marginBottom: '20px', textWrap: 'balance' }}>
+              Built with{' '}
               <span style={{ color: 'var(--accent-gold)' }}>accountability.</span>
             </h2>
 

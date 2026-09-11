@@ -17,9 +17,8 @@ export default function CapabilitiesPage() {
             <span className="section-label-bullet" />
             <span className="t-label">OUR SERVICES</span>
           </div>
-          <h1 className="t-headline" style={{ marginBottom: '24px', fontSize: 'clamp(36px, 5vw, 72px)', lineHeight: 1.05 }}>
-            OUR ELECTRICAL
-            <br />
+          <h1 className="t-headline" style={{ marginBottom: '24px', fontSize: 'clamp(36px, 5vw, 72px)', lineHeight: 1.05, textWrap: 'balance' }}>
+            OUR ELECTRICAL{' '}
             <span style={{ color: 'var(--accent-gold)' }}>SERVICES</span>
           </h1>
           <p className="t-body" style={{ maxWidth: '680px', fontSize: 'clamp(16px, 1.2vw, 20px)', lineHeight: 1.6 }}>
@@ -39,9 +38,8 @@ export default function CapabilitiesPage() {
                 <span className="section-label-bullet" />
                 <span className="t-label">01 — INDUSTRIAL ELECTRIFICATION</span>
               </div>
-              <h2 className="t-headline" style={{ fontSize: 'clamp(26px, 3.2vw, 40px)', marginBottom: '20px' }}>
-                INDUSTRIAL
-                <br />
+              <h2 className="t-headline" style={{ fontSize: 'clamp(26px, 3.2vw, 40px)', marginBottom: '20px', textWrap: 'balance' }}>
+                INDUSTRIAL{' '}
                 <span style={{ color: 'var(--accent-gold)' }}>ELECTRIFICATION</span>
               </h2>
               <p className="t-body" style={{ maxWidth: '480px', marginBottom: '24px', lineHeight: 1.65 }}>
@@ -58,11 +56,11 @@ export default function CapabilitiesPage() {
               </div>
             </div>
 
-            <div style={{ borderLeft: '1px solid var(--line-soft)', paddingLeft: 'clamp(20px, 3vw, 48px)' }}>
+            <div className="col-border-responsive" style={{ borderLeft: '1px solid var(--line-soft)', paddingLeft: 'clamp(20px, 3vw, 48px)' }}>
               <div className="section-label" style={{ marginBottom: '16px' }}>
                 <span className="t-label">Scope Deliverables</span>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '14px' }}>
                 {[
                   'Electrical Design & Engineering',
                   'HT/LT Distribution Networks',
@@ -93,9 +91,8 @@ export default function CapabilitiesPage() {
                 <span className="section-label-bullet" />
                 <span className="t-label">02 — UNDERGROUND CABLE SYSTEMS</span>
               </div>
-              <h2 className="t-headline" style={{ fontSize: 'clamp(26px, 3.2vw, 40px)', marginBottom: '20px' }}>
-                UNDERGROUND
-                <br />
+              <h2 className="t-headline" style={{ fontSize: 'clamp(26px, 3.2vw, 40px)', marginBottom: '20px', textWrap: 'balance' }}>
+                UNDERGROUND{' '}
                 <span style={{ color: 'var(--accent-gold)' }}>CABLE SYSTEMS</span>
               </h2>
               <p className="t-body" style={{ maxWidth: '480px', marginBottom: '24px', lineHeight: 1.65 }}>
@@ -113,7 +110,7 @@ export default function CapabilitiesPage() {
               </div>
             </div>
 
-            <div style={{ borderLeft: '1px solid var(--line-soft)', paddingLeft: 'clamp(20px, 3vw, 48px)' }}>
+            <div className="col-border-responsive" style={{ borderLeft: '1px solid var(--line-soft)', paddingLeft: 'clamp(20px, 3vw, 48px)' }}>
               <div className="section-label" style={{ marginBottom: '16px' }}>
                 <span className="t-label">Cabling Services</span>
               </div>
@@ -150,9 +147,8 @@ export default function CapabilitiesPage() {
                 <span className="section-label-bullet" />
                 <span className="t-label">03 — SUBSTATION &amp; SWITCHYARD SERVICES</span>
               </div>
-              <h2 className="t-headline" style={{ fontSize: 'clamp(26px, 3.2vw, 40px)', marginBottom: '20px' }}>
-                SUBSTATION &amp;
-                <br />
+              <h2 className="t-headline" style={{ fontSize: 'clamp(26px, 3.2vw, 40px)', marginBottom: '20px', textWrap: 'balance' }}>
+                SUBSTATION &amp;{' '}
                 <span style={{ color: 'var(--accent-gold)' }}>SWITCHYARD SERVICES</span>
               </h2>
               <p className="t-body" style={{ maxWidth: '480px', marginBottom: '24px', lineHeight: 1.65 }}>
@@ -171,11 +167,11 @@ export default function CapabilitiesPage() {
               </div>
             </div>
 
-            <div style={{ borderLeft: '1px solid var(--line-soft)', paddingLeft: 'clamp(20px, 3vw, 48px)' }}>
+            <div className="col-border-responsive" style={{ borderLeft: '1px solid var(--line-soft)', paddingLeft: 'clamp(20px, 3vw, 48px)' }}>
               <div className="section-label" style={{ marginBottom: '16px' }}>
                 <span className="t-label">Technical Disciplines</span>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '12px' }}>
                 {[
                   'Site Design & Surveying',
                   'Foundation Design & Civil Works',
@@ -208,9 +204,8 @@ export default function CapabilitiesPage() {
                 <span className="section-label-bullet" />
                 <span className="t-label">04 — TRANSMISSION LINES</span>
               </div>
-              <h2 className="t-headline" style={{ fontSize: 'clamp(26px, 3.2vw, 40px)', marginBottom: '20px' }}>
-                TRANSMISSION
-                <br />
+              <h2 className="t-headline" style={{ fontSize: 'clamp(26px, 3.2vw, 40px)', marginBottom: '20px', textWrap: 'balance' }}>
+                TRANSMISSION{' '}
                 <span style={{ color: 'var(--accent-gold)' }}>LINES</span>
               </h2>
               <p className="t-body" style={{ maxWidth: '480px', marginBottom: '24px', lineHeight: 1.65 }}>
@@ -218,11 +213,11 @@ export default function CapabilitiesPage() {
               </p>
             </div>
 
-            <div style={{ borderLeft: '1px solid var(--line-soft)', paddingLeft: 'clamp(20px, 3vw, 48px)' }}>
+            <div className="col-border-responsive" style={{ borderLeft: '1px solid var(--line-soft)', paddingLeft: 'clamp(20px, 3vw, 48px)' }}>
               <div className="section-label" style={{ marginBottom: '16px' }}>
                 <span className="t-label">Verified Voltage Levels</span>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 110px), 1fr))', gap: '14px' }}>
                 {['11KV', '33KV', '66KV', '132KV', '220KV', '400KV'].map((v) => (
                   <div key={v} style={{ padding: '20px 16px', background: 'var(--bg-secondary)', border: '1px solid var(--line-soft)', textAlign: 'center' }}>
                     <div style={{ fontSize: 'clamp(20px, 2vw, 28px)', fontWeight: 700, color: 'var(--accent-gold)' }}>
@@ -246,13 +241,12 @@ export default function CapabilitiesPage() {
             <span className="section-label-bullet" />
             <span className="t-label">COMPLETE SERVICE DIRECTORY</span>
           </div>
-          <h2 className="t-headline" style={{ fontSize: 'clamp(28px, 3.5vw, 44px)', marginBottom: '40px' }}>
-            All 20 In-House &amp; Turnkey
-            <br />
+          <h2 className="t-headline" style={{ fontSize: 'clamp(28px, 3.5vw, 44px)', marginBottom: '40px', textWrap: 'balance' }}>
+            All 20 In-House &amp; Turnkey{' '}
             <span style={{ color: 'var(--accent-gold)' }}>Electrical Services</span>
           </h2>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '2px', background: 'var(--line)', border: '1px solid var(--line)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '2px', background: 'var(--line)', border: '1px solid var(--line)' }}>
             {SERVICES_20.map((service) => (
               <div key={service.number} style={{ padding: '36px 30px', background: 'var(--bg-light)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '220px' }}>
                 <div>

@@ -249,7 +249,7 @@ export default function QuoteModal() {
             {/* Form */}
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {/* Row 1: Name & Company */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
+              <div className="quote-form-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: '16px' }}>
                 <div>
                   <label
                     style={{
@@ -299,7 +299,7 @@ export default function QuoteModal() {
               </div>
 
               {/* Row 2: Phone & Email */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
+              <div className="quote-form-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: '16px' }}>
                 <div>
                   <label
                     style={{
@@ -350,7 +350,7 @@ export default function QuoteModal() {
               </div>
 
               {/* Row 3: Project Type & Location */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
+              <div className="quote-form-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: '16px' }}>
                 <div>
                   <label
                     style={{
@@ -536,11 +536,25 @@ export default function QuoteModal() {
           font-size: 13.5px;
           font-family: inherit;
           outline: none;
+          min-height: 44px;
           transition: border-color 200ms ease, box-shadow 200ms ease;
         }
         .quote-input:focus {
           border-color: var(--accent-gold);
           box-shadow: 0 0 0 2px rgba(201, 160, 82, 0.15);
+        }
+        @media (max-width: 600px) {
+          .quote-form-row {
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
+          }
+          .quote-modal-container {
+            padding: 24px 18px !important;
+          }
+          .quote-input {
+            font-size: 16px !important; /* Prevents iOS auto-zoom shift */
+            padding: 11px 13px !important;
+          }
         }
       `}</style>
     </div>

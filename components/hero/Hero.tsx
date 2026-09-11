@@ -189,6 +189,7 @@ export default function Hero() {
           {/* Scroll indicator — bottom right */}
           <div
             data-hero-detail
+            className="hero-scroll-indicator"
             style={{
               position: 'absolute',
               right: 0,
@@ -230,10 +231,10 @@ export default function Hero() {
           flex-direction: column;
           gap: 0;
           margin-bottom: 24px;
-          font-size: clamp(40px, 4.8vw, 68px);
+          font-size: clamp(38px, 4.8vw, 68px);
           font-weight: 600;
           letter-spacing: -0.023em;
-          line-height: 1.03;
+          line-height: 1.04;
           color: #FAF8F5;
         }
 
@@ -258,7 +259,7 @@ export default function Hero() {
         /* ── CTA row ── */
         .hero-cta-row {
           display: flex;
-          gap: 10px;
+          gap: 12px;
           flex-wrap: wrap;
         }
 
@@ -275,6 +276,9 @@ export default function Hero() {
           padding: 16px 28px;
           cursor: pointer;
           transition: all 300ms ease;
+          border-radius: 2px;
+          min-height: 48px;
+          box-sizing: border-box;
         }
 
         .hero-btn-primary {
@@ -318,7 +322,7 @@ export default function Hero() {
           display: inline-flex;
           align-items: center;
           gap: 14px;
-          margin-top: clamp(38px, 4.5vw, 48px);
+          margin-top: clamp(32px, 4.5vw, 48px);
         }
 
         .hero-est-line {
@@ -348,25 +352,71 @@ export default function Hero() {
         /* ── Tablet: widen text column slightly ── */
         @media (max-width: 1024px) {
           .hero-text-col {
-            width: 52%;
+            width: 58%;
             max-width: 540px;
           }
           .hero-headline {
-            font-size: clamp(36px, 5vw, 56px);
+            font-size: clamp(34px, 5vw, 56px);
           }
         }
 
-        /* ── Mobile: full width, stack ── */
+        /* ── Mobile: full width, stack cleanly without collision ── */
         @media (max-width: 768px) {
+          .hero-root {
+            min-height: 100svh;
+            height: auto;
+          }
+          .hero-content {
+            position: relative;
+            padding-top: max(88px, calc(72px + 4vh));
+            padding-bottom: 40px;
+          }
           .hero-text-col {
             width: 100%;
             max-width: 100%;
           }
           .hero-headline {
-            font-size: clamp(32px, 8vw, 48px);
+            font-size: clamp(30px, 7.5vw, 44px);
+            margin-bottom: 18px;
           }
           .hero-para {
             max-width: 100%;
+            font-size: 14px;
+            margin-bottom: 24px;
+          }
+          .hero-btn {
+            width: 100%;
+            justify-content: space-between;
+            padding: 14px 20px;
+          }
+          .hero-est-badge {
+            margin-top: 24px;
+            gap: 10px;
+            width: 100%;
+            justify-content: center;
+          }
+          .hero-est-line {
+            width: 20px;
+          }
+          .hero-est-text {
+            font-size: 10px;
+            letter-spacing: 0.16em;
+          }
+          .hero-scroll-indicator {
+            display: none !important;
+          }
+        }
+
+        /* ── Landscape mobile protection ── */
+        @media (max-height: 500px) {
+          .hero-root {
+            min-height: 520px;
+            height: auto;
+          }
+          .hero-content {
+            position: relative;
+            padding-top: 80px;
+            padding-bottom: 32px;
           }
         }
       `}</style>

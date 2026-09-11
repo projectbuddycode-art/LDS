@@ -62,13 +62,12 @@ export default function TransmissionSection() {
             <span className="section-label-bullet" />
             <span className="t-label">08 — Transmission Lines</span>
           </div>
-          <h2 data-reveal className="t-headline" style={{ marginBottom: '16px' }}>
-            Overhead lines.
-            <br />
+          <h2 data-reveal className="t-headline" style={{ marginBottom: '16px', textWrap: 'balance' }}>
+            Overhead lines.{' '}
             <span style={{ color: 'var(--accent-gold)' }}>Up to 400KV.</span>
           </h2>
           <p data-reveal className="t-body" style={{ maxWidth: '520px', margin: '0 auto 32px' }}>
-            Lukhdatar & Sons executes overhead transmission line projects across voltage levels from 11KV to 400KV, covering structural foundations, tower erection, conductor tension stringing, and substation grid synchronization.
+            Lukhdatar &amp; Sons executes overhead transmission line projects across voltage levels from 11KV to 400KV, covering structural foundations, tower erection, conductor tension stringing, and substation grid synchronization.
           </p>
         </div>
 
