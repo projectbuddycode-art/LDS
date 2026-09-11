@@ -145,63 +145,112 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
       }}
       aria-label="LDS Cinematic Intro 101"
     >
-      {/* ── Instant Fallback Poster (Zero layout shift, zero blank frame) ── */}
-      <img
-        src="/media/posters/intro-101.jpg"
-        alt=""
+      {/* ── Ambient Theater Glow Backdrop Layer (Active on Mobile/Portrait to eliminate harsh letterboxing) ── */}
+      <div
+        className="intro-ambient-backdrop"
         aria-hidden="true"
-        fetchPriority="high"
         style={{
           position: 'absolute',
           inset: 0,
           width: '100%',
-          height: '100dvh',
-          objectFit: 'cover',
-          objectPosition: 'center',
-          display: 'block',
+          height: '100%',
+          overflow: 'hidden',
           zIndex: 1,
           pointerEvents: 'none',
         }}
-      />
+      >
+        <img
+          src="/media/posters/intro-101.jpg"
+          alt=""
+          aria-hidden="true"
+          fetchPriority="high"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            objectPosition: 'center',
+            filter: 'blur(40px) brightness(0.35) saturate(1.4)',
+            transform: 'scale(1.12)',
+            opacity: 0.65,
+            display: 'block',
+          }}
+        />
+      </div>
 
-      {/* ── True Full-Screen INTRO 101 Video — 100% × 100dvh ── */}
-      <video
-        ref={videoRef}
-        src={MEDIA.introVideo}
-        poster="/media/posters/intro-101.jpg"
-        autoPlay
-        muted
-        playsInline
-        preload="auto"
-        onPlaying={() => setIsVideoPlaying(true)}
-        onTimeUpdate={(e) => {
-          const target = e.currentTarget
-          // Trigger subtle crossfade ~0.25s before end to avoid any frame stutter
-          if (target.duration > 0 && target.currentTime >= target.duration - 0.25) {
-            const container = containerRef.current
-            if (container && !isDoneRef.current) {
-              container.style.transition = 'opacity 450ms cubic-bezier(0.4, 0, 0.2, 1)'
-              container.style.opacity = '0'
-              container.style.pointerEvents = 'none'
-            }
-          }
-        }}
-        onEnded={handleEnded}
-        onError={handleError}
-        aria-hidden="true"
-        className="intro-101-video"
+      {/* ── Main Crisp Video & Poster Frame (100% visible, zero cropping on all devices) ── */}
+      <div
+        className="intro-video-stage"
         style={{
-          position: 'absolute',
-          inset: 0,
+          position: 'relative',
           width: '100%',
-          height: '100dvh',
-          objectFit: 'cover',
-          objectPosition: 'center',
-          display: 'block',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
           zIndex: 2,
-          opacity: isVideoPlaying ? 1 : 0.99,
         }}
-      />
+      >
+        {/* Instant Fallback Poster */}
+        <img
+          src="/media/posters/intro-101.jpg"
+          alt=""
+          aria-hidden="true"
+          fetchPriority="high"
+          className="intro-101-media intro-101-poster"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            objectPosition: 'center',
+            display: isVideoPlaying ? 'none' : 'block',
+            zIndex: 2,
+            pointerEvents: 'none',
+          }}
+        />
+
+        {/* Crisp Foreground Video */}
+        <video
+          ref={videoRef}
+          src={MEDIA.introVideo}
+          poster="/media/posters/intro-101.jpg"
+          autoPlay
+          muted
+          playsInline
+          preload="auto"
+          onPlaying={() => setIsVideoPlaying(true)}
+          onTimeUpdate={(e) => {
+            const target = e.currentTarget
+            // Trigger subtle crossfade ~0.25s before end to avoid any frame stutter
+            if (target.duration > 0 && target.currentTime >= target.duration - 0.25) {
+              const container = containerRef.current
+              if (container && !isDoneRef.current) {
+                container.style.transition = 'opacity 450ms cubic-bezier(0.4, 0, 0.2, 1)'
+                container.style.opacity = '0'
+                container.style.pointerEvents = 'none'
+              }
+            }
+          }}
+          onEnded={handleEnded}
+          onError={handleError}
+          aria-hidden="true"
+          className="intro-101-media intro-101-video"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            objectPosition: 'center',
+            display: 'block',
+            zIndex: 3,
+            opacity: isVideoPlaying ? 1 : 0.99,
+          }}
+        />
+      </div>
 
       {/* ── Premium Top-Right Skip Intro CTA ── */}
       <button
@@ -213,17 +262,17 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
         className="intro-skip-btn"
         style={{
           position: 'absolute',
-          top: 'clamp(20px, 3.5vw, 36px)',
-          right: 'clamp(20px, 3.5vw, 36px)',
-          zIndex: 10,
+          top: 'max(20px, env(safe-area-inset-top, 20px))',
+          right: 'max(20px, env(safe-area-inset-right, 20px))',
+          zIndex: 20,
           display: 'inline-flex',
           alignItems: 'center',
           gap: '8px',
           padding: '10px 18px',
-          background: 'rgba(10, 14, 18, 0.75)',
+          background: 'rgba(10, 14, 18, 0.78)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
-          border: '1px solid rgba(201, 160, 82, 0.45)',
+          border: '1px solid rgba(201, 160, 82, 0.50)',
           color: '#FAF8F5',
           fontSize: '11px',
           fontWeight: 600,
@@ -232,21 +281,24 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
           borderRadius: '2px',
           cursor: 'pointer',
           transition: 'all 250ms cubic-bezier(0.4, 0, 0.2, 1)',
-          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.40)',
+          boxShadow: '0 4px 18px rgba(0, 0, 0, 0.50)',
+          minHeight: '44px',
+          minWidth: '44px',
+          touchAction: 'manipulation',
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.borderColor = 'var(--accent-gold)'
-          e.currentTarget.style.background = 'rgba(201, 160, 82, 0.18)'
+          e.currentTarget.style.background = 'rgba(201, 160, 82, 0.20)'
           e.currentTarget.style.color = 'var(--accent-gold)'
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.borderColor = 'rgba(201, 160, 82, 0.45)'
-          e.currentTarget.style.background = 'rgba(10, 14, 18, 0.75)'
+          e.currentTarget.style.borderColor = 'rgba(201, 160, 82, 0.50)'
+          e.currentTarget.style.background = 'rgba(10, 14, 18, 0.78)'
           e.currentTarget.style.color = '#FAF8F5'
         }}
       >
         <span>SKIP INTRO</span>
-        <span style={{ fontSize: '13px', lineHeight: 1 }}>→</span>
+        <span style={{ fontSize: '13px', lineHeight: 1, color: 'var(--accent-gold)' }}>→</span>
       </button>
 
       <style>{`
@@ -257,35 +309,63 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
           height: 100vh !important;
         }
 
-        .intro-101-video {
-          width: 100% !important;
-          height: 100dvh !important;
-          height: 100svh !important;
-          height: 100vh !important;
-          object-fit: cover !important;
-          object-position: center !important;
+        /* Desktop widescreen: cinematic full-bleed cover */
+        @media (min-width: 1025px) {
+          .intro-ambient-backdrop {
+            display: none !important;
+          }
+          .intro-101-media {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            object-position: center !important;
+          }
+        }
+
+        /* Mobile, tablet portrait, and vertical screens: 100% complete uncropped video frame */
+        @media (max-width: 1024px) and (orientation: portrait), (max-width: 768px) {
+          .intro-ambient-backdrop {
+            display: block !important;
+          }
+          .intro-101-media {
+            width: 100% !important;
+            height: 100% !important;
+            max-width: 100vw !important;
+            max-height: 100dvh !important;
+            object-fit: contain !important;
+            object-position: center center !important;
+          }
+          .intro-skip-btn {
+            top: max(16px, env(safe-area-inset-top, 16px)) !important;
+            right: max(16px, env(safe-area-inset-right, 16px)) !important;
+            padding: 8px 14px !important;
+            font-size: 10.5px !important;
+          }
+        }
+
+        /* Mobile landscape: clean aspect ratio without notch clipping */
+        @media (max-height: 500px) and (orientation: landscape) {
+          .intro-ambient-backdrop {
+            display: none !important;
+          }
+          .intro-101-media {
+            width: 100% !important;
+            height: 100% !important;
+            max-height: 100dvh !important;
+            object-fit: contain !important;
+            object-position: center center !important;
+          }
+          .intro-skip-btn {
+            top: max(10px, env(safe-area-inset-top, 10px)) !important;
+            right: max(14px, env(safe-area-inset-right, 14px)) !important;
+            padding: 6px 12px !important;
+            font-size: 10px !important;
+            min-height: 36px !important;
+          }
         }
 
         .intro-skip-btn:active {
           transform: scale(0.96);
-        }
-
-        /* Mobile full-screen cover protection */
-        @media (max-width: 768px) {
-          .intro-fullscreen-overlay,
-          .intro-101-video {
-            width: 100% !important;
-            height: 100dvh !important;
-            height: 100svh !important;
-            object-fit: cover !important;
-            object-position: center !important;
-          }
-          .intro-skip-btn {
-            top: 18px !important;
-            right: 18px !important;
-            padding: 8px 14px !important;
-            font-size: 10.5px !important;
-          }
         }
       `}</style>
     </div>
