@@ -40,10 +40,10 @@ export default function ProjectsIndustriesPage() {
     commercial:           '/media/posters/commercial.jpg',
     warehousing:          '/media/posters/warehouse.jpg',
     realEstate:           '/media/posters/residential.jpg',
-    institutions:         '/media/campus.jpg',
-    utilities:            '/media/substation.jpg',
+    institutions:         '/media/posters/campus.jpg',
+    utilities:            '/media/posters/substation.jpg',
     industrialFacilities: '/media/posters/industrial.jpg',
-    infrastructure:       '/media/infrastructure.jpg',
+    infrastructure:       '/media/posters/infrastructure.jpg',
   }
 
   return (

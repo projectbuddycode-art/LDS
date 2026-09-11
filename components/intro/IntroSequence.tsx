@@ -20,6 +20,7 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
 
     if (fallbackTimerRef.current) {
       clearTimeout(fallbackTimerRef.current)
+      fallbackTimerRef.current = null
     }
 
     const container = containerRef.current
@@ -67,44 +68,47 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
     video.setAttribute('muted', '')
     video.playbackRate = 1.0
 
-    function handleVideoReady() {
+    // Explicit React/JS playback attempt
+    const attemptPlay = async () => {
       if (isDoneRef.current) return
-      const playPromise = video?.play()
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            setIsVideoPlaying(true)
-          })
-          .catch((err) => {
-            console.warn('[IntroSequence] Autoplay deferred:', err)
-            // If browser prevents autoplay, advance after a short moment
-            setTimeout(finishSequence, 1500)
-          })
+      try {
+        await video.play()
+        setIsVideoPlaying(true)
+      } catch (error) {
+        console.warn('[IntroSequence] Video autoplay deferred or prevented by browser:', error)
+        // If autoplay is deferred or restricted, fail gracefully after a short visual moment
+        setTimeout(() => {
+          if (!isDoneRef.current) {
+            finishSequence()
+          }
+        }, 1200)
       }
     }
 
-    if (video.readyState >= 2) {
-      handleVideoReady()
-    } else {
-      video.addEventListener('loadeddata', handleVideoReady, { once: true })
-      video.addEventListener('canplay', handleVideoReady, { once: true })
-      video.addEventListener('canplaythrough', handleVideoReady, { once: true })
+    // Attempt playback immediately
+    attemptPlay()
+
+    // Also attach events to ensure playback triggers as soon as data arrives
+    const handleCanPlay = () => {
+      if (!isDoneRef.current && !isVideoPlaying) {
+        attemptPlay()
+      }
     }
 
+    video.addEventListener('loadeddata', handleCanPlay)
+    video.addEventListener('canplay', handleCanPlay)
+    video.addEventListener('playing', () => setIsVideoPlaying(true))
     video.addEventListener('ended', handleEnded)
     video.addEventListener('error', handleError)
 
-    // Explicit load
-    video.load()
-
-    // Safety timeout: transition after 11s maximum in case video hangs
+    // Guaranteed safety timeout (8.5s maximum): never leave website waiting indefinitely
     fallbackTimerRef.current = setTimeout(() => {
       if (!isDoneRef.current) {
         finishSequence()
       }
-    }, 11000)
+    }, 8500)
 
-    // Escape or Space key skips intro
+    // Escape, Space, or Enter skips intro
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' || e.key === ' ' || e.key === 'Enter') {
         finishSequence()
@@ -115,15 +119,15 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
     return () => {
       if (fallbackTimerRef.current) {
         clearTimeout(fallbackTimerRef.current)
+        fallbackTimerRef.current = null
       }
       window.removeEventListener('keydown', handleKeyDown)
-      video.removeEventListener('loadeddata', handleVideoReady)
-      video.removeEventListener('canplay', handleVideoReady)
-      video.removeEventListener('canplaythrough', handleVideoReady)
+      video.removeEventListener('loadeddata', handleCanPlay)
+      video.removeEventListener('canplay', handleCanPlay)
       video.removeEventListener('ended', handleEnded)
       video.removeEventListener('error', handleError)
     }
-  }, [finishSequence, handleEnded, handleError])
+  }, [finishSequence, handleEnded, handleError, isVideoPlaying])
 
   return (
     <div
@@ -206,7 +210,7 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
             height: '100%',
             objectFit: 'cover',
             objectPosition: 'center',
-            display: isVideoPlaying ? 'none' : 'block',
+            display: 'block',
             zIndex: 2,
             pointerEvents: 'none',
           }}
@@ -220,12 +224,13 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
           autoPlay
           muted
           playsInline
+          loop={false}
           preload="auto"
           onPlaying={() => setIsVideoPlaying(true)}
           onTimeUpdate={(e) => {
             const target = e.currentTarget
-            // Trigger subtle crossfade ~0.25s before end to avoid any frame stutter
-            if (target.duration > 0 && target.currentTime >= target.duration - 0.25) {
+            // Trigger subtle crossfade ~0.35s before end to avoid any frame stutter
+            if (target.duration > 0 && target.currentTime >= target.duration - 0.35) {
               const container = containerRef.current
               if (container && !isDoneRef.current) {
                 container.style.transition = 'opacity 450ms cubic-bezier(0.4, 0, 0.2, 1)'
@@ -247,7 +252,9 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
             objectPosition: 'center',
             display: 'block',
             zIndex: 3,
-            opacity: isVideoPlaying ? 1 : 0.99,
+            opacity: isVideoPlaying ? 1 : 0,
+            transition: 'opacity 350ms cubic-bezier(0.4, 0, 0.2, 1)',
+            backgroundColor: 'transparent',
           }}
         />
       </div>

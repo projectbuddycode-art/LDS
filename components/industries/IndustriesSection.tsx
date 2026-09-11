@@ -37,19 +37,30 @@ export default function IndustriesSection() {
   
   const [isMobile, setIsMobile] = useState<boolean>(false)
   const [mobileActiveIndex, setMobileActiveIndex] = useState<number>(0)
+  const [loadedVideos, setLoadedVideos] = useState<Record<string, boolean>>({})
 
   // Controlled video playback helper
   const updateVideoPlayback = useCallback((activeIdx: number) => {
     const refs = isMobile ? mobileVideoRefs.current : desktopVideoRefs.current
     refs.forEach((vid, i) => {
       if (!vid) return
+      // Strict DOM property enforcement
+      vid.muted = true
+      vid.defaultMuted = true
+      vid.playsInline = true
+      vid.setAttribute('playsinline', '')
+      vid.setAttribute('webkit-playsinline', '')
+      vid.setAttribute('muted', '')
+
       if (i === activeIdx) {
         const promise = vid.play()
         if (promise !== undefined) {
           promise.catch(() => {})
         }
       } else {
-        vid.pause()
+        if (!vid.paused) {
+          vid.pause()
+        }
       }
     })
   }, [isMobile])
@@ -67,9 +78,9 @@ export default function IndustriesSection() {
         updateVideoPlayback(isMobile ? mobileActiveIndex : activeIndexRef.current)
       } else {
         const refs = isMobile ? mobileVideoRefs.current : desktopVideoRefs.current
-        refs.forEach((vid) => { if (vid) vid.pause() })
+        refs.forEach((vid) => { if (vid && !vid.paused) vid.pause() })
       }
-    }, { rootMargin: '200px' })
+    }, { rootMargin: '300px 0px 300px 0px' })
 
     observer.observe(el)
     return () => observer.disconnect()
@@ -215,6 +226,10 @@ export default function IndustriesSection() {
     updateVideoPlayback(index)
   }
 
+  const handleVideoReady = (id: string) => {
+    setLoadedVideos((prev) => ({ ...prev, [id]: true }))
+  }
+
   return (
     <section
       ref={sectionRef}
@@ -272,6 +287,7 @@ export default function IndustriesSection() {
               const videoSrc = MEDIA.industries[industry.mediaKey]
               const objPos = OBJECT_POSITIONS[industry.mediaKey] || 'center center'
               const isInitialActive = index === 0
+              const isLoaded = loadedVideos[`desktop-${industry.id}`]
 
               return (
                 <div
@@ -293,13 +309,13 @@ export default function IndustriesSection() {
                   }}
                 >
                   {/* Video wrapper */}
-                  <div style={{ position: 'absolute', inset: 0 }}>
+                  <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
                     {POSTER_MAP[industry.mediaKey] && (
                       <img
                         src={POSTER_MAP[industry.mediaKey]}
                         alt=""
                         aria-hidden="true"
-                        loading="lazy"
+                        loading="eager"
                         style={{
                           position: 'absolute',
                           inset: 0,
@@ -309,17 +325,27 @@ export default function IndustriesSection() {
                           objectPosition: objPos,
                           zIndex: 1,
                           pointerEvents: 'none',
+                          display: 'block',
                         }}
                       />
                     )}
                     <video
-                      ref={(el) => { desktopVideoRefs.current[index] = el }}
+                      ref={(el) => {
+                        if (el) {
+                          el.muted = true
+                          el.defaultMuted = true
+                          el.playsInline = true
+                        }
+                        desktopVideoRefs.current[index] = el
+                      }}
                       src={videoSrc}
                       poster={POSTER_MAP[industry.mediaKey]}
                       muted
                       playsInline
                       loop
                       preload="metadata"
+                      onPlaying={() => handleVideoReady(`desktop-${industry.id}`)}
+                      onLoadedData={() => handleVideoReady(`desktop-${industry.id}`)}
                       style={{
                         position: 'relative',
                         zIndex: 2,
@@ -327,6 +353,10 @@ export default function IndustriesSection() {
                         height: '100%',
                         objectFit: 'cover',
                         objectPosition: objPos,
+                        opacity: isLoaded ? 1 : 0,
+                        transition: 'opacity 400ms cubic-bezier(0.4, 0, 0.2, 1)',
+                        backgroundColor: 'transparent',
+                        display: 'block',
                       }}
                       aria-label={`Video showing ${industry.label} electrification`}
                     />
@@ -339,6 +369,7 @@ export default function IndustriesSection() {
                       inset: 0,
                       background: 'linear-gradient(to top, rgba(10,14,18,0.85) 0%, rgba(10,14,18,0.20) 40%, transparent 70%)',
                       zIndex: 2,
+                      pointerEvents: 'none',
                     }}
                   />
 
@@ -366,6 +397,7 @@ export default function IndustriesSection() {
                       left: '24px',
                       right: '24px',
                       zIndex: 3,
+                      pointerEvents: 'none',
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
@@ -436,6 +468,7 @@ export default function IndustriesSection() {
               const videoSrc = MEDIA.industries[industry.mediaKey]
               const objPos = OBJECT_POSITIONS[industry.mediaKey] || 'center center'
               const isActive = index === mobileActiveIndex
+              const isLoaded = loadedVideos[`mobile-${industry.id}`]
 
               return (
                 <div
@@ -456,13 +489,13 @@ export default function IndustriesSection() {
                   }}
                 >
                   {/* Video wrapper */}
-                  <div style={{ position: 'absolute', inset: 0 }}>
+                  <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
                     {POSTER_MAP[industry.mediaKey] && (
                       <img
                         src={POSTER_MAP[industry.mediaKey]}
                         alt=""
                         aria-hidden="true"
-                        loading="lazy"
+                        loading="eager"
                         style={{
                           position: 'absolute',
                           inset: 0,
@@ -472,17 +505,27 @@ export default function IndustriesSection() {
                           objectPosition: objPos,
                           zIndex: 1,
                           pointerEvents: 'none',
+                          display: 'block',
                         }}
                       />
                     )}
                     <video
-                      ref={(el) => { mobileVideoRefs.current[index] = el }}
+                      ref={(el) => {
+                        if (el) {
+                          el.muted = true
+                          el.defaultMuted = true
+                          el.playsInline = true
+                        }
+                        mobileVideoRefs.current[index] = el
+                      }}
                       src={videoSrc}
                       poster={POSTER_MAP[industry.mediaKey]}
                       muted
                       playsInline
                       loop
                       preload="metadata"
+                      onPlaying={() => handleVideoReady(`mobile-${industry.id}`)}
+                      onLoadedData={() => handleVideoReady(`mobile-${industry.id}`)}
                       style={{
                         position: 'relative',
                         zIndex: 2,
@@ -490,6 +533,10 @@ export default function IndustriesSection() {
                         height: '100%',
                         objectFit: 'cover',
                         objectPosition: objPos,
+                        opacity: isLoaded ? 1 : 0,
+                        transition: 'opacity 400ms cubic-bezier(0.4, 0, 0.2, 1)',
+                        backgroundColor: 'transparent',
+                        display: 'block',
                       }}
                       aria-label={`Video showing ${industry.label} electrification`}
                     />
@@ -502,6 +549,7 @@ export default function IndustriesSection() {
                       inset: 0,
                       background: 'linear-gradient(to top, rgba(10,14,18,0.88) 0%, rgba(10,14,18,0.20) 40%, transparent 70%)',
                       zIndex: 2,
+                      pointerEvents: 'none',
                     }}
                   />
 
@@ -528,6 +576,7 @@ export default function IndustriesSection() {
                       left: '20px',
                       right: '20px',
                       zIndex: 3,
+                      pointerEvents: 'none',
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>

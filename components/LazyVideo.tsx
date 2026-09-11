@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useRef, useState, memo } from 'react'
+import { useEffect, useRef, useState, memo, useCallback } from 'react'
 
-interface LazyVideoProps extends React.VideoHTMLAttributes<HTMLVideoElement> {
+export interface LazyVideoProps extends React.VideoHTMLAttributes<HTMLVideoElement> {
   src: string
   poster: string
   aspectRatio?: string
@@ -19,16 +19,46 @@ function LazyVideo({
   className,
   style,
   onError,
+  onPlaying,
+  onCanPlay,
+  onLoadedData,
   ...props
 }: LazyVideoProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const playDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  
+  const [isPlaying, setIsPlaying] = useState(false)
   const [hasError, setHasError] = useState(false)
 
+  // Reset states if src changes
   useEffect(() => {
+    setIsPlaying(false)
     setHasError(false)
   }, [src])
+
+  const safePlay = useCallback(() => {
+    const video = videoRef.current
+    if (!video || hasError) return
+
+    // Enforce mobile-safe DOM parameters
+    video.muted = true
+    video.defaultMuted = true
+    video.playsInline = true
+
+    const playPromise = video.play()
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          setIsPlaying(true)
+        })
+        .catch((err) => {
+          if (process.env.NODE_ENV !== 'production') {
+            console.warn('[LDS Video Playback Info]', { src, message: err?.message })
+          }
+        })
+    }
+  }, [src, hasError])
 
   useEffect(() => {
     if (hasError) return
@@ -36,40 +66,35 @@ function LazyVideo({
     const container = containerRef.current
     if (!video) return
 
-    // Ensure muted & playsinline are strictly set on the DOM instance
+    // Explicitly configure DOM instance properties
     video.muted = true
+    video.defaultMuted = true
     video.playsInline = true
+    video.setAttribute('playsinline', '')
+    video.setAttribute('webkit-playsinline', '')
+    video.setAttribute('muted', '')
 
-    // For hero video or immediate preload, trigger play right away
+    // For hero video or immediate preload, trigger playback immediately
     if (preloadImmediate) {
-      const p = video.play()
-      if (p !== undefined) {
-        p.catch(() => {})
-      }
+      safePlay()
       return
     }
 
     if (typeof IntersectionObserver === 'undefined' || !container) {
-      const p = video.play()
-      if (p !== undefined) {
-        p.catch(() => {})
-      }
+      safePlay()
       return
     }
 
-    // Viewport IntersectionObserver: plays when visible, pauses when offscreen
+    // Proactive IntersectionObserver (350px preload buffer)
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           if (playDebounceRef.current) clearTimeout(playDebounceRef.current)
           playDebounceRef.current = setTimeout(() => {
             if (video && entry.isIntersecting) {
-              const p = video.play()
-              if (p !== undefined) {
-                p.catch(() => {})
-              }
+              safePlay()
             }
-          }, 60)
+          }, 50)
         } else {
           if (playDebounceRef.current) {
             clearTimeout(playDebounceRef.current)
@@ -80,7 +105,7 @@ function LazyVideo({
           }
         }
       },
-      { rootMargin: '100px 0px 100px 0px', threshold: 0.1 }
+      { rootMargin: '350px 0px 350px 0px', threshold: 0.05 }
     )
 
     observer.observe(container)
@@ -92,12 +117,37 @@ function LazyVideo({
       }
       observer.disconnect()
     }
-  }, [src, preloadImmediate, hasError])
+  }, [src, preloadImmediate, hasError, safePlay])
+
+  const handleVideoPlaying = (e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
+    setIsPlaying(true)
+    if (onPlaying) onPlaying(e)
+  }
+
+  const handleCanPlay = (e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
+    safePlay()
+    if (onCanPlay) onCanPlay(e)
+  }
+
+  const handleLoadedData = (e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
+    if (preloadImmediate) {
+      safePlay()
+    }
+    if (onLoadedData) onLoadedData(e)
+  }
 
   const handleVideoError = (e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
     setHasError(true)
+    setIsPlaying(false)
+    const video = videoRef.current
     if (process.env.NODE_ENV !== 'production') {
-      console.warn(`[LazyVideo] Failed to load video: ${src}. Falling back to poster: ${poster}`)
+      console.warn('[LDS Video Error Handler]', {
+        src,
+        poster,
+        readyState: video?.readyState,
+        networkState: video?.networkState,
+        error: video?.error,
+      })
     }
     if (onError) onError(e)
   }
@@ -111,19 +161,19 @@ function LazyVideo({
         height: '100%',
         aspectRatio,
         overflow: 'hidden',
-        background: '#0E131A',
+        background: '#0A0E12',
         contain: 'layout paint',
         ...containerStyle,
       }}
       className={className}
     >
-      {/* Background Poster Fallback Image (always present, guarantees 0 layout shift or blank frame) */}
+      {/* ── 1. Poster Layer (Immediately visible, guarantees 0 layout shift or blank frame) ── */}
       {poster && (
         <img
           src={poster}
           alt=""
           aria-hidden="true"
-          loading="lazy"
+          loading="eager"
           style={{
             position: 'absolute',
             inset: 0,
@@ -138,7 +188,7 @@ function LazyVideo({
         />
       )}
 
-      {/* Video Element */}
+      {/* ── 2. Cinematic Video Layer (Crossfades seamlessly over poster when playing) ── */}
       {!hasError && (
         <video
           ref={(el) => {
@@ -156,6 +206,9 @@ function LazyVideo({
           playsInline
           loop
           preload={preloadImmediate ? 'auto' : 'metadata'}
+          onPlaying={handleVideoPlaying}
+          onCanPlay={handleCanPlay}
+          onLoadedData={handleLoadedData}
           onError={handleVideoError}
           aria-hidden="true"
           style={{
@@ -166,8 +219,10 @@ function LazyVideo({
             objectFit: style?.objectFit || 'cover',
             objectPosition: style?.objectPosition || 'center center',
             display: 'block',
-            backgroundColor: '#0E131A',
+            backgroundColor: 'transparent',
             zIndex: 2,
+            opacity: isPlaying ? 1 : 0,
+            transition: 'opacity 400ms cubic-bezier(0.4, 0, 0.2, 1)',
             ...style,
           }}
           {...props}
