@@ -6,11 +6,8 @@ import { ECOSYSTEM_LOGOS } from '@/data/content'
 
 export default function EcosystemSection() {
   const sectionRef = useRef<HTMLElement>(null)
-  const trackRef = useRef<HTMLDivElement>(null)
   const [isPaused, setIsPaused] = useState(false)
   const isDraggingRef = useRef(false)
-  const startXRef = useRef(0)
-  const scrollLeftRef = useRef(0)
   const resumeTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   // ── Viewport entry reveal ─────────────────────────────────────────────────
@@ -67,28 +64,16 @@ export default function EcosystemSection() {
     }
   }, [])
 
-  // ── Smooth manual carousel navigation (Left / Right buttons) ──────────────
-  const handleScroll = useCallback((direction: 'left' | 'right') => {
-    const track = trackRef.current
-    if (!track) return
+  // ── Arrow nav — pause/resume ──────────────────────────────────────────────
+  const handleArrow = useCallback(() => {
     setIsPaused(true)
     if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current)
-
-    const scrollAmount = direction === 'left' ? -320 : 320
-    track.scrollBy({ left: scrollAmount, behavior: 'smooth' })
-
-    resumeTimerRef.current = setTimeout(() => {
-      setIsPaused(false)
-    }, 3500)
+    resumeTimerRef.current = setTimeout(() => setIsPaused(false), 3500)
   }, [])
 
-  // ── Pointer Drag & Swipe Support ──────────────────────────────────────────
-  const handleMouseDown = (e: React.MouseEvent) => {
-    const track = trackRef.current
-    if (!track) return
+  // ── Drag support ─────────────────────────────────────────────────────────
+  const handleMouseDown = () => {
     isDraggingRef.current = true
-    startXRef.current = e.pageX - track.offsetLeft
-    scrollLeftRef.current = track.scrollLeft
     setIsPaused(true)
     if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current)
   }
@@ -96,22 +81,15 @@ export default function EcosystemSection() {
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDraggingRef.current) return
     e.preventDefault()
-    const track = trackRef.current
-    if (!track) return
-    const x = e.pageX - track.offsetLeft
-    const walk = (x - startXRef.current) * 1.5
-    track.scrollLeft = scrollLeftRef.current - walk
   }
 
   const handleMouseUp = () => {
     if (!isDraggingRef.current) return
     isDraggingRef.current = false
-    resumeTimerRef.current = setTimeout(() => {
-      setIsPaused(false)
-    }, 3000)
+    resumeTimerRef.current = setTimeout(() => setIsPaused(false), 3000)
   }
 
-  // Double list for continuous seamless infinite loop (Single-line continuous moving logo spotlight)
+  // Double list for seamless infinite loop
   const doubledLogos = [...ECOSYSTEM_LOGOS, ...ECOSYSTEM_LOGOS]
 
   return (
@@ -188,11 +166,11 @@ export default function EcosystemSection() {
                 Our Clients &amp; Relationships ↗
               </a>
 
-              {/* ── Circular Carousel Navigation Arrows ── */}
+              {/* ── Carousel Navigation Arrows ── */}
               <div className="eco-nav-controls" aria-label="Ecosystem carousel controls">
                 <button
                   type="button"
-                  onClick={() => handleScroll('left')}
+                  onClick={handleArrow}
                   className="eco-arrow-btn"
                   aria-label="Previous ecosystem brands"
                   title="Previous"
@@ -201,7 +179,7 @@ export default function EcosystemSection() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => handleScroll('right')}
+                  onClick={handleArrow}
                   className="eco-arrow-btn"
                   aria-label="Next ecosystem brands"
                   title="Next"
@@ -214,44 +192,33 @@ export default function EcosystemSection() {
         </div>
       </div>
 
-      {/* ── Single-Line Horizontal Moving Logo Spotlight (Seamless 30s Loop) ── */}
-      <div className="eco-carousel-viewport">
-        {/* Center Spotlight Effect */}
-        <div className="eco-spotlight-beam" aria-hidden="true" />
-
-        {/* Carousel Track */}
-        <div
-          ref={trackRef}
-          className={`eco-track-wrapper ${isPaused ? 'is-paused' : ''}`}
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => {
-            if (!isDraggingRef.current) setIsPaused(false)
-          }}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-        >
-          <div className="eco-carousel-track">
-            {doubledLogos.map((brand, idx) => (
-              <div
-                key={`${brand.name}-${idx}`}
-                className="eco-logo-card"
-                title={brand.name}
-              >
-                <div className="eco-card-ambient" aria-hidden="true" />
-                <div className="eco-logo-frame">
-                  <Image
-                    src={brand.logo}
-                    alt={brand.alt}
-                    width={160}
-                    height={70}
-                    className="eco-logo-img"
-                    loading="lazy"
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
+      {/* ── Full-Width Edge-to-Edge Logo Marquee Strip ── */}
+      <div
+        className="eco-carousel-viewport"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => { if (!isDraggingRef.current) setIsPaused(false) }}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+      >
+        {/* Continuous marquee track */}
+        <div className={`eco-carousel-track${isPaused ? ' is-paused' : ''}`}>
+          {doubledLogos.map((brand, idx) => (
+            <div
+              key={`${brand.name}-${idx}`}
+              className="eco-logo-cell"
+              title={brand.name}
+            >
+              <Image
+                src={brand.logo}
+                alt={brand.alt}
+                width={160}
+                height={70}
+                className="eco-logo-img"
+                loading="lazy"
+              />
+            </div>
+          ))}
         </div>
       </div>
 
@@ -271,8 +238,9 @@ export default function EcosystemSection() {
         </div>
       </div>
 
-      {/* ── Scoped Styles for Moving Spotlight Carousel ── */}
+      {/* ── Scoped Styles ── */}
       <style>{`
+        /* ─── Section header grid ─── */
         #ecosystem-header {
           display: grid;
           grid-template-columns: 1fr 1fr;
@@ -287,7 +255,7 @@ export default function EcosystemSection() {
           }
         }
 
-        /* ── Navigation Arrow Controls ── */
+        /* ─── Arrow Buttons ─── */
         .eco-nav-controls {
           display: flex;
           align-items: center;
@@ -323,154 +291,112 @@ export default function EcosystemSection() {
           transform: scale(0.95);
         }
 
-        /* ── Carousel Viewport ── */
+        /* ─── Full-Width Viewport — clips moving track ─── */
         .eco-carousel-viewport {
           position: relative;
           width: 100%;
           overflow: hidden;
-          padding: 12px 0;
-        }
-
-        /* ── Subtle Center Spotlight Effect ── */
-        .eco-spotlight-beam {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: min(600px, 80vw);
-          height: 200px;
-          border-radius: 50%;
-          pointer-events: none;
-          z-index: 3;
-          background: radial-gradient(
-            ellipse 50% 50% at center,
-            rgba(201, 160, 82, 0.14) 0%,
-            rgba(201, 160, 82, 0.04) 50%,
-            transparent 75%
-          );
-        }
-
-        /* ── Carousel Track Wrapper ── */
-        .eco-track-wrapper {
-          display: flex;
-          overflow-x: auto;
-          scrollbar-width: none;
-          -ms-overflow-style: none;
+          background: var(--bg-light);
+          /* Reserve fixed height to prevent layout shift */
+          min-height: 96px;
+          border-top: 1px solid rgba(0, 0, 0, 0.08);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.08);
           cursor: grab;
           user-select: none;
         }
 
-        .eco-track-wrapper::-webkit-scrollbar {
-          display: none;
-        }
-
-        .eco-track-wrapper:active {
+        .eco-carousel-viewport:active {
           cursor: grabbing;
         }
 
-        /* ── Single-Line Continuous Horizontal Moving Track (Approx 32s cycle, seamless) ── */
+        /* ─── Moving track ─── */
         .eco-carousel-track {
           display: flex;
-          gap: 16px;
+          gap: 0;
           width: max-content;
-          animation: eco-marquee 32s linear infinite;
+          animation: eco-marquee 40s linear infinite;
           will-change: transform;
+          backface-visibility: hidden;
         }
 
-        .is-paused .eco-carousel-track {
+        .eco-carousel-track.is-paused {
           animation-play-state: paused;
         }
 
         @keyframes eco-marquee {
-          0% {
-            transform: translate3d(0, 0, 0);
-          }
-          100% {
-            transform: translate3d(-50%, 0, 0);
-          }
+          from { transform: translate3d(0, 0, 0); }
+          to   { transform: translate3d(-50%, 0, 0); }
         }
 
-        /* ── Premium Logo Card ── */
-        .eco-logo-card {
+        /* ─── Individual logo cell — transparent, light, flat ─── */
+        .eco-logo-cell {
           flex-shrink: 0;
-          width: clamp(170px, 14vw, 210px);
-          height: 94px;
-          background: #11171E;
-          border: 1px solid rgba(201, 160, 82, 0.16);
-          border-radius: 4px;
+          width: clamp(148px, 12vw, 192px);
+          height: 96px;
+          background: var(--bg-light);
+          border: none;
+          /* Subtle right divider between logos */
+          border-right: 1px solid rgba(0, 0, 0, 0.07);
+          border-radius: 0;
+          box-shadow: none;
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 6px 12px;
+          padding: 14px 22px;
           position: relative;
-          overflow: hidden;
-          transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1),
-                      border-color 300ms ease,
-                      background-color 300ms ease,
-                      box-shadow 300ms ease;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+          transition: background 260ms ease, transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .eco-card-ambient {
-          position: absolute;
-          inset: 0;
-          background: radial-gradient(circle at 50% 0%, rgba(201, 160, 82, 0.08), transparent 70%);
-          opacity: 0;
-          transition: opacity 300ms ease;
-          pointer-events: none;
-        }
-
-        .eco-logo-frame {
-          width: 100%;
-          height: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          position: relative;
-        }
-
+        /* ─── Logo image — large, clear, maintains aspect ratio ─── */
         .eco-logo-img {
-          width: auto;
-          height: auto;
-          max-width: 90%;
-          max-height: 82%;
-          object-fit: contain;
-          object-position: center;
+          width: auto !important;
+          height: auto !important;
+          max-width: 90% !important;
+          max-height: 78% !important;
+          object-fit: contain !important;
+          object-position: center !important;
           opacity: 1;
-          transition: transform 300ms ease, filter 300ms ease;
-          filter: contrast(1.05);
+          filter: none;
+          transition: opacity 260ms ease;
+          display: block;
         }
 
-        /* ── Desktop Hover Interactions ── */
+        /* ─── Hover: very subtle scale, light gold tint ─── */
         @media (hover: hover) and (pointer: fine) {
-          .eco-logo-card:hover {
-            transform: translateY(-2px) scale(1.02);
-            background: #151D26;
-            border-color: rgba(201, 160, 82, 0.55);
-            box-shadow: 0 8px 24px rgba(201, 160, 82, 0.14), 0 2px 8px rgba(0, 0, 0, 0.35);
-            z-index: 2;
+          .eco-logo-cell:hover {
+            background: rgba(201, 160, 82, 0.04);
+            transform: scale(1.05);
+            z-index: 3;
           }
 
-          .eco-logo-card:hover .eco-card-ambient {
+          .eco-logo-cell:hover .eco-logo-img {
             opacity: 1;
-          }
-
-          .eco-logo-card:hover .eco-logo-img {
-            opacity: 1;
-            filter: contrast(1.08) brightness(1.02);
           }
         }
 
-        /* ── Reduced Motion ── */
+        /* ─── Reduced Motion ─── */
         @media (prefers-reduced-motion: reduce) {
           .eco-carousel-track {
             animation: none;
           }
-          .eco-spotlight-beam {
-            display: none;
-          }
-          .eco-logo-card {
+          .eco-logo-cell {
             transition: none;
+          }
+        }
+
+        /* ─── Mobile ─── */
+        @media (max-width: 640px) {
+          .eco-logo-cell {
+            width: clamp(112px, 34vw, 148px);
+            height: 80px;
+            padding: 10px 14px;
+          }
+          .eco-logo-img {
+            max-width: 82% !important;
+            max-height: 68% !important;
+          }
+          .eco-carousel-viewport {
+            min-height: 80px;
           }
         }
       `}</style>
