@@ -41,7 +41,6 @@ export default function ProjectsIndustriesPage() {
     warehousing:          '/media/posters/warehouse.jpg',
     realEstate:           '/media/posters/residential.jpg',
     institutions:         '/media/posters/campus.jpg',
-    utilities:            '/media/posters/substation.jpg',
     industrialFacilities: '/media/posters/industrial.jpg',
     infrastructure:       '/media/posters/infrastructure.jpg',
   }
@@ -126,7 +125,7 @@ export default function ProjectsIndustriesPage() {
         </div>
       </section>
 
-      {/* ── Section 2: Industries (8 Dedicated Sectors) ─────────────────────────── */}
+      {/* ── Section 2: Industries (7 Dedicated Sectors) ─────────────────────────── */}
       <section className="section-py" style={{ background: 'var(--bg-primary)', borderBottom: '1px solid var(--line-soft)' }}>
         <div className="site-container">
           <div className="section-label" style={{ marginBottom: '16px' }}>

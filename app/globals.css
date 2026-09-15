@@ -898,7 +898,7 @@ video {
 }
 
 /* ─────────────────────────────────────────────────────────
-   UTILITIES
+  UTILITY CLASSES
 ───────────────────────────────────────────────────────── */
 .back-nav-link:hover {
   transform: translateX(-4px);

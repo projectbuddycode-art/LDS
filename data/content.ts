@@ -224,7 +224,6 @@ export const INDUSTRIES = [
   { id: 'warehousing',          label: 'Warehousing',            mediaKey: 'warehousing'          as const },
   { id: 'real-estate',          label: 'Real Estate',            mediaKey: 'realEstate'           as const },
   { id: 'institutions',         label: 'Institutions',           mediaKey: 'institutions'         as const },
-  { id: 'utilities',            label: 'Utilities',              mediaKey: 'utilities'            as const },
   { id: 'industrial-facilities', label: 'Industrial Facilities',  mediaKey: 'industrialFacilities' as const },
   { id: 'infrastructure',       label: 'Infrastructure',         mediaKey: 'infrastructure'       as const },
 ]

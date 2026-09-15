@@ -18,7 +18,6 @@ const OBJECT_POSITIONS: Record<string, string> = {
   warehousing:          'center 25%',
   realEstate:           'center 22%',
   institutions:         'center 25%',
-  utilities:            'center 20%',
   industrialFacilities: 'center 22%',
   infrastructure:       'center 25%',
 }
@@ -29,7 +28,6 @@ const POSTER_MAP: Record<string, string> = {
   warehousing:          '/media/posters/warehouse.jpg',
   realEstate:           '/media/posters/residential.jpg',
   institutions:         '/media/posters/campus.jpg',
-  utilities:            '/media/posters/substation.jpg',
   industrialFacilities: '/media/posters/industrial.jpg',
   infrastructure:       '/media/posters/infrastructure.jpg',
 }
@@ -344,7 +342,7 @@ export default function IndustriesSection() {
             <span style={{ color: 'var(--accent-gold)' }}>SECTOR.</span>
           </h2>
           <p className="t-body" style={{ maxWidth: '440px' }}>
-            From manufacturing plants and warehouses to institutional campuses, commercial facilities, and utilities — Lukhdatar &amp; Sons delivers the same engineering precision across every industrial sector.
+            From manufacturing plants and warehouses to institutional campuses and commercial facilities, Lukhdatar &amp; Sons delivers the same engineering precision across every industrial sector.
           </p>
         </div>
       </div>

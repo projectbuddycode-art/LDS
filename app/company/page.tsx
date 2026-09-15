@@ -239,7 +239,6 @@ export default function CompanyPage() {
                   { sector: 'Commercial Electrical Work', examples: 'Hotels, commercial complexes, retail hubs, and corporate infrastructure.' },
                   { sector: 'Industrial & Warehouses', examples: 'Manufacturing facilities, process plants, logistics parks, and distribution depots.' },
                   { sector: 'Housing & Townships', examples: 'Residential developments, township electrification, and underground distribution loops.' },
-                  { sector: 'Utility Substations', examples: 'State electricity board substations, switchyards, and power corridors up to 220KV.' }
                 ].map((s) => (
                   <div key={s.sector} style={{ padding: '20px 22px', border: '1px solid var(--line-soft)', background: 'var(--bg-light)' }}>
                     <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '6px' }}>

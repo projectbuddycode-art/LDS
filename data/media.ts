@@ -45,7 +45,7 @@ export const MEDIA = {
     shristinagar:      '/media/shristinagar.mp4',
   },
 
-  // ── Industries Section (8 Dedicated Sectors) ─────────────
+  // ── Industries Section (7 Dedicated Sectors) ─────────────
   // Dedicated videos mapped per specification.
   industries: {
     manufacturing:        '/media/industrial.mp4',      // 01 — Manufacturing
@@ -53,9 +53,8 @@ export const MEDIA = {
     warehousing:          '/media/warehouse.mp4',       // 03 — Warehousing
     realEstate:           '/media/residential.mp4',     // 04 — Real Estate
     institutions:         '/media/campus.mp4',          // 05 — Institutions
-    utilities:            '/media/substation.mp4',      // 06 — Utilities
-    industrialFacilities: '/media/industrial.mp4',      // 07 — Industrial Facilities (Dedicated)
-    infrastructure:       '/media/infrastructure.mp4',  // 08 — Infrastructure (Dedicated)
+    industrialFacilities: '/media/industrial.mp4',      // 06 — Industrial Facilities (Dedicated)
+    infrastructure:       '/media/infrastructure.mp4',  // 07 — Infrastructure (Dedicated)
   },
 
   // ── Beyond Commissioning / Accountability ────────────────
