@@ -73,6 +73,15 @@ export default function ProductsEquipmentPage() {
     apfcControlPanels:  '/media/posters/capacitor-bank.jpg',
   }
 
+  const objectPositionMap: Record<string, string> = {
+    transformers: 'center center',
+    switchgear: 'center 42%',
+    powerControlCenter: 'center center',
+    capacitorBank: 'center center',
+    busduct: 'center center',
+    apfcControlPanels: 'center 32%',
+  }
+
   return (
     <PageLayout>
       {/* ── Hero Section ──────────────────────────────────────────────────────── */}
@@ -131,6 +140,7 @@ export default function ProductsEquipmentPage() {
                     muted
                     playsInline
                     loop
+                    style={{ objectPosition: objectPositionMap[item.mediaKey] || 'center center' }}
                   />
                 </div>
                 <div style={{

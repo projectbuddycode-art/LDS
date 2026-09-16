@@ -47,6 +47,14 @@ function LazyVideo({
     if (!video) return
     if (!intersectingRef.current && !preloadImmediate) return
 
+    if (typeof window !== 'undefined') {
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      if (prefersReducedMotion) {
+        safePause(video)
+        return
+      }
+    }
+
     prepareVideo(video)
     void safePlay(video).then((started) => {
       if (started && !isUnmountedRef.current) {

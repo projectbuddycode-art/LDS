@@ -1,5 +1,9 @@
 // Centralized media manifest for LDS Infrastructure website
-// Sourced strictly from verified project assets in /public/media/
+// Sourced strictly from verified project assets in /public/media/ and project root media files.
+
+const switchgearVideo = new URL('../Switchgear_installation_in_indus…_20260917040924 (1).mp4', import.meta.url).toString()
+const apfcVideo = new URL('../Industrial_control_panels_and_APFC_20260917040929.mp4', import.meta.url).toString()
+const transformersVideo = new URL('../Transformers_inside_electrical_p…_20260917041122.mp4', import.meta.url).toString()
 
 export const MEDIA = {
   // ── Intro + Hero ─────────────────────────────────────────
@@ -20,12 +24,12 @@ export const MEDIA = {
 
   // ── Equipment Range & Cinematic Mapping ──────────────────
   equipment: {
-    transformers:       '/media/hero-bg.mp4',
-    switchgear:         '/media/substation.mp4',
+    transformers:       transformersVideo,
+    switchgear:         switchgearVideo,
     busduct:            '/media/busduct.mp4',
     capacitorBank:      '/media/capacitor-bank.mp4',
     powerControlCenter: '/media/power-control-center.mp4',
-    apfcControlPanels:  '/media/capacitor-bank.mp4',
+    apfcControlPanels:  apfcVideo,
   },
 
   // ── Turnkey / Workforce ──────────────────────────────────

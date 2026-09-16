@@ -118,10 +118,10 @@ export default function ClientsPartnershipsPage() {
       <section className="section-py" style={{ background: 'var(--bg-secondary)', textAlign: 'center' }}>
         <div className="site-container">
           <h2 className="t-headline" style={{ fontSize: 'clamp(24px, 3.5vw, 40px)', marginBottom: '20px' }}>
-            Discuss a Project with LDS
+            Interested in partnering with LDS?
           </h2>
-          <p className="t-body" style={{ maxWidth: '520px', margin: '0 auto 36px' }}>
-            Looking for a turnkey electrical contractor, equipment partner, or substation execution team? Contact LDS today.
+          <p className="t-body" style={{ maxWidth: '640px', margin: '0 auto 36px' }}>
+            We welcome conversations with organizations looking to build long-term technical, supply, engineering, and project collaborations.
           </p>
           <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <button
@@ -129,7 +129,7 @@ export default function ClientsPartnershipsPage() {
               className="cta-btn cta-btn-primary"
               style={{ cursor: 'pointer', fontFamily: 'inherit' }}
             >
-              Get a Quote ↗
+              Partner With Us ↗
             </button>
             <a href="/company" className="cta-btn">
               About Us ↗

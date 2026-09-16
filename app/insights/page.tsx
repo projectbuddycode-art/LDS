@@ -1,14 +1,99 @@
 'use client'
 
+import { useState } from 'react'
 import PageLayout from '@/components/layout/PageLayout'
 import BackNav from '@/components/navigation/BackNav'
 import { PROJECTS, INDUSTRIES } from '@/data/content'
 import { MEDIA } from '@/data/media'
 import LazyVideo from '@/components/LazyVideo'
-import Link from 'next/link'
 import { openQuoteModal } from '@/lib/quoteEvents'
 
 export default function ProjectsIndustriesPage() {
+  const [expandedProjectId, setExpandedProjectId] = useState<string | null>(null)
+
+  const projectSnapshots: Record<string, Record<string, string>> = {
+    'taj-hotel': {
+      industry: 'Hospitality',
+      projectType: 'Luxury hospitality electrical infrastructure',
+      scope: 'Electrical infrastructure for a premium hotel environment',
+      systems: 'Power distribution • switchboards • lighting • backup coordination',
+      ldsRole: 'Turnkey electrical infrastructure execution',
+      projectContext: 'Project reference within a premium hospitality setting.',
+    },
+    sonotel: {
+      industry: 'Hospitality',
+      projectType: 'Hospitality electrical SITC',
+      scope: 'Main distribution panels, bus ducts, generator synchronization, and illumination systems',
+      systems: 'Main distribution panels • bus ducts • generator synchronization • lighting',
+      ldsRole: 'Supply, installation, testing & commissioning',
+      projectContext: 'Executed for a hospitality property with coordinated power and lighting infrastructure.',
+    },
+    'assam-medical-college': {
+      industry: 'Healthcare / Medical',
+      projectType: 'Medical college and research campus electrical infrastructure',
+      scope: 'Complete electrical SITC across academic blocks, hospital wards, and research laboratories',
+      systems: 'Transformer yards • rising mains • cable tray networks • earthing systems',
+      ldsRole: 'Complete electrical SITC delivery',
+      projectContext: 'Campus-wide project covering clinical, academic, and research areas.',
+    },
+    'sarojini-naidu-hospital': {
+      industry: 'Healthcare / Medical',
+      projectType: 'Healthcare facility modernization',
+      scope: 'Primary power distribution switchboards and electrical installation modernization',
+      systems: 'Capacitor banks • main switchboards • grounding networks • power distribution',
+      ldsRole: 'Turnkey SITC of electrical installations',
+      projectContext: 'Delivered for an active medical facility with focused modernization of electrical infrastructure.',
+    },
+    'skmc-medical-college': {
+      industry: 'Healthcare / Medical',
+      projectType: 'Medical college campus electrification',
+      scope: 'Campus power distribution and illumination infrastructure',
+      systems: 'HT VCB switchgear • transformers • cable trays • emergency lighting',
+      ldsRole: 'Complete electrical SITC',
+      projectContext: 'Project scope covered campus-wide distribution and safety lighting systems.',
+    },
+    'bihar-vidhan-sabha': {
+      industry: 'Government / Institutional',
+      projectType: 'Institutional infrastructure electrification',
+      scope: 'Turnkey infrastructure electrification for a state legislative complex',
+      systems: 'Primary distribution • secure power routing • backup synchronization • panels',
+      ldsRole: 'Turnkey electrical infrastructure execution',
+      projectContext: 'Institutional project delivered with a focus on dependable public-sector power infrastructure.',
+    },
+    'warehouse-projects': {
+      industry: 'Industrial / Infrastructure',
+      projectType: 'Warehouse and logistics electrification',
+      scope: 'Industrial power distribution and external logistics infrastructure',
+      systems: 'High-bay lighting • high-masts • motor distribution boards • lightning protection',
+      ldsRole: 'Electrical infrastructure and distribution execution',
+      projectContext: 'Large-format logistics facility electrification with yard and internal distribution works.',
+    },
+    'kohora-substation': {
+      industry: 'Substation',
+      projectType: 'Utility substation infrastructure',
+      scope: '2 × 3.15 MVA substation with control room and 9 VCB panels',
+      systems: 'Transformers • control room • VCB panels • cable ducts',
+      ldsRole: 'Turnkey design, supply, erection, testing & commissioning',
+      projectContext: 'Completed in 100 working days with comprehensive testing and commissioning.',
+    },
+    signature: {
+      industry: 'Residential / Township',
+      projectType: 'Residential township power distribution',
+      scope: 'HT/LT power distribution and transformer yard infrastructure',
+      systems: 'HT/LT distribution • transformer yards • LT control panels • sub-metering',
+      ldsRole: 'Power distribution and control system execution',
+      projectContext: 'Delivered for a residential township with structured HT/LT distribution networks.',
+    },
+    shristinagar: {
+      industry: 'Residential / Township',
+      projectType: 'Township electrification',
+      scope: 'Outdoor township electrification and distribution loop infrastructure',
+      systems: 'LT feeder pillar boards • underground distribution loops • street lighting',
+      ldsRole: 'Electrical distribution and external electrification execution',
+      projectContext: 'Project included weather-proof feeder boards and external distribution infrastructure.',
+    },
+  }
+
   const projectMediaMap: Record<string, string> = {
     tajHotel:          MEDIA.projects.tajHotel,
     sonotel:           MEDIA.projects.sonotel,
@@ -60,7 +145,7 @@ export default function ProjectsIndustriesPage() {
             <span style={{ color: 'var(--accent-gold)' }}>Industries Served</span>
           </h1>
           <p className="t-body" style={{ maxWidth: '680px', fontSize: 'clamp(16px, 1.2vw, 20px)', lineHeight: 1.6 }}>
-            Explore verified project execution highlights across hospitality, healthcare campuses, logistics warehouses, government facilities, and residential townships.
+            From hospitality and healthcare to industrial, commercial, and infrastructure applications, LDS supports electrical projects across diverse environments.
           </p>
         </div>
       </section>
@@ -79,131 +164,206 @@ export default function ProjectsIndustriesPage() {
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))',
-            gap: '16px',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
+            gap: '20px',
             marginBottom: '40px',
           }}>
             {PROJECTS.map((proj, idx) => (
-              <div
+              <article
                 key={proj.id}
                 style={{
-                  position: 'relative',
-                  aspectRatio: '16/10',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0',
                   overflow: 'hidden',
-                  background: 'var(--surface)',
+                  background: 'var(--bg-light)',
                   border: '1px solid var(--line-soft)',
+                  minWidth: 0,
                 }}
               >
-                <div style={{ position: 'absolute', inset: 0 }}>
+                <div style={{ width: '100%', aspectRatio: '16 / 10', overflow: 'hidden', background: 'var(--surface)', borderBottom: '1px solid var(--line-soft)' }}>
                   <LazyVideo
                     src={projectMediaMap[proj.mediaKey]}
                     poster={projectPosterMap[proj.mediaKey]}
                     aria-label={proj.title}
+                    style={{ objectPosition: 'center center' }}
                   />
                 </div>
-                <div style={{
-                  position: 'absolute',
-                  inset: 0,
-                  background: 'linear-gradient(to top, rgba(10,14,18,0.92) 0%, rgba(10,14,18,0.3) 50%, transparent 80%)',
-                  zIndex: 2,
-                }} />
-                <div style={{ position: 'absolute', bottom: '20px', left: '20px', right: '20px', zIndex: 3 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+
+                <div style={{ padding: '20px 20px 22px', display: 'flex', flexDirection: 'column', gap: '12px', minWidth: 0 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
                     <span className="t-label" style={{ color: 'var(--accent-gold)' }}>{proj.tag}</span>
-                    <span style={{ fontSize: '10px', color: 'rgba(250,248,245,0.4)', fontWeight: 600 }}>0{idx + 1}</span>
+                    <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600, letterSpacing: '0.12em' }}>
+                      {String(idx + 1).padStart(2, '0')}
+                    </span>
                   </div>
-                  <div style={{ fontSize: '18px', fontWeight: 600, color: '#FAF8F5', marginBottom: '4px' }}>
+
+                  <h3 style={{ fontSize: 'clamp(18px, 1.5vw, 22px)', fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1.25, margin: 0, wordBreak: 'break-word' }}>
                     {proj.title}
+                  </h3>
+
+                  <p className="t-body" style={{ margin: 0, fontSize: '14px', lineHeight: 1.7, color: 'var(--text-secondary)', wordBreak: 'break-word' }}>
+                    {proj.desc}
+                  </p>
+
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '4px' }}>
+                    <span className="t-label" style={{ color: 'var(--text-muted)' }}>Industry</span>
+                    <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '0.02em' }}>
+                      {proj.tag}
+                    </span>
                   </div>
-                  <div style={{ fontSize: '12px', color: 'rgba(250,248,245,0.70)', lineHeight: 1.4 }}>
-                    {proj.scope}
-                  </div>
+
+                  <button
+                    type="button"
+                    aria-expanded={expandedProjectId === proj.id}
+                    onClick={() => setExpandedProjectId((current) => current === proj.id ? null : proj.id)}
+                    style={{
+                      alignSelf: 'flex-start',
+                      border: 'none',
+                      background: 'transparent',
+                      color: 'var(--accent-gold)',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
+                      cursor: 'pointer',
+                      padding: 0,
+                    }}
+                  >
+                    {expandedProjectId === proj.id ? 'Show Less' : 'Know More'} ↗
+                  </button>
+
+                  {expandedProjectId === proj.id && (() => {
+                    const snapshot = projectSnapshots[proj.id]
+                    const fields = [
+                      { label: 'Industry', value: snapshot?.industry },
+                      { label: 'Project Type', value: snapshot?.projectType },
+                      { label: 'Scope', value: snapshot?.scope },
+                      { label: 'Systems', value: snapshot?.systems },
+                      { label: 'LDS Role', value: snapshot?.ldsRole },
+                      { label: 'Project Context', value: snapshot?.projectContext },
+                    ].filter((field) => !!field.value)
+
+                    return (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', paddingTop: '12px', borderTop: '1px solid var(--line-soft)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
+                          <span className="t-label" style={{ color: 'var(--accent-gold)' }}>Project Snapshot</span>
+                        </div>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '10px' }}>
+                          {fields.map((field) => (
+                            <div key={field.label} style={{ display: 'flex', flexDirection: 'column', gap: '4px', padding: '10px 10px 9px', border: '1px solid var(--line-soft)', background: 'var(--bg-primary)' }}>
+                              <span style={{ color: 'var(--text-muted)', fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+                                {field.label}
+                              </span>
+                              <span style={{ color: 'var(--text-primary)', fontSize: '13px', lineHeight: 1.5, wordBreak: 'break-word' }}>
+                                {field.value}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => openQuoteModal(`${proj.title} project details`)}
+                          style={{
+                            alignSelf: 'flex-start',
+                            marginTop: '2px',
+                            border: '1px solid var(--line-gold)',
+                            background: 'var(--bg-light)',
+                            color: 'var(--text-primary)',
+                            fontSize: '12px',
+                            fontWeight: 600,
+                            letterSpacing: '0.08em',
+                            textTransform: 'uppercase',
+                            cursor: 'pointer',
+                            padding: '10px 12px',
+                          }}
+                        >
+                          Request Project Details ↗
+                        </button>
+                      </div>
+                    )
+                  })()}
                 </div>
-              </div>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Section 2: Industries (7 Dedicated Sectors) ─────────────────────────── */}
+      {/* ── Section 2: Verified Industries Served ─────────────────────────────── */}
       <section className="section-py" style={{ background: 'var(--bg-primary)', borderBottom: '1px solid var(--line-soft)' }}>
         <div className="site-container">
           <div className="section-label" style={{ marginBottom: '16px' }}>
             <span className="section-label-bullet" />
-            <span className="t-label">INDUSTRIES</span>
+            <span className="t-label">INDUSTRIES SERVED</span>
           </div>
           <h2 className="t-headline" style={{ fontSize: 'clamp(28px, 3.5vw, 44px)', marginBottom: '16px', textWrap: 'balance' }}>
-            POWERING EVERY{' '}
-            <span style={{ color: 'var(--accent-gold)' }}>SECTOR.</span>
+            Electrical Infrastructure Supporting{' '}
+            <span style={{ color: 'var(--accent-gold)' }}>Diverse Sectors</span>
           </h2>
-          <p className="t-body" style={{ maxWidth: '540px', marginBottom: '40px' }}>
-            Dedicated electrical engineering and installation solutions configured for each industrial sector.
+          <p className="t-body" style={{ maxWidth: '620px', marginBottom: '28px' }}>
+            LDS has delivered electrical infrastructure and system works across multiple industries documented throughout the company portfolio and project history.
           </p>
 
           <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 260px), 1fr))',
-            gap: '16px',
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '10px',
           }}>
-            {INDUSTRIES.map((ind, idx) => (
-              <div
+            {INDUSTRIES.map((ind) => (
+              <span
                 key={ind.id}
                 style={{
-                  position: 'relative',
-                  aspectRatio: '4/5',
-                  overflow: 'hidden',
-                  background: 'var(--surface)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  padding: '10px 14px',
                   border: '1px solid var(--line-soft)',
+                  background: 'var(--bg-light)',
+                  color: 'var(--text-primary)',
+                  fontSize: '13px',
+                  fontWeight: 500,
                 }}
               >
-                <div style={{ position: 'absolute', inset: 0 }}>
-                  <LazyVideo
-                    src={MEDIA.industries[ind.mediaKey]}
-                    poster={industryPosterMap[ind.mediaKey]}
-                    aria-label={ind.label}
-                  />
-                </div>
-                <div style={{
-                  position: 'absolute',
-                  inset: 0,
-                  background: 'linear-gradient(to top, rgba(10,14,18,0.90) 0%, rgba(10,14,18,0.2) 40%, transparent 70%)',
-                  zIndex: 2,
-                }} />
-                <div style={{ position: 'absolute', bottom: '24px', left: '24px', right: '24px', zIndex: 3 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                    <span style={{ fontSize: '10px', fontWeight: 600, color: 'var(--accent-gold)' }}>0{idx + 1}</span>
-                    <div style={{ width: '24px', height: '1px', background: 'var(--accent-gold)', opacity: 0.8 }} />
-                  </div>
-                  <div style={{ fontSize: '20px', fontWeight: 600, color: '#FAF8F5' }}>
-                    {ind.label}
-                  </div>
-                </div>
-              </div>
+                {ind.label}
+              </span>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Section 3: Call to Action ─────────────────────────────────────────── */}
+      {/* ── Section 3: Selected Projects + Additional Project Inquiry ───────── */}
       <section className="section-py" style={{ background: 'var(--bg-secondary)', textAlign: 'center' }}>
         <div className="site-container">
+          <div className="section-label" style={{ justifyContent: 'center', marginBottom: '18px' }}>
+            <span className="section-label-bullet" />
+            <span className="t-label">SELECTED PROJECTS</span>
+          </div>
           <h2 className="t-headline" style={{ fontSize: 'clamp(24px, 3.5vw, 40px)', marginBottom: '20px' }}>
-            Ready for Your Next Project?
+            Selected project examples from across our portfolio.
           </h2>
-          <p className="t-body" style={{ maxWidth: '520px', margin: '0 auto 36px' }}>
-            Tell us about your electrical project requirements and our engineering team will get in touch.
+          <p className="t-body" style={{ maxWidth: '720px', margin: '0 auto 16px' }}>
+            The projects showcased here represent a selection of LDS&apos;s work across different industries and applications.
+          </p>
+          <p className="t-body" style={{ maxWidth: '720px', margin: '0 auto 36px' }}>
+            Looking for more project references or information about our experience in your industry? Reach out to our team to discuss additional projects, capabilities, and relevant project experience.
           </p>
           <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <button
-              onClick={() => openQuoteModal()}
+              onClick={() => openQuoteModal('Project Details Request')}
               className="cta-btn cta-btn-primary"
+              style={{ cursor: 'pointer', fontFamily: 'inherit' }}
+            >
+              Request Project Details ↗
+            </button>
+            <button
+              onClick={() => openQuoteModal()}
+              className="cta-btn"
               style={{ cursor: 'pointer', fontFamily: 'inherit' }}
             >
               Get a Quote ↗
             </button>
-            <a href="/capabilities" className="cta-btn">
-              Our Services ↗
-            </a>
           </div>
         </div>
       </section>

@@ -252,6 +252,14 @@ export default function IntroSequence({ onComplete }: IntroSequenceProps) {
           onPlaying={() => setIsVideoPlaying(true)}
           onTimeUpdate={(e) => {
             const target = e.currentTarget
+
+            // Keep the opening and main cinematic motion unchanged, but gently slow the final branding sequence
+            if (target.duration > 0) {
+              const endWindow = Math.min(2.2, Math.max(0.8, target.duration * 0.08))
+              const isFinalBrandingWindow = target.currentTime >= target.duration - endWindow
+              target.playbackRate = isFinalBrandingWindow ? 0.82 : 1
+            }
+
             // Trigger subtle crossfade ~0.35s before end to avoid any frame stutter
             if (target.duration > 0 && target.currentTime >= target.duration - 0.35) {
               const container = containerRef.current
